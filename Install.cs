@@ -1,11 +1,20 @@
-﻿using System.Net.Http.Handlers;
+﻿using Downloader;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Common;
+using SharpCompress.Readers;
 
 namespace FlashpointInstaller
 {
     public partial class Install : Form
     {
-        private static ProgressMessageHandler handler = new(new HttpClientHandler() { AllowAutoRedirect = true });
-        private HttpClient client = new(handler);
+        DownloadService downloader = new(new DownloadConfiguration());
+
+        Stream stream;
+        SevenZipArchive archive;
+        IReader reader;
+
+        string lastEntry = "";
+        long extractedSize = 0;
 
         public Install()
         {
@@ -14,34 +23,79 @@ namespace FlashpointInstaller
 
         private async void Install_Load(object sender, EventArgs e)
         {
-            handler.HttpReceiveProgress += Install_ReceiveProgress;
+            downloader.DownloadStarted += OnDownloadStarted;
+            downloader.DownloadProgressChanged += OnDownloadProgressChanged;
 
-            byte[] fpData = await client.GetByteArrayAsync("http://localhost/Flashpoint%2010.1%20Infinity.7z");
-            await File.WriteAllBytesAsync(@"fp.tmp", fpData);
-
-            Close();
+            stream = await downloader.DownloadFileTaskAsync("http://localhost/Flashpoint%2011%20Infinity.7z");
+            
+            await Task.Run(() =>
+            {
+                using (archive = SevenZipArchive.Open(stream))
+                {
+                    using (reader = archive.ExtractAllEntries())
+                    {
+                        reader.EntryExtractionProgress += OnEntryExtractionProgressChanged;
+                        reader.WriteAllToDirectory(((Main)Application.OpenForms["Main"]).FolderText.Text, new ExtractionOptions { ExtractFullPath = true, Overwrite = true });
+                    }
+                }
+            });
         }
 
-        private void Install_ReceiveProgress(object sender, HttpProgressEventArgs e)
+        private void OnDownloadStarted(object? sender, DownloadStartedEventArgs e)
         {
-            if (this.IsHandleCreated)
+            Info.Invoke((MethodInvoker)delegate
             {
-                Progress.Invoke((MethodInvoker)delegate
-                {
-                    Progress.Value = (int)((e.BytesTransferred / e.TotalBytes) * Progress.Maximum);
-                });
-                
-                Info.Invoke((MethodInvoker)delegate
-                {
-                    Info.Text = $"Downloading... {e.BytesTransferred / 1000000} of {e.TotalBytes / 1000000}";
-                });
+                Info.Text = $"Downloaded 0MB of {Math.Round((double)e.TotalBytesToReceive / 1000000)}MB";
+            });
+        }
+
+        private void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
+        {
+            Progress.Invoke((MethodInvoker)delegate
+            {
+                Progress.Value = (int)((double)e.ReceivedBytesSize / e.TotalBytesToReceive * (Progress.Maximum / 2));
+            });
+
+            Info.Invoke((MethodInvoker)delegate
+            {
+                Info.Text = $"Downloaded {e.ReceivedBytesSize / 1000000}MB of {e.TotalBytesToReceive / 1000000}MB";
+            });
+        }
+
+        private void OnEntryExtractionProgressChanged(object? sender, ReaderExtractionEventArgs<IEntry> e)
+        {
+            if (e.Item.Key != lastEntry)
+            {
+                extractedSize += e.Item.Size;
+                lastEntry = e.Item.Key;
             }
+
+            long extractedSizeExact = extractedSize - (e.Item.Size - e.ReaderProgress.BytesTransferred);
+
+            Progress.Invoke((MethodInvoker)delegate
+            {
+                Progress.Value = (Progress.Maximum / 2) + ((int)((double)extractedSizeExact / archive.TotalUncompressSize * (Progress.Maximum / 2)));
+            });
+            
+            Info.Invoke((MethodInvoker)delegate
+            {
+                Info.Text = $"Extracted {extractedSize / 1000000}MB of {archive.TotalUncompressSize / 1000000}MB";
+            });
         }
 
         private void Cancel_Click(object sender, EventArgs e)
         {
-            client.DeleteAsync("http://localhost/Flashpoint%2010.1%20Infinity.7z");
-            client.CancelPendingRequests();
+            if (downloader.IsBusy)
+            {
+                downloader.CancelAsync();
+            }
+            else if (reader != null)
+            {
+                reader.Cancel();
+                archive.Dispose();
+                stream.Dispose();
+            }
+
             Close();
         }
     }
