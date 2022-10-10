@@ -45,10 +45,10 @@
             this.RunOnClose.Text = "Run Flashpoint on exit";
             this.RunOnClose.UseVisualStyleBackColor = true;
             // 
-            // Close
+            // CloseButton
             // 
             this.CloseButton.Location = new System.Drawing.Point(217, 39);
-            this.CloseButton.Name = "Close";
+            this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new System.Drawing.Size(75, 23);
             this.CloseButton.TabIndex = 2;
             this.CloseButton.Text = "Close";
@@ -81,6 +81,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Installation Complete";
+            this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Exit);
             this.ResumeLayout(false);
             this.PerformLayout();

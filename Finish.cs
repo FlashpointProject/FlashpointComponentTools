@@ -10,10 +10,14 @@ namespace FlashpointInstaller
         {
             if (RunOnClose.Checked)
             {
-                Process.Start(Path.Combine(
-                    ((Main)Application.OpenForms["Main"]).FolderText.Text,
-                    @"Flashpoint 11 Infinity\Launcher\Flashpoint.exe"
-                ));
+                Process flashpointProcess = new();
+                flashpointProcess.StartInfo.UseShellExecute = true;
+                flashpointProcess.StartInfo.FileName = "Flashpoint.exe";
+                flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(
+                    ((Main)Application.OpenForms["Main"]).FolderTextBox.Text,
+                    @"Flashpoint 11 Infinity\Launcher"
+                );
+                flashpointProcess.Start();
             }
 
             Environment.Exit(0);

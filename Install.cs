@@ -3,7 +3,6 @@ using IWshRuntimeLibrary;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Readers;
-using File = System.IO.File;
 
 namespace FlashpointInstaller
 {
@@ -23,24 +22,15 @@ namespace FlashpointInstaller
 
         private async void Install_Load(object sender, EventArgs e)
         {
-            downloader.DownloadStarted += OnDownloadStarted;
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
 
-            stream = await downloader.DownloadFileTaskAsync("http://localhost/Flashpoint%2011%20Infinity.7z");
-            //stream = File.OpenRead(@"E:\Flashpoint 11 Infinity.zip");
+            stream = await downloader.DownloadFileTaskAsync("https://bluepload.unstable.life/selif/flashpointdummy.zip");
+            //stream = System.IO.File.OpenRead(@"E:\Flashpoint 11 Infinity.zip");
 
             if (!downloader.IsCancelled)
             {
                 await Task.Run(ExtractTask);
             }
-        }
-
-        private void OnDownloadStarted(object? sender, DownloadStartedEventArgs e)
-        {
-            Info.Invoke((MethodInvoker)delegate
-            {
-                Info.Text = $"Downloaded 0MB of {e.TotalBytesToReceive / 1000000}MB";
-            });
         }
 
         private void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
@@ -52,7 +42,7 @@ namespace FlashpointInstaller
 
             Info.Invoke((MethodInvoker)delegate
             {
-                Info.Text = $"Downloaded {e.ReceivedBytesSize / 1000000}MB of {e.TotalBytesToReceive / 1000000}MB";
+                Info.Text = $"1/2: Downloading archive - {e.ReceivedBytesSize / 1000000}MB of {e.TotalBytesToReceive / 1000000}MB";
             });
         }
 
@@ -62,8 +52,8 @@ namespace FlashpointInstaller
             {
                 using (reader = archive.ExtractAllEntries())
                 {
-                    int extractedFiles = 0;
-                    int totalFiles = archive.Entries.Where(entry => !entry.IsDirectory).Count();
+                    long extractedSize = 0;
+                    long totalSize = archive.TotalUncompressSize;
                     
                     while (!reader.Cancelled && reader.MoveToNextEntry())
                     {
@@ -72,20 +62,20 @@ namespace FlashpointInstaller
                             continue;
                         }
 
-                        reader.WriteEntryToDirectory(mainForm.FolderText.Text, new ExtractionOptions { ExtractFullPath = true, Overwrite = true });
+                        reader.WriteEntryToDirectory(mainForm.FolderTextBox.Text, new ExtractionOptions { ExtractFullPath = true, Overwrite = true });
 
-                        extractedFiles++;
+                        extractedSize += reader.Entry.Size;
 
                         try
                         {
                             Progress.Invoke((MethodInvoker)delegate
                             {
-                                Progress.Value = (Progress.Maximum / 2) + ((int)((double)extractedFiles / totalFiles * (Progress.Maximum / 2)));
+                                Progress.Value = (Progress.Maximum / 2) + (int)((double)extractedSize / totalSize * (Progress.Maximum / 2));
                             });
                             
                             Info.Invoke((MethodInvoker)delegate
                             {
-                                Info.Text = $"Extracted {extractedFiles} of {totalFiles} files";
+                                Info.Text = $"2/2: Extracting files - {extractedSize / 1000000}MB of {totalSize / 1000000}MB";
                             });
                         }
                         catch { }
@@ -105,23 +95,31 @@ namespace FlashpointInstaller
 
         private void FinishInstallation()
         {
-            if (mainForm.ShortcutsDesktop.Checked)
+            if (mainForm.Shortcut.Checked)
             {
-                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-                IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(desktopPath, "Flashpoint Infinity.lnk"));
-                shortcut.TargetPath = Path.Combine(mainForm.FolderText.Text, @"Flashpoint 11 Infinity\Launcher\Flashpoint.exe");
+                IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                    "Flashpoint Infinity.lnk"
+                ));
+                shortcut.TargetPath = Path.Combine(mainForm.FolderTextBox.Text, @"Flashpoint 11 Infinity\Launcher\Flashpoint.exe");
+                shortcut.WorkingDirectory = Path.Combine(mainForm.FolderTextBox.Text, @"Flashpoint 11 Infinity\Launcher");
+                shortcut.Description = "Shortcut to Flashpoint Infinity";
                 shortcut.Save();
             }
 
-            Finish FinishWindow = new();
-            FinishWindow.ShowDialog();
+            Invoke((MethodInvoker)delegate
+            {
+                Hide();
+                mainForm.Hide();
+
+                Finish FinishWindow = new();
+                FinishWindow.ShowDialog();
+            });
         }
 
         private async void Cancel_Click(object sender, EventArgs e)
         {
             Cancel.Enabled = false;
-            Info.Text = "Cancelling installation...";
 
             if (downloader.IsBusy)
             {
@@ -133,7 +131,14 @@ namespace FlashpointInstaller
 
                 await Task.Run(() =>
                 {
+                    Info.Invoke((MethodInvoker)delegate
+                    {
+                        Info.Text = $"Cancelling installation...";
+                    });
+
                     while (!finishedWriting) { }
+
+                    Directory.Delete(Path.Combine(mainForm.FolderTextBox.Text, "Flashpoint 11 Infinity"), true);
                 });
             }
 

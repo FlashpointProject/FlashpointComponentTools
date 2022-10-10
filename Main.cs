@@ -9,10 +9,10 @@ namespace FlashpointInstaller
 
         private void Main_Load(object sender, EventArgs e)
         {
-            FolderText.AutoSize = false;
-            FolderText.Height = 21;
+            FolderTextBox.AutoSize = false;
+            FolderTextBox.Height = 21;
 
-            FolderText.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            FolderTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -51,7 +51,7 @@ namespace FlashpointInstaller
             {
                 if (updateText)
                 {
-                    FolderText.Text = path;
+                    FolderTextBox.Text = path;
                 }
                 return true;
             }
@@ -65,7 +65,7 @@ namespace FlashpointInstaller
 
         private void Install_Click(object sender, EventArgs e)
         {
-            if (!SetPath(FolderText.Text, false))
+            if (!SetPath(FolderTextBox.Text, false))
             {
                 return;
             }
