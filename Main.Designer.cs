@@ -198,11 +198,11 @@
         private GroupBox Folder;
         private Button FolderButton;
         private Label ShortcutsText;
-        private CheckBox ShortcutsDesktop;
         private TableLayoutPanel Shortcuts;
-        private CheckBox ShortcutsStart;
         private Button Install;
         private Label About;
         public TextBox FolderText;
+        public CheckBox ShortcutsDesktop;
+        public CheckBox ShortcutsStart;
     }
 }

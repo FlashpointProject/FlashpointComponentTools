@@ -5,10 +5,7 @@ namespace FlashpointInstaller
 {
     public partial class Main : Form
     {
-        public Main()
-        {
-            InitializeComponent();
-        }
+        public Main() => InitializeComponent();
 
         private void Main_Load(object sender, EventArgs e)
         {
@@ -59,7 +56,10 @@ namespace FlashpointInstaller
                 return true;
             }
 
-            MessageBox.Show($"Flashpoint cannot be used from the {errorPath} directory!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(
+                $"Flashpoint cannot be installed to the {errorPath} directory! Choose a different folder.",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+            );
             return false;
         }
 
