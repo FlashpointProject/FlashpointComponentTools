@@ -21,7 +21,7 @@ namespace FlashpointInstaller
         ZipArchive archive;
         IReader reader;
 
-        bool finishedWriting = false;
+        bool doneCancelling = false;
 
         public Install() => InitializeComponent();
 
@@ -30,7 +30,7 @@ namespace FlashpointInstaller
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
 
             stream = await downloader.DownloadFileTaskAsync("https://bluepload.unstable.life/selif/flashpointdummy.zip");
-            //stream = System.IO.File.OpenRead(@"E:\Flashpoint 11 Infinity.zip");
+            //stream = System.IO.File.OpenRead(@"E:\flashpointdummy.zip");
 
             if (!downloader.IsCancelled)
             {
@@ -88,7 +88,9 @@ namespace FlashpointInstaller
 
                     if (reader.Cancelled)
                     {
-                        finishedWriting = true;
+                        Directory.Delete(Path.Combine(mainForm.FolderTextBox.Text, "Flashpoint 11 Infinity"), true);
+
+                        doneCancelling = true;
                     }
                     else
                     {
@@ -134,17 +136,7 @@ namespace FlashpointInstaller
             {
                 reader.Cancel();
 
-                await Task.Run(() =>
-                {
-                    Info.Invoke((MethodInvoker)delegate
-                    {
-                        Info.Text = $"Cancelling installation...";
-                    });
-
-                    while (!finishedWriting) { }
-
-                    Directory.Delete(Path.Combine(mainForm.FolderTextBox.Text, "Flashpoint 11 Infinity"), true);
-                });
+                await Task.Run(() => { while (!doneCancelling) { } });
             }
 
             Close();
