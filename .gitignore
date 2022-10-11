@@ -1,5 +1,4 @@
 .vs/
 bin/
 obj/
-Properties/PublishProfiles/
-FlashpointInstaller.csproj.user
+packages/

@@ -1,4 +1,9 @@
-﻿using Downloader;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+using Downloader;
 using IWshRuntimeLibrary;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
@@ -10,7 +15,7 @@ namespace FlashpointInstaller
     {
         Main mainForm = (Main)Application.OpenForms["Main"];
 
-        DownloadService downloader = new(new DownloadConfiguration());
+        DownloadService downloader = new DownloadService(new DownloadConfiguration());
 
         Stream stream;
         ZipArchive archive;
@@ -33,7 +38,7 @@ namespace FlashpointInstaller
             }
         }
 
-        private void OnDownloadProgressChanged(object? sender, DownloadProgressChangedEventArgs e)
+        private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             Progress.Invoke((MethodInvoker)delegate
             {
@@ -54,7 +59,7 @@ namespace FlashpointInstaller
                 {
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
-                    
+
                     while (!reader.Cancelled && reader.MoveToNextEntry())
                     {
                         if (reader.Entry.IsDirectory)
@@ -72,7 +77,7 @@ namespace FlashpointInstaller
                             {
                                 Progress.Value = (Progress.Maximum / 2) + (int)((double)extractedSize / totalSize * (Progress.Maximum / 2));
                             });
-                            
+
                             Info.Invoke((MethodInvoker)delegate
                             {
                                 Info.Text = $"2/2: Extracting files - {extractedSize / 1000000}MB of {totalSize / 1000000}MB";
@@ -80,7 +85,7 @@ namespace FlashpointInstaller
                         }
                         catch { }
                     }
-                    
+
                     if (reader.Cancelled)
                     {
                         finishedWriting = true;
@@ -112,7 +117,7 @@ namespace FlashpointInstaller
                 Hide();
                 mainForm.Hide();
 
-                Finish FinishWindow = new();
+                var FinishWindow = new Finish();
                 FinishWindow.ShowDialog();
             });
         }

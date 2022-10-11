@@ -1,4 +1,8 @@
+﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Windows.Forms;
+
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace FlashpointInstaller
@@ -9,9 +13,6 @@ namespace FlashpointInstaller
 
         private void Main_Load(object sender, EventArgs e)
         {
-            FolderTextBox.AutoSize = false;
-            FolderTextBox.Height = 21;
-
             FolderTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
 
@@ -22,7 +23,7 @@ namespace FlashpointInstaller
 
         private void FolderButton_Click(object sender, EventArgs e)
         {
-            CommonOpenFileDialog PathDialog = new() { IsFolderPicker = true };
+            var PathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
 
             if (PathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
@@ -70,7 +71,7 @@ namespace FlashpointInstaller
                 return;
             }
 
-            Install InstallWindow = new();
+            var InstallWindow = new Install();
             InstallWindow.ShowDialog();
         }
     }

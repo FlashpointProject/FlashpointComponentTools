@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows.Forms;
 
 namespace FlashpointInstaller
 {
@@ -10,7 +13,7 @@ namespace FlashpointInstaller
         {
             if (RunOnClose.Checked)
             {
-                Process flashpointProcess = new();
+                var flashpointProcess = new Process();
                 flashpointProcess.StartInfo.UseShellExecute = true;
                 flashpointProcess.StartInfo.FileName = "Flashpoint.exe";
                 flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(
