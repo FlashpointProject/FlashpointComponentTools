@@ -73,7 +73,7 @@
             this.Name = "Install";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Installing Flashpoint Infinity...";
+            this.Text = "Installing Flashpoint...";
             this.Load += new System.EventHandler(this.Install_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

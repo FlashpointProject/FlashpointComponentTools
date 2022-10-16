@@ -39,7 +39,7 @@
             this.Message.Name = "Message";
             this.Message.Size = new System.Drawing.Size(280, 20);
             this.Message.TabIndex = 0;
-            this.Message.Text = "Flashpoint Infinity has been successfully installed.";
+            this.Message.Text = "Flashpoint has been successfully installed.";
             this.Message.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // RunOnClose

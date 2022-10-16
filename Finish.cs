@@ -17,8 +17,7 @@ namespace FlashpointInstaller
                 flashpointProcess.StartInfo.UseShellExecute = true;
                 flashpointProcess.StartInfo.FileName = "Flashpoint.exe";
                 flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(
-                    ((Main)Application.OpenForms["Main"]).FolderTextBox.Text,
-                    @"Flashpoint 11 Infinity\Launcher"
+                    ((Main)Application.OpenForms["Main"]).FolderTextBox.Text, @"Launcher"
                 );
                 flashpointProcess.Start();
             }

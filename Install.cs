@@ -29,11 +29,14 @@ namespace FlashpointInstaller
         {
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
 
-            stream = await downloader.DownloadFileTaskAsync("https://bluepload.unstable.life/selif/flashpointdummy.zip");
+            //stream = await downloader.DownloadFileTaskAsync("https://bluepload.unstable.life/selif/flashpointdummy.zip");
+            stream = await downloader.DownloadFileTaskAsync("http://localhost/flashpointdummy.zip");
             //stream = System.IO.File.OpenRead(@"E:\flashpointdummy.zip");
 
             if (!downloader.IsCancelled)
             {
+                Directory.CreateDirectory(mainForm.FolderTextBox.Text);
+
                 await Task.Run(ExtractTask);
             }
         }
@@ -67,7 +70,9 @@ namespace FlashpointInstaller
                             continue;
                         }
 
-                        reader.WriteEntryToDirectory(mainForm.FolderTextBox.Text, new ExtractionOptions { ExtractFullPath = true, Overwrite = true });
+                        reader.WriteEntryToDirectory(
+                            mainForm.FolderTextBox.Text, new ExtractionOptions { ExtractFullPath = true, Overwrite = true }
+                        );
 
                         extractedSize += reader.Entry.Size;
 
@@ -88,7 +93,7 @@ namespace FlashpointInstaller
 
                     if (reader.Cancelled)
                     {
-                        Directory.Delete(Path.Combine(mainForm.FolderTextBox.Text, "Flashpoint 11 Infinity"), true);
+                        Directory.Delete(mainForm.FolderTextBox.Text, true);
 
                         doneCancelling = true;
                     }
@@ -106,11 +111,11 @@ namespace FlashpointInstaller
             {
                 IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                    "Flashpoint Infinity.lnk"
+                    "Flashpoint.lnk"
                 ));
-                shortcut.TargetPath = Path.Combine(mainForm.FolderTextBox.Text, @"Flashpoint 11 Infinity\Launcher\Flashpoint.exe");
-                shortcut.WorkingDirectory = Path.Combine(mainForm.FolderTextBox.Text, @"Flashpoint 11 Infinity\Launcher");
-                shortcut.Description = "Shortcut to Flashpoint Infinity";
+                shortcut.TargetPath = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher\Flashpoint.exe");
+                shortcut.WorkingDirectory = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher");
+                shortcut.Description = "Shortcut to Flashpoint";
                 shortcut.Save();
             }
 
