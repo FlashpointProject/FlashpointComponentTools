@@ -1,5 +1,5 @@
-# Flashpoint Infinity Installer
-This is a work-in-progress installer for Flashpoint Infinity. The core installation functionality (download and extract archive, create desktop shortcut)  has been implemented; however, my end goal is to allow us to explore more efficient ways of distributing Flashpoint Infinity.
+# Flashpoint Installer
+This is a work-in-progress installer for Flashpoint. The core installation functionality (download and extract archive, create desktop shortcut)  has been implemented; however, my end goal is to allow us to explore more efficient ways of distributing Flashpoint.
 
 ## To-do
 * Add automatic version detection
