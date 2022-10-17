@@ -39,7 +39,7 @@
             this.Message.Name = "Message";
             this.Message.Size = new System.Drawing.Size(280, 20);
             this.Message.TabIndex = 0;
-            this.Message.Text = "Flashpoint has been successfully installed.";
+            this.Message.Text = "Flashpoint has been successfully downloaded.";
             this.Message.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // RunOnClose
@@ -79,7 +79,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Installation Complete";
+            this.Text = "Download Complete";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Exit);
             this.ResumeLayout(false);

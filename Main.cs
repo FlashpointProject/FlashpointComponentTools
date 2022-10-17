@@ -18,7 +18,8 @@ namespace FlashpointInstaller
         Stream listStream;
         XmlDocument listData;
 
-        long downloadSize = 0;
+        public long DownloadSize = 0;
+        public string ComponentRootURL;
 
         public Main() => InitializeComponent();
         
@@ -29,6 +30,8 @@ namespace FlashpointInstaller
             listStream = await new DownloadService(new DownloadConfiguration()).DownloadFileTaskAsync(componentListURL); listStream.Position = 0;
             listData = new XmlDocument(); listData.Load(listStream);
 
+            ComponentRootURL = listData.GetElementsByTagName("list")[0].Attributes["url"].Value;
+            
             void Iterate(XmlNode sourceNode, TreeNodeCollection destNode)
             {
                 foreach (XmlNode node in sourceNode.ChildNodes)
@@ -38,15 +41,17 @@ namespace FlashpointInstaller
                     Iterate(node, listNode.Nodes);
                 }
             }
-            Iterate(listData.GetElementsByTagName("list")[0], ComponentList.Nodes);
+            Iterate(listData.GetElementsByTagName("list")[0], ComponentQueue.Nodes);
         }
 
         private TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent)
         {
-            var listNode = parent.Add(GetComponentPath(child), child.Attributes["title"].Value);
+            var listNode = parent.Add(child.Attributes["title"].Value);
             listNode.Tag = new Dictionary<string, string>
             {
-                { "url", GetComponentPath(child) },
+                { "title", child.Attributes["title"].Value },
+                { "url", GetComponentURL(child) },
+                { "path", GetComponentPath(child) },
                 { "type", child.Name },
                 { "disabled", "false" }
             };
@@ -69,7 +74,7 @@ namespace FlashpointInstaller
             return listNode;
         }
 
-        private string GetComponentPath(XmlNode node)
+        private string GetComponentURL(XmlNode node)
         {
             string path = node.Attributes["url"].Value;
 
@@ -85,6 +90,25 @@ namespace FlashpointInstaller
                 node = node.ParentNode;
             }
 
+            return path;
+        }
+
+        private string GetComponentPath(XmlNode node)
+        {
+            string path = "";
+
+            node = node.ParentNode;
+
+            while (node != null && node.Name != "list")
+            {
+                if (node.Attributes != null)
+                {
+                    path = $"{node.Attributes["url"].Value}\\{path}";
+                }
+
+                node = node.ParentNode;
+            }
+            
             return path;
         }
 
@@ -156,9 +180,9 @@ namespace FlashpointInstaller
                     Iterate(childNode.Nodes);
                 }
             }
-            Iterate(ComponentList.Nodes);
+            Iterate(ComponentQueue.Nodes);
 
-            downloadSize = newDownloadSize;
+            DownloadSize = newDownloadSize;
 
             if (newDownloadSize >= 1000000000000)
             {
@@ -186,6 +210,17 @@ namespace FlashpointInstaller
 
         private void Install_Click(object sender, EventArgs e)
         {
+            if (DownloadSize >= 1000000000000)
+            {
+                var terabyteWarning = MessageBox.Show(
+                    "You are about to download OVER A TERABYTE of data. The Complete Offline Archive " +
+                    "component is optional and Flashpoint will work without it. Proceed anyway?",
+                    "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation
+                );
+
+                if (terabyteWarning == DialogResult.No) { return; }
+            }
+
             if (SetPath(FolderTextBox.Text, false))
             {
                 var InstallWindow = new Install();

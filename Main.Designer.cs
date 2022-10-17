@@ -36,20 +36,26 @@
             this.FolderTextBox = new System.Windows.Forms.TextBox();
             this.FolderButton = new System.Windows.Forms.Button();
             this.Install = new System.Windows.Forms.Button();
-            this.Shortcut = new System.Windows.Forms.CheckBox();
             this.Link = new System.Windows.Forms.LinkLabel();
             this.TabControl = new System.Windows.Forms.TabControl();
-            this.InstallTab = new System.Windows.Forms.TabPage();
-            this.UpdateTab = new System.Windows.Forms.TabPage();
-            this.UninstallTab = new System.Windows.Forms.TabPage();
-            this.ComponentList = new RikTheVeggie.TriStateTreeView();
-            this.ComponentMessage = new System.Windows.Forms.Label();
-            this.ComponentSizeLabel = new System.Windows.Forms.Label();
+            this.DownloadTab = new System.Windows.Forms.TabPage();
             this.ComponentSize = new System.Windows.Forms.Label();
+            this.ComponentSizeLabel = new System.Windows.Forms.Label();
+            this.ComponentMessage = new System.Windows.Forms.Label();
+            this.UpdateTab = new System.Windows.Forms.TabPage();
+            this.RemoveTab = new System.Windows.Forms.TabPage();
+            this.ComponentQueue = new RikTheVeggie.TriStateTreeView();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.ShortcutLabel = new System.Windows.Forms.Label();
+            this.ShortcutDesktop = new System.Windows.Forms.CheckBox();
+            this.ShortcutStartMenu = new System.Windows.Forms.CheckBox();
+            this.ComponentManager = new RikTheVeggie.TriStateTreeView();
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).BeginInit();
             this.Folder.SuspendLayout();
             this.TabControl.SuspendLayout();
-            this.InstallTab.SuspendLayout();
+            this.DownloadTab.SuspendLayout();
+            this.UpdateTab.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // Logo
@@ -67,16 +73,16 @@
             this.About.AutoSize = true;
             this.About.Location = new System.Drawing.Point(12, 192);
             this.About.Name = "About";
-            this.About.Size = new System.Drawing.Size(118, 13);
+            this.About.Size = new System.Drawing.Size(124, 13);
             this.About.TabIndex = 1;
-            this.About.Text = "Flashpoint Installer v1.0";
+            this.About.Text = "Flashpoint Manager v1.0";
             // 
             // Folder
             // 
             this.Folder.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.Folder.Controls.Add(this.FolderTextBox);
             this.Folder.Controls.Add(this.FolderButton);
-            this.Folder.Location = new System.Drawing.Point(7, 239);
+            this.Folder.Location = new System.Drawing.Point(7, 199);
             this.Folder.Name = "Folder";
             this.Folder.Size = new System.Drawing.Size(576, 49);
             this.Folder.TabIndex = 2;
@@ -104,26 +110,13 @@
             // Install
             // 
             this.Install.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.Install.Location = new System.Drawing.Point(168, 296);
+            this.Install.Location = new System.Drawing.Point(300, 256);
             this.Install.Name = "Install";
-            this.Install.Size = new System.Drawing.Size(416, 26);
+            this.Install.Size = new System.Drawing.Size(284, 26);
             this.Install.TabIndex = 2;
-            this.Install.Text = "Install Flashpoint";
+            this.Install.Text = "Download Flashpoint";
             this.Install.UseVisualStyleBackColor = true;
             this.Install.Click += new System.EventHandler(this.Install_Click);
-            // 
-            // Shortcut
-            // 
-            this.Shortcut.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.Shortcut.AutoSize = true;
-            this.Shortcut.Checked = true;
-            this.Shortcut.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.Shortcut.Location = new System.Drawing.Point(7, 302);
-            this.Shortcut.Name = "Shortcut";
-            this.Shortcut.Size = new System.Drawing.Size(154, 17);
-            this.Shortcut.TabIndex = 3;
-            this.Shortcut.Text = "Create shortcut on desktop";
-            this.Shortcut.UseVisualStyleBackColor = true;
             // 
             // Link
             // 
@@ -139,64 +132,50 @@
             // 
             // TabControl
             // 
-            this.TabControl.Controls.Add(this.InstallTab);
+            this.TabControl.Controls.Add(this.DownloadTab);
             this.TabControl.Controls.Add(this.UpdateTab);
-            this.TabControl.Controls.Add(this.UninstallTab);
+            this.TabControl.Controls.Add(this.RemoveTab);
             this.TabControl.ItemSize = new System.Drawing.Size(150, 20);
             this.TabControl.Location = new System.Drawing.Point(12, 229);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(600, 360);
+            this.TabControl.Size = new System.Drawing.Size(600, 320);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.TabControl.TabIndex = 5;
             // 
-            // InstallTab
+            // DownloadTab
             // 
-            this.InstallTab.Controls.Add(this.ComponentSize);
-            this.InstallTab.Controls.Add(this.ComponentSizeLabel);
-            this.InstallTab.Controls.Add(this.ComponentMessage);
-            this.InstallTab.Controls.Add(this.ComponentList);
-            this.InstallTab.Controls.Add(this.Folder);
-            this.InstallTab.Controls.Add(this.Install);
-            this.InstallTab.Controls.Add(this.Shortcut);
-            this.InstallTab.Location = new System.Drawing.Point(4, 24);
-            this.InstallTab.Name = "InstallTab";
-            this.InstallTab.Padding = new System.Windows.Forms.Padding(3);
-            this.InstallTab.Size = new System.Drawing.Size(592, 332);
-            this.InstallTab.TabIndex = 0;
-            this.InstallTab.Text = "Install";
-            this.InstallTab.UseVisualStyleBackColor = true;
+            this.DownloadTab.Controls.Add(this.tableLayoutPanel1);
+            this.DownloadTab.Controls.Add(this.ComponentSize);
+            this.DownloadTab.Controls.Add(this.ComponentSizeLabel);
+            this.DownloadTab.Controls.Add(this.ComponentMessage);
+            this.DownloadTab.Controls.Add(this.ComponentQueue);
+            this.DownloadTab.Controls.Add(this.Folder);
+            this.DownloadTab.Controls.Add(this.Install);
+            this.DownloadTab.Location = new System.Drawing.Point(4, 24);
+            this.DownloadTab.Name = "DownloadTab";
+            this.DownloadTab.Padding = new System.Windows.Forms.Padding(3);
+            this.DownloadTab.Size = new System.Drawing.Size(592, 292);
+            this.DownloadTab.TabIndex = 0;
+            this.DownloadTab.Text = "Download Flashpoint";
+            this.DownloadTab.UseVisualStyleBackColor = true;
             // 
-            // UpdateTab
+            // ComponentSize
             // 
-            this.UpdateTab.Location = new System.Drawing.Point(4, 24);
-            this.UpdateTab.Name = "UpdateTab";
-            this.UpdateTab.Padding = new System.Windows.Forms.Padding(3);
-            this.UpdateTab.Size = new System.Drawing.Size(592, 332);
-            this.UpdateTab.TabIndex = 1;
-            this.UpdateTab.Text = "Update";
-            this.UpdateTab.UseVisualStyleBackColor = true;
+            this.ComponentSize.Location = new System.Drawing.Point(442, 59);
+            this.ComponentSize.Name = "ComponentSize";
+            this.ComponentSize.Size = new System.Drawing.Size(140, 15);
+            this.ComponentSize.TabIndex = 8;
+            this.ComponentSize.Text = "0MB";
             // 
-            // UninstallTab
+            // ComponentSizeLabel
             // 
-            this.UninstallTab.Location = new System.Drawing.Point(4, 24);
-            this.UninstallTab.Name = "UninstallTab";
-            this.UninstallTab.Padding = new System.Windows.Forms.Padding(3);
-            this.UninstallTab.Size = new System.Drawing.Size(592, 332);
-            this.UninstallTab.TabIndex = 2;
-            this.UninstallTab.Text = "Uninstall";
-            this.UninstallTab.UseVisualStyleBackColor = true;
-            // 
-            // ComponentList
-            // 
-            this.ComponentList.Indent = 20;
-            this.ComponentList.Location = new System.Drawing.Point(16, 14);
-            this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(384, 216);
-            this.ComponentList.TabIndex = 5;
-            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
-            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            this.ComponentSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ComponentSizeLabel.Location = new System.Drawing.Point(410, 59);
+            this.ComponentSizeLabel.Name = "ComponentSizeLabel";
+            this.ComponentSizeLabel.Size = new System.Drawing.Size(35, 15);
+            this.ComponentSizeLabel.TabIndex = 7;
+            this.ComponentSizeLabel.Text = "Size:";
             // 
             // ComponentMessage
             // 
@@ -204,29 +183,110 @@
             this.ComponentMessage.Name = "ComponentMessage";
             this.ComponentMessage.Size = new System.Drawing.Size(172, 30);
             this.ComponentMessage.TabIndex = 6;
-            this.ComponentMessage.Text = "Select components to be included in your Flashpoint installation.";
+            this.ComponentMessage.Text = "Select components to be included in your Flashpoint download.\r\n";
             // 
-            // ComponentSizeLabel
+            // UpdateTab
             // 
-            this.ComponentSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ComponentSizeLabel.Location = new System.Drawing.Point(410, 59);
-            this.ComponentSizeLabel.Name = "ComponentSizeLabel";
-            this.ComponentSizeLabel.Size = new System.Drawing.Size(40, 15);
-            this.ComponentSizeLabel.TabIndex = 7;
-            this.ComponentSizeLabel.Text = "Size:";
+            this.UpdateTab.Controls.Add(this.ComponentManager);
+            this.UpdateTab.Location = new System.Drawing.Point(4, 24);
+            this.UpdateTab.Name = "UpdateTab";
+            this.UpdateTab.Padding = new System.Windows.Forms.Padding(3);
+            this.UpdateTab.Size = new System.Drawing.Size(592, 292);
+            this.UpdateTab.TabIndex = 1;
+            this.UpdateTab.Text = "Manage Components";
+            this.UpdateTab.UseVisualStyleBackColor = true;
             // 
-            // ComponentSize
+            // RemoveTab
             // 
-            this.ComponentSize.Location = new System.Drawing.Point(456, 59);
-            this.ComponentSize.Name = "ComponentSize";
-            this.ComponentSize.Size = new System.Drawing.Size(126, 15);
-            this.ComponentSize.TabIndex = 8;
+            this.RemoveTab.Location = new System.Drawing.Point(4, 24);
+            this.RemoveTab.Name = "RemoveTab";
+            this.RemoveTab.Padding = new System.Windows.Forms.Padding(3);
+            this.RemoveTab.Size = new System.Drawing.Size(592, 292);
+            this.RemoveTab.TabIndex = 2;
+            this.RemoveTab.Text = "Remove Flashpoint";
+            this.RemoveTab.UseVisualStyleBackColor = true;
+            // 
+            // ComponentQueue
+            // 
+            this.ComponentQueue.Indent = 20;
+            this.ComponentQueue.Location = new System.Drawing.Point(16, 14);
+            this.ComponentQueue.Name = "ComponentQueue";
+            this.ComponentQueue.Size = new System.Drawing.Size(384, 176);
+            this.ComponentQueue.TabIndex = 5;
+            this.ComponentQueue.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentQueue.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
+            this.ComponentQueue.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 3;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel1.Controls.Add(this.ShortcutStartMenu, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.ShortcutLabel, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.ShortcutDesktop, 1, 0);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(7, 255);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(274, 26);
+            this.tableLayoutPanel1.TabIndex = 11;
+            // 
+            // ShortcutLabel
+            // 
+            this.ShortcutLabel.AutoSize = true;
+            this.ShortcutLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ShortcutLabel.Location = new System.Drawing.Point(3, 3);
+            this.ShortcutLabel.Margin = new System.Windows.Forms.Padding(3);
+            this.ShortcutLabel.Name = "ShortcutLabel";
+            this.ShortcutLabel.Size = new System.Drawing.Size(112, 20);
+            this.ShortcutLabel.TabIndex = 0;
+            this.ShortcutLabel.Text = "Create shortcuts in:";
+            this.ShortcutLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // ShortcutDesktop
+            // 
+            this.ShortcutDesktop.AutoSize = true;
+            this.ShortcutDesktop.Checked = true;
+            this.ShortcutDesktop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShortcutDesktop.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ShortcutDesktop.Location = new System.Drawing.Point(121, 3);
+            this.ShortcutDesktop.Name = "ShortcutDesktop";
+            this.ShortcutDesktop.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.ShortcutDesktop.Size = new System.Drawing.Size(66, 20);
+            this.ShortcutDesktop.TabIndex = 1;
+            this.ShortcutDesktop.Text = "Desktop";
+            this.ShortcutDesktop.UseVisualStyleBackColor = true;
+            // 
+            // ShortcutStartMenu
+            // 
+            this.ShortcutStartMenu.AutoSize = true;
+            this.ShortcutStartMenu.Checked = true;
+            this.ShortcutStartMenu.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShortcutStartMenu.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ShortcutStartMenu.Location = new System.Drawing.Point(193, 3);
+            this.ShortcutStartMenu.Name = "ShortcutStartMenu";
+            this.ShortcutStartMenu.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
+            this.ShortcutStartMenu.Size = new System.Drawing.Size(78, 20);
+            this.ShortcutStartMenu.TabIndex = 2;
+            this.ShortcutStartMenu.Text = "Start Menu";
+            this.ShortcutStartMenu.UseVisualStyleBackColor = true;
+            // 
+            // ComponentManager
+            // 
+            this.ComponentManager.Indent = 20;
+            this.ComponentManager.Location = new System.Drawing.Point(16, 14);
+            this.ComponentManager.Name = "ComponentManager";
+            this.ComponentManager.Size = new System.Drawing.Size(384, 176);
+            this.ComponentManager.TabIndex = 13;
+            this.ComponentManager.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 601);
+            this.ClientSize = new System.Drawing.Size(624, 561);
             this.Controls.Add(this.TabControl);
             this.Controls.Add(this.Link);
             this.Controls.Add(this.About);
@@ -237,14 +297,16 @@
             this.MinimizeBox = false;
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Flashpoint Installer";
+            this.Text = "Flashpoint Manager";
             this.Load += new System.EventHandler(this.Main_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).EndInit();
             this.Folder.ResumeLayout(false);
             this.Folder.PerformLayout();
             this.TabControl.ResumeLayout(false);
-            this.InstallTab.ResumeLayout(false);
-            this.InstallTab.PerformLayout();
+            this.DownloadTab.ResumeLayout(false);
+            this.UpdateTab.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -259,15 +321,19 @@
         private System.Windows.Forms.Button FolderButton;
         private System.Windows.Forms.Button Install;
         private System.Windows.Forms.LinkLabel Link;
-        public System.Windows.Forms.CheckBox Shortcut;
         private System.Windows.Forms.TabControl TabControl;
-        private System.Windows.Forms.TabPage InstallTab;
+        private System.Windows.Forms.TabPage DownloadTab;
         private System.Windows.Forms.TabPage UpdateTab;
-        private System.Windows.Forms.TabPage UninstallTab;
-        private RikTheVeggie.TriStateTreeView ComponentList;
         private System.Windows.Forms.Label ComponentSize;
         private System.Windows.Forms.Label ComponentSizeLabel;
         private System.Windows.Forms.Label ComponentMessage;
+        public RikTheVeggie.TriStateTreeView ComponentQueue;
+        private System.Windows.Forms.TabPage RemoveTab;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Label ShortcutLabel;
+        public System.Windows.Forms.CheckBox ShortcutStartMenu;
+        public System.Windows.Forms.CheckBox ShortcutDesktop;
+        public RikTheVeggie.TriStateTreeView ComponentManager;
     }
 }
 
