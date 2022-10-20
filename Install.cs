@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,7 +22,7 @@ namespace FlashpointInstaller
         List<Dictionary<string, string>> componentInfo = new List<Dictionary<string, string>>();
         Dictionary<string, string> workingComponent;
 
-        DownloadService downloader = new DownloadService(new DownloadConfiguration());
+        DownloadService downloader = new DownloadService(new DownloadConfiguration { OnTheFlyDownload = false });
 
         Stream stream;
         ZipArchive archive;
@@ -30,13 +31,14 @@ namespace FlashpointInstaller
         long byteProgress = 0;
         long byteTotal = ((Main)Application.OpenForms["Main"]).DownloadSize;
 
-        bool doneCancelling = false;
+        int cancelStatus = 0;
 
         public Install() => InitializeComponent();
 
         private async void Install_Load(object sender, EventArgs e)
         {
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
+            downloader.DownloadFileCompleted += OnDownloadFileCompleted;
 
             void Iterate(TreeNodeCollection parent)
             {
@@ -57,21 +59,17 @@ namespace FlashpointInstaller
             foreach (var component in componentInfo)
             {
                 workingComponent = component;
-
                 stream = await downloader.DownloadFileTaskAsync(component["url"]);
+                
+                if (cancelStatus == 2) { return; }
 
-                if (!downloader.IsCancelled)
-                {
-                    Directory.CreateDirectory(mainForm.FolderTextBox.Text);
-
-                    await Task.Run(ExtractTask);
-                }
-                else { return; }
+                Directory.CreateDirectory(mainForm.FolderTextBox.Text);
+                await Task.Run(ExtractTask);
 
                 byteProgress += int.Parse(component["size"]);
             }
 
-            FinishInstallation();
+            if (cancelStatus == 0) { FinishInstallation(); }
         }
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -85,13 +83,18 @@ namespace FlashpointInstaller
                     ((byteProgress + (currentProgress / 2 * currentSize)) / byteTotal * Progress.Maximum)
                 );
             });
-            
+
             Info.Invoke((MethodInvoker)delegate
             {
-                Info.Text = 
+                Info.Text =
                     $"Downloading component \"{workingComponent["title"]}\"... " +
                     $"{Math.Truncate(currentProgress * 100)}%";
             });
+        }
+
+        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            if (e.Cancelled) { cancelStatus = 2; }
         }
 
         private void ExtractTask()
@@ -110,7 +113,7 @@ namespace FlashpointInstaller
                     
                     using (TextWriter writer = File.CreateText(infoPath + infoFile))
                     {
-                        writer.WriteLine($"{workingComponent["url"]} {workingComponent["hash"]}");
+                        writer.WriteLine($"{workingComponent["hash"]} {workingComponent["url"]}");
                     }
 
                     while (!reader.Cancelled && reader.MoveToNextEntry())
@@ -123,38 +126,34 @@ namespace FlashpointInstaller
 
                         using (TextWriter writer = File.AppendText(infoPath + infoFile))
                         {
-                            writer.WriteLine(reader.Entry.Key);
+                            writer.WriteLine($"{reader.Entry.Crc} {reader.Entry.Key}");
                         }
 
                         extractedSize += reader.Entry.Size;
 
-                        try
+                        double currentProgress = (double)extractedSize / totalSize;
+                        long currentSize = long.Parse(workingComponent["size"]);
+                        
+                        Progress.Invoke((MethodInvoker)delegate
                         {
-                            double currentProgress = (double)extractedSize / totalSize;
-                            long currentSize = long.Parse(workingComponent["size"]);
+                            Progress.Value = (int)(
+                                (byteProgress + (currentSize / 2) + (currentProgress / 2 * currentSize)) / byteTotal * Progress.Maximum
+                            );
+                        });
 
-                            Progress.Invoke((MethodInvoker)delegate
-                            {
-                                Progress.Value = (int)(
-                                    (byteProgress + (currentSize / 2) + (currentProgress / 2 * currentSize)) / byteTotal * Progress.Maximum
-                                );
-                            });
-
-                            Info.Invoke((MethodInvoker)delegate
-                            {
-                                Info.Text = 
-                                    $"Extracting component \"{workingComponent["title"]}\"... " +
-                                    $"{Math.Truncate(currentProgress * 100)}%";
-                            });
-                        }
-                        catch { }
+                        Info.Invoke((MethodInvoker)delegate
+                        {
+                            Info.Text = 
+                                $"Extracting component \"{workingComponent["title"]}\"... " +
+                                $"{Math.Truncate(currentProgress * 100)}%";
+                        });
                     }
 
                     if (reader.Cancelled)
                     {
+                        cancelStatus = 1;
                         Directory.Delete(mainForm.FolderTextBox.Text, true);
-
-                        doneCancelling = true;
+                        cancelStatus = 2;
                     }
                 }
             }
@@ -182,30 +181,21 @@ namespace FlashpointInstaller
                 shortcut.Save();
             }
 
-            Invoke((MethodInvoker)delegate
-            {
-                Hide();
-                mainForm.Hide();
+            Hide();
+            mainForm.Hide();
 
-                var FinishWindow = new Finish();
-                FinishWindow.ShowDialog();
-            });
+            var FinishWindow = new Finish();
+            FinishWindow.ShowDialog();
         }
 
         private async void Cancel_Click(object sender, EventArgs e)
         {
             Cancel.Enabled = false;
 
-            if (downloader.IsBusy)
-            {
-                downloader.CancelAsync();
-            }
-            else if (reader != null)
-            {
-                reader.Cancel();
+            if (downloader.IsBusy) { downloader.CancelAsync(); }
+            if (reader != null) { reader.Cancel(); }
 
-                await Task.Run(() => { while (!doneCancelling) { } });
-            }
+            await Task.Run(() => { while (cancelStatus != 2) { } });
 
             Close();
         }
