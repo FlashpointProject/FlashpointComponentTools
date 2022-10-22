@@ -264,6 +264,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common.cs" />
     <Compile Include="Finish.cs">
       <SubType>Form</SubType>
     </Compile>

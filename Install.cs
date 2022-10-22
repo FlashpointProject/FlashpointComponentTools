@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using Downloader;
+using FlashpointInstaller.Common;
 using IWshRuntimeLibrary;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
@@ -61,7 +62,7 @@ namespace FlashpointInstaller
                 workingComponent = component;
                 stream = await downloader.DownloadFileTaskAsync(component["url"]);
                 
-                if (cancelStatus == 2) { return; }
+                if (cancelStatus != 0) return;
 
                 Directory.CreateDirectory(mainForm.FolderTextBox.Text);
                 await Task.Run(ExtractTask);
@@ -69,32 +70,37 @@ namespace FlashpointInstaller
                 byteProgress += int.Parse(component["size"]);
             }
 
-            if (cancelStatus == 0) { FinishInstallation(); }
+            if (cancelStatus == 0) FinishInstallation();
         }
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (cancelStatus != 0)
+            {
+                downloader.CancelAsync();
+                return;
+            }
+
             double currentProgress = (double)e.ReceivedBytesSize / e.TotalBytesToReceive;
             long currentSize = long.Parse(workingComponent["size"]);
+            double totalProgress = (byteProgress + (currentProgress / 2 * currentSize)) / byteTotal;
 
             Progress.Invoke((MethodInvoker)delegate
             {
-                Progress.Value = (int)((double)
-                    ((byteProgress + (currentProgress / 2 * currentSize)) / byteTotal * Progress.Maximum)
-                );
+                Progress.Value = (int)((double)totalProgress * Progress.Maximum);
             });
 
             Info.Invoke((MethodInvoker)delegate
             {
                 Info.Text =
-                    $"Downloading component \"{workingComponent["title"]}\"... " +
-                    $"{Math.Truncate(currentProgress * 100)}%";
+                    $"[{(int)((double)totalProgress * 100)}%] Downloading component \"{workingComponent["title"]}\"... " +
+                    $"{FPM.GetFormattedBytes(e.ReceivedBytesSize)} of {FPM.GetFormattedBytes(e.TotalBytesToReceive)}";
             });
         }
 
         private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            if (e.Cancelled) { cancelStatus = 2; }
+            if (e.Cancelled) cancelStatus = 2;
         }
 
         private void ExtractTask()
@@ -116,9 +122,9 @@ namespace FlashpointInstaller
                         writer.WriteLine($"{workingComponent["hash"]} {workingComponent["url"]}");
                     }
 
-                    while (!reader.Cancelled && reader.MoveToNextEntry())
+                    while (cancelStatus == 0 && reader.MoveToNextEntry())
                     {
-                        if (reader.Entry.IsDirectory) { continue; }
+                        if (reader.Entry.IsDirectory) continue;
 
                         reader.WriteEntryToDirectory(
                             mainForm.FolderTextBox.Text, new ExtractionOptions { ExtractFullPath = true, Overwrite = true }
@@ -133,53 +139,54 @@ namespace FlashpointInstaller
 
                         double currentProgress = (double)extractedSize / totalSize;
                         long currentSize = long.Parse(workingComponent["size"]);
-                        
+                        double totalProgress = (byteProgress + (currentSize / 2) + (currentProgress / 2 * currentSize)) / byteTotal;
+
                         Progress.Invoke((MethodInvoker)delegate
                         {
-                            Progress.Value = (int)(
-                                (byteProgress + (currentSize / 2) + (currentProgress / 2 * currentSize)) / byteTotal * Progress.Maximum
-                            );
+                            Progress.Value = (int)((double)totalProgress * Progress.Maximum);
                         });
 
                         Info.Invoke((MethodInvoker)delegate
                         {
                             Info.Text = 
-                                $"Extracting component \"{workingComponent["title"]}\"... " +
-                                $"{Math.Truncate(currentProgress * 100)}%";
+                                $"[{(int)((double)totalProgress * 100)}%] Extracting component \"{workingComponent["title"]}\"... " +
+                                $"{FPM.GetFormattedBytes(extractedSize)} of {FPM.GetFormattedBytes(totalSize)}";
                         });
                     }
 
-                    if (reader.Cancelled)
+                    if (cancelStatus != 0)
                     {
-                        cancelStatus = 1;
-                        Directory.Delete(mainForm.FolderTextBox.Text, true);
+                        reader.Cancel();
                         cancelStatus = 2;
                     }
                 }
             }
         }
 
-        private void FinishInstallation()
+        private async void FinishInstallation()
         {
-            var shortcutPaths = new List<string>();
+            await Task.Run(() =>
+            {
+                var shortcutPaths = new List<string>();
 
-            if (mainForm.ShortcutDesktop.Checked)
-            {
-                shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-            }
-            if (mainForm.ShortcutStartMenu.Checked)
-            {
-                shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
-            }
+                if (mainForm.ShortcutDesktop.Checked)
+                {
+                    shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+                }
+                if (mainForm.ShortcutStartMenu.Checked)
+                {
+                    shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
+                }
 
-            foreach(string path in shortcutPaths)
-            {
-                IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
-                shortcut.TargetPath = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher\Flashpoint.exe");
-                shortcut.WorkingDirectory = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher");
-                shortcut.Description = "Shortcut to Flashpoint";
-                shortcut.Save();
-            }
+                foreach (string path in shortcutPaths)
+                {
+                    IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
+                    shortcut.TargetPath = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher\Flashpoint.exe");
+                    shortcut.WorkingDirectory = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher");
+                    shortcut.Description = "Shortcut to Flashpoint";
+                    shortcut.Save();
+                }
+            });
 
             Hide();
             mainForm.Hide();
@@ -191,12 +198,18 @@ namespace FlashpointInstaller
         private async void Cancel_Click(object sender, EventArgs e)
         {
             Cancel.Enabled = false;
+            cancelStatus = 1;
 
-            if (downloader.IsBusy) { downloader.CancelAsync(); }
-            if (reader != null) { reader.Cancel(); }
+            await Task.Run(() =>
+            { 
+                while (cancelStatus != 2) { }
 
-            await Task.Run(() => { while (cancelStatus != 2) { } });
-
+                if (Directory.Exists(mainForm.FolderTextBox.Text))
+                {
+                    Directory.Delete(mainForm.FolderTextBox.Text, true);
+                }
+            });
+            
             Close();
         }
     }
