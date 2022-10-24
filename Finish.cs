@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
+using FlashpointInstaller.Common;
+
 namespace FlashpointInstaller
 {
     public partial class Finish : Form
@@ -16,9 +18,7 @@ namespace FlashpointInstaller
                 var flashpointProcess = new Process();
                 flashpointProcess.StartInfo.UseShellExecute = true;
                 flashpointProcess.StartInfo.FileName = "Flashpoint.exe";
-                flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(
-                    ((Main)Application.OpenForms["Main"]).FolderTextBox.Text, @"Launcher"
-                );
+                flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(FPM.Path, @"Launcher");
                 flashpointProcess.Start();
             }
 

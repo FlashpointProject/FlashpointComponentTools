@@ -13,35 +13,18 @@ namespace FlashpointInstaller
 {
     public partial class Main : Form
     {
-        readonly string componentListURL = "http://localhost/components.xml";
-
-        Stream listStream;
-        XmlDocument listData;
-
-        public long DownloadSize = 0;
-        public string ComponentRootURL;
-
         public Main() => InitializeComponent();
         
         private async void Main_Load(object sender, EventArgs e)
         {
+            FPM.ListURL = "http://localhost/components.xml";
+
             SetPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
             
-            listStream = await new DownloadService(new DownloadConfiguration()).DownloadFileTaskAsync(componentListURL); listStream.Position = 0;
-            listData = new XmlDocument(); listData.Load(listStream);
-
-            ComponentRootURL = listData.GetElementsByTagName("list")[0].Attributes["url"].Value;
+            Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL); listStream.Position = 0;
+            FPM.XmlTree = new XmlDocument(); FPM.XmlTree.Load(listStream);
             
-            void Iterate(XmlNode sourceNode, TreeNodeCollection destNode)
-            {
-                foreach (XmlNode node in sourceNode.ChildNodes)
-                {
-                    var listNode = FPM.AddNodeToList(node, destNode);
-
-                    Iterate(node, listNode.Nodes);
-                }
-            }
-            Iterate(listData.GetElementsByTagName("list")[0], ComponentQueue.Nodes);
+            FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes);
         }
 
         private bool SetPath(string path, bool updateText)
@@ -65,7 +48,7 @@ namespace FlashpointInstaller
             {
                 if (updateText)
                 {
-                    FolderTextBox.Text = Path.Combine(path, "Flashpoint");
+                    FPM.Path = Path.Combine(path, "Flashpoint");
                 }
 
                 return true;
@@ -96,26 +79,8 @@ namespace FlashpointInstaller
 
         private void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            long newDownloadSize = 0;
-
-            void Iterate(TreeNodeCollection parent)
-            {
-                foreach (TreeNode childNode in parent)
-                {
-                    var attributes = childNode.Tag as Dictionary<string, string>;
-
-                    if (childNode.Checked && attributes["type"] == "component")
-                    {
-                        newDownloadSize += int.Parse(attributes["size"]);
-                    }
-
-                    Iterate(childNode.Nodes);
-                }
-            }
-            Iterate(ComponentQueue.Nodes);
-
-            DownloadSize = newDownloadSize;
-            ComponentSize.Text = FPM.GetFormattedBytes(newDownloadSize);
+            FPM.DownloadSize = FPM.GetEstimatedSize(ComponentList.Nodes);
+            DownloadSizeDisplay.Text = FPM.GetFormattedBytes(FPM.DownloadSize);
         }
 
         private void ComponentQueue_BeforeSelect(object sender, TreeViewCancelEventArgs e)
@@ -126,16 +91,21 @@ namespace FlashpointInstaller
         private void FolderButton_Click(object sender, EventArgs e)
         {
             var PathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
-
+            
             if (PathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 SetPath(PathDialog.FileName, true);
             }
         }
 
-        private void Install_Click(object sender, EventArgs e)
+        private void FolderTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (DownloadSize >= 1000000000000)
+            if (e.KeyChar == (char)Keys.Return) { Install_Start(this, e); }
+        }
+
+        private void Install_Start(object sender, EventArgs e)
+        {
+            if (FPM.DownloadSize >= 1000000000000)
             {
                 var terabyteWarning = MessageBox.Show(
                     "You are about to download OVER A TERABYTE of data. The Complete Offline Archive " +
@@ -146,7 +116,7 @@ namespace FlashpointInstaller
                 if (terabyteWarning == DialogResult.No) return;
             }
 
-            if (SetPath(FolderTextBox.Text, false))
+            if (SetPath(FPM.Path, false))
             {
                 var InstallWindow = new Install();
                 InstallWindow.ShowDialog();

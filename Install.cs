@@ -18,8 +18,6 @@ namespace FlashpointInstaller
 {
     public partial class Install : Form
     {
-        Main mainForm = (Main)Application.OpenForms["Main"];
-
         List<Dictionary<string, string>> componentInfo = new List<Dictionary<string, string>>();
         Dictionary<string, string> workingComponent;
 
@@ -30,7 +28,7 @@ namespace FlashpointInstaller
         IReader reader;
 
         long byteProgress = 0;
-        long byteTotal = ((Main)Application.OpenForms["Main"]).DownloadSize;
+        long byteTotal = FPM.DownloadSize;
 
         int cancelStatus = 0;
 
@@ -40,7 +38,7 @@ namespace FlashpointInstaller
         {
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
             downloader.DownloadFileCompleted += OnDownloadFileCompleted;
-
+            
             void Iterate(TreeNodeCollection parent)
             {
                 foreach (TreeNode childNode in parent)
@@ -55,7 +53,7 @@ namespace FlashpointInstaller
                     Iterate(childNode.Nodes);
                 }
             }
-            Iterate(mainForm.ComponentQueue.Nodes);
+            Iterate(FPM.Main.ComponentList.Nodes);
 
             foreach (var component in componentInfo)
             {
@@ -64,7 +62,7 @@ namespace FlashpointInstaller
                 
                 if (cancelStatus != 0) return;
 
-                Directory.CreateDirectory(mainForm.FolderTextBox.Text);
+                Directory.CreateDirectory(FPM.Path);
                 await Task.Run(ExtractTask);
 
                 byteProgress += int.Parse(component["size"]);
@@ -112,7 +110,7 @@ namespace FlashpointInstaller
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
 
-                    string infoPath = Path.Combine(mainForm.FolderTextBox.Text, "Components", workingComponent["path"]);
+                    string infoPath = Path.Combine(FPM.Path, "Components", workingComponent["path"]);
                     string infoFile = $"{workingComponent["title"]}.txt";
 
                     Directory.CreateDirectory(infoPath);
@@ -127,7 +125,7 @@ namespace FlashpointInstaller
                         if (reader.Entry.IsDirectory) continue;
 
                         reader.WriteEntryToDirectory(
-                            mainForm.FolderTextBox.Text, new ExtractionOptions { ExtractFullPath = true, Overwrite = true }
+                            FPM.Path, new ExtractionOptions { ExtractFullPath = true, Overwrite = true }
                         );
 
                         using (TextWriter writer = File.AppendText(infoPath + infoFile))
@@ -169,11 +167,11 @@ namespace FlashpointInstaller
             {
                 var shortcutPaths = new List<string>();
 
-                if (mainForm.ShortcutDesktop.Checked)
+                if (FPM.Main.ShortcutDesktop.Checked)
                 {
                     shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
                 }
-                if (mainForm.ShortcutStartMenu.Checked)
+                if (FPM.Main.ShortcutStartMenu.Checked)
                 {
                     shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
                 }
@@ -181,15 +179,15 @@ namespace FlashpointInstaller
                 foreach (string path in shortcutPaths)
                 {
                     IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
-                    shortcut.TargetPath = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher\Flashpoint.exe");
-                    shortcut.WorkingDirectory = Path.Combine(mainForm.FolderTextBox.Text, @"Launcher");
+                    shortcut.TargetPath = Path.Combine(FPM.Path, @"Launcher\Flashpoint.exe");
+                    shortcut.WorkingDirectory = Path.Combine(FPM.Path, @"Launcher");
                     shortcut.Description = "Shortcut to Flashpoint";
                     shortcut.Save();
                 }
             });
 
             Hide();
-            mainForm.Hide();
+            FPM.Main.Hide();
 
             var FinishWindow = new Finish();
             FinishWindow.ShowDialog();
@@ -204,9 +202,9 @@ namespace FlashpointInstaller
             { 
                 while (cancelStatus != 2) { }
 
-                if (Directory.Exists(mainForm.FolderTextBox.Text))
+                if (Directory.Exists(FPM.Path))
                 {
-                    Directory.Delete(mainForm.FolderTextBox.Text, true);
+                    Directory.Delete(FPM.Path, true);
                 }
             });
             

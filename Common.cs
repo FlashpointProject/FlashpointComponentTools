@@ -8,8 +8,28 @@ namespace FlashpointInstaller
 {
     namespace Common
     {
-        public class FPM
+        public static class FPM
         {
+            public static Main Main { get { return (Main)Application.OpenForms["Main"]; } }
+            public static XmlDocument XmlTree { get; set; }
+            public static string ListURL { get; set; }
+            public static long DownloadSize { get; set; }
+            public static string Path
+            {
+                get { return Main.FolderTextBox.Text; }
+                set { Main.FolderTextBox.Text = value; }
+            }
+
+            public static void RecursiveAddToList(XmlNode sourceNode, TreeNodeCollection destNode)
+            {
+                foreach (XmlNode node in sourceNode.ChildNodes)
+                {
+                    var listNode = FPM.AddNodeToList(node, destNode);
+
+                    RecursiveAddToList(node, listNode.Nodes);
+                }
+            }
+
             public static TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent)
             {
                 var listNode = parent.Add(child.Attributes["title"].Value);
@@ -39,6 +59,29 @@ namespace FlashpointInstaller
                 }
 
                 return listNode;
+            }
+
+            public static long GetEstimatedSize(TreeNodeCollection sourceNodes)
+            {
+                long size = 0;
+
+                void Iterate(TreeNodeCollection parent)
+                {
+                    foreach (TreeNode childNode in parent)
+                    {
+                        var attributes = childNode.Tag as Dictionary<string, string>;
+
+                        if (childNode.Checked && attributes["type"] == "component")
+                        {
+                            size += int.Parse(attributes["size"]);
+                        }
+
+                        Iterate(childNode.Nodes);
+                    }
+                }
+                Iterate(sourceNodes);
+
+                return size;
             }
 
             public static string GetComponentURL(XmlNode node)
