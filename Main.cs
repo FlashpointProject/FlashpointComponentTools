@@ -19,47 +19,13 @@ namespace FlashpointInstaller
         {
             FPM.ListURL = "http://localhost/components.xml";
 
-            SetPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
+            FPM.SetDownloadPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
             
             Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL); listStream.Position = 0;
             FPM.XmlTree = new XmlDocument(); FPM.XmlTree.Load(listStream);
             
-            FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes);
-        }
-
-        private bool SetPath(string path, bool updateText)
-        {
-            string errorPath;
-
-            if (path.StartsWith(Environment.ExpandEnvironmentVariables("%ProgramW6432%"))
-             || path.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)))
-            {
-                errorPath = "Program Files";
-            }
-            else if (path.StartsWith(Path.GetTempPath().Remove(Path.GetTempPath().Length - 1)))
-            {
-                errorPath = "Temporary Files";
-            }
-            else if (path.StartsWith(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "OneDrive")))
-            {
-                errorPath = "OneDrive";
-            }
-            else
-            {
-                if (updateText)
-                {
-                    FPM.Path = Path.Combine(path, "Flashpoint");
-                }
-
-                return true;
-            }
-
-            MessageBox.Show(
-                $"Flashpoint cannot be installed to the {errorPath} directory! Choose a different folder.",
-                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-            );
-
-            return false;
+            FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes, true);
+            FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList2.Nodes, false);
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -71,39 +37,49 @@ namespace FlashpointInstaller
         {
             var nodeAttributes = e.Node.Tag as Dictionary<string, string>;
 
-            if (nodeAttributes["disabled"] == "true")
-            {
-                e.Cancel = true;
-            }
+            if (bool.Parse(nodeAttributes["disabled"])) e.Cancel = true;
         }
 
         private void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.DownloadSize = FPM.GetEstimatedSize(ComponentList.Nodes);
-            DownloadSizeDisplay.Text = FPM.GetFormattedBytes(FPM.DownloadSize);
-        }
-
-        private void ComponentQueue_BeforeSelect(object sender, TreeViewCancelEventArgs e)
-        {
-            Description.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
-        }
-
-        private void FolderButton_Click(object sender, EventArgs e)
-        {
-            var PathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
-            
-            if (PathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            if (e.Node.TreeView.Name == "ComponentList")
             {
-                SetPath(PathDialog.FileName, true);
+                FPM.DownloadSize = FPM.GetEstimatedSize(ComponentList.Nodes);
+            }
+            else if (e.Node.TreeView.Name == "ComponentList2")
+            {
+                FPM.ModifiedSize = FPM.GetEstimatedSize(ComponentList2.Nodes);
             }
         }
 
-        private void FolderTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        private void ComponentList_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Return) { Install_Start(this, e); }
+            if (e.Node.TreeView.Name == "ComponentList")
+            {
+                Description.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
+            }
+            else if (e.Node.TreeView.Name == "ComponentList2")
+            {
+                Description2.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
+            }
         }
 
-        private void Install_Start(object sender, EventArgs e)
+        private void DownloadPathBrowse_Click(object sender, EventArgs e)
+        {
+            var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
+            
+            if (pathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                FPM.SetDownloadPath(pathDialog.FileName, true);
+            }
+        }
+
+        private void DownloadPath_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Return) Download_Start(this, e);
+        }
+
+        private void Download_Start(object sender, EventArgs e)
         {
             if (FPM.DownloadSize >= 1000000000000)
             {
@@ -116,10 +92,12 @@ namespace FlashpointInstaller
                 if (terabyteWarning == DialogResult.No) return;
             }
 
-            if (SetPath(FPM.Path, false))
+            if (FPM.SetDownloadPath(FPM.DownloadPath, false))
             {
-                var InstallWindow = new Install();
-                InstallWindow.ShowDialog();
+                FPM.UpdateMode = false;
+
+                var downloadWindow = new Download();
+                downloadWindow.ShowDialog();
             }
         }
     }

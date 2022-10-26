@@ -18,7 +18,7 @@ namespace FlashpointInstaller
                 var flashpointProcess = new Process();
                 flashpointProcess.StartInfo.UseShellExecute = true;
                 flashpointProcess.StartInfo.FileName = "Flashpoint.exe";
-                flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(FPM.Path, @"Launcher");
+                flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(FPM.DownloadPath, @"Launcher");
                 flashpointProcess.Start();
             }
 

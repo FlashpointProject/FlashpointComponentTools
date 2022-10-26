@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -13,24 +14,66 @@ namespace FlashpointInstaller
             public static Main Main { get { return (Main)Application.OpenForms["Main"]; } }
             public static XmlDocument XmlTree { get; set; }
             public static string ListURL { get; set; }
-            public static long DownloadSize { get; set; }
-            public static string Path
+            public static string DownloadPath
             {
-                get { return Main.FolderTextBox.Text; }
-                set { Main.FolderTextBox.Text = value; }
+                get { return Main.DownloadPath.Text; }
+                set { Main.DownloadPath.Text = value; }
+            }
+            public static string FlashpointPath
+            {
+                get { return Main.FlashpointPath.Text; }
+                set { Main.FlashpointPath.Text = value; }
             }
 
-            public static void RecursiveAddToList(XmlNode sourceNode, TreeNodeCollection destNode)
+            private static long downloadSize;
+            public static long DownloadSize
             {
-                foreach (XmlNode node in sourceNode.ChildNodes)
+                get => downloadSize;
+                set
                 {
-                    var listNode = FPM.AddNodeToList(node, destNode);
+                    Main.DownloadSizeDisplay.Text = GetFormattedBytes(value);
+                    downloadSize = value;
+                }
+            }
+            private static long modifiedSize;
+            public static long ModifiedSize
+            {
+                get => modifiedSize;
+                set
+                {
+                    modifiedSize = value;
+                    Main.ManagerSizeDisplay.Text = GetFormattedBytes(modifiedSize - InitialSize);
+                }
+            }
+            public static long InitialSize { get; set; }
 
-                    RecursiveAddToList(node, listNode.Nodes);
+            public static bool UpdateMode { get; set; } = false;
+
+            public static List<Dictionary<string, string>> InitialComponentInfo { get; set; } = new List<Dictionary<string, string>>();
+            public static List<Dictionary<string, string>> AddedComponentInfo   { get; set; } = new List<Dictionary<string, string>>();
+            public static List<Dictionary<string, string>> RemovedComponentInfo { get; set; } = new List<Dictionary<string, string>>();
+
+            public static void Iterate(TreeNodeCollection parent, Action<TreeNode> action)
+            {
+                foreach (TreeNode childNode in parent)
+                {
+                    action(childNode);
+
+                    Iterate(childNode.Nodes, action);
                 }
             }
 
-            public static TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent)
+            public static void RecursiveAddToList(XmlNode sourceNode, TreeNodeCollection destNode, bool setCheckState)
+            {
+                foreach (XmlNode node in sourceNode.ChildNodes)
+                {
+                    var listNode = AddNodeToList(node, destNode, setCheckState);
+
+                    RecursiveAddToList(node, listNode.Nodes, setCheckState);
+                }
+            }
+
+            public static TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent, bool setCheckState)
             {
                 var listNode = parent.Add(child.Attributes["title"].Value);
                 listNode.Tag = new Dictionary<string, string>
@@ -48,7 +91,7 @@ namespace FlashpointInstaller
                     (listNode.Tag as Dictionary<string, string>).Add("size", child.Attributes["size"].Value);
                     (listNode.Tag as Dictionary<string, string>).Add("hash", child.Attributes["hash"].Value);
 
-                    listNode.Checked = bool.Parse(child.Attributes["checked"].Value);
+                    if (setCheckState) listNode.Checked = bool.Parse(child.Attributes["checked"].Value);
                 }
 
                 if ((child.ParentNode.Name == "category" && child.ParentNode.Attributes["required"].Value == "true")
@@ -61,25 +104,80 @@ namespace FlashpointInstaller
                 return listNode;
             }
 
+            public static bool SetDownloadPath(string path, bool updateText)
+            {
+                string errorPath;
+
+                if (path.StartsWith(Environment.ExpandEnvironmentVariables("%ProgramW6432%"))
+                 || path.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)))
+                {
+                    errorPath = "Program Files";
+                }
+                else if (path.StartsWith(Path.GetTempPath().Remove(Path.GetTempPath().Length - 1)))
+                {
+                    errorPath = "Temporary Files";
+                }
+                else if (path.StartsWith(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "OneDrive")))
+                {
+                    errorPath = "OneDrive";
+                }
+                else
+                {
+                    if (updateText) DownloadPath = Path.Combine(path, "Flashpoint");
+
+                    return true;
+                }
+
+                MessageBox.Show(
+                    $"Flashpoint cannot be installed to the {errorPath} directory! Choose a different folder.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                );
+
+                return false;
+            }
+
+            public static bool SetFlashpointPath(string path, bool updateText)
+            {
+                bool isFlashpoint = false;
+
+                Iterate(Main.ComponentList2.Nodes, node =>
+                {
+                    var attributes = node.Tag as Dictionary<string, string>;
+                    string infoPath = Path.Combine(path, "Components", attributes["path"], $"{attributes["title"]}.txt");
+
+                    if (File.Exists(infoPath))
+                    {
+                        isFlashpoint = true;
+
+                        return;
+                    }
+                });
+
+                if (isFlashpoint)
+                {
+                    if (updateText) FlashpointPath = path;
+
+                    return true;
+                }
+
+                MessageBox.Show($"Flashpoint was not found in this directory!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                return false;
+            }
+
             public static long GetEstimatedSize(TreeNodeCollection sourceNodes)
             {
                 long size = 0;
 
-                void Iterate(TreeNodeCollection parent)
+                Iterate(sourceNodes, node =>
                 {
-                    foreach (TreeNode childNode in parent)
+                    var attributes = node.Tag as Dictionary<string, string>;
+
+                    if (node.Checked && attributes["type"] == "component")
                     {
-                        var attributes = childNode.Tag as Dictionary<string, string>;
-
-                        if (childNode.Checked && attributes["type"] == "component")
-                        {
-                            size += int.Parse(attributes["size"]);
-                        }
-
-                        Iterate(childNode.Nodes);
+                        size += int.Parse(attributes["size"]);
                     }
-                }
-                Iterate(sourceNodes);
+                });
 
                 return size;
             }
@@ -132,17 +230,9 @@ namespace FlashpointInstaller
                 {
                     return (Math.Truncate((double)bytes / 100000000) / 10).ToString("N1") + "GB";
                 }
-                else if (bytes >= 1000000)
-                {
-                    return (Math.Truncate((double)bytes / 100000) / 10).ToString("N1") + "MB";
-                }
-                else if (bytes >= 1000)
-                {
-                    return (Math.Truncate((double)bytes / 100) / 10).ToString("N1") + "KB";
-                }
                 else
                 {
-                    return $"{bytes}B";
+                    return (Math.Truncate((double)bytes / 100000) / 10).ToString("N1") + "MB";
                 }
             }
         }

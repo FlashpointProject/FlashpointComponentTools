@@ -271,17 +271,20 @@
     <Compile Include="Finish.Designer.cs">
       <DependentUpon>Finish.cs</DependentUpon>
     </Compile>
-    <Compile Include="Install.cs">
+    <Compile Include="Download.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Install.Designer.cs">
-      <DependentUpon>Install.cs</DependentUpon>
+    <Compile Include="Download.Designer.cs">
+      <DependentUpon>Download.cs</DependentUpon>
     </Compile>
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Manager.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -291,8 +294,8 @@
     <EmbeddedResource Include="Finish.resx">
       <DependentUpon>Finish.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Install.resx">
-      <DependentUpon>Install.cs</DependentUpon>
+    <EmbeddedResource Include="Download.resx">
+      <DependentUpon>Download.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

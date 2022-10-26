@@ -16,7 +16,7 @@ using File = System.IO.File;
 
 namespace FlashpointInstaller
 {
-    public partial class Install : Form
+    public partial class Download : Form
     {
         List<Dictionary<string, string>> componentInfo = new List<Dictionary<string, string>>();
         Dictionary<string, string> workingComponent;
@@ -32,28 +32,22 @@ namespace FlashpointInstaller
 
         int cancelStatus = 0;
 
-        public Install() => InitializeComponent();
+        public Download() => InitializeComponent();
 
-        private async void Install_Load(object sender, EventArgs e)
+        private async void Download_Load(object sender, EventArgs e)
         {
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
             downloader.DownloadFileCompleted += OnDownloadFileCompleted;
-            
-            void Iterate(TreeNodeCollection parent)
+
+            FPM.Iterate(FPM.Main.ComponentList.Nodes, node =>
             {
-                foreach (TreeNode childNode in parent)
+                var attributes = node.Tag as Dictionary<string, string>;
+
+                if (attributes["type"] == "component" && node.Checked)
                 {
-                    var attributes = childNode.Tag as Dictionary<string, string>;
-
-                    if (attributes["type"] == "component" && childNode.Checked)
-                    {
-                        componentInfo.Add(childNode.Tag as Dictionary<string, string>);
-                    }
-
-                    Iterate(childNode.Nodes);
+                    componentInfo.Add(attributes);
                 }
-            }
-            Iterate(FPM.Main.ComponentList.Nodes);
+            });
 
             foreach (var component in componentInfo)
             {
@@ -62,13 +56,13 @@ namespace FlashpointInstaller
                 
                 if (cancelStatus != 0) return;
 
-                Directory.CreateDirectory(FPM.Path);
+                Directory.CreateDirectory(FPM.DownloadPath);
                 await Task.Run(ExtractTask);
 
                 byteProgress += int.Parse(component["size"]);
             }
 
-            if (cancelStatus == 0) FinishInstallation();
+            if (cancelStatus == 0) FinishDownload();
         }
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -110,23 +104,23 @@ namespace FlashpointInstaller
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
 
-                    string infoPath = Path.Combine(FPM.Path, "Components", workingComponent["path"]);
+                    string infoPath = Path.Combine(FPM.DownloadPath, "Components", workingComponent["path"]);
                     string infoFile = $"{workingComponent["title"]}.txt";
 
                     Directory.CreateDirectory(infoPath);
                     
                     using (TextWriter writer = File.CreateText(infoPath + infoFile))
                     {
-                        writer.WriteLine($"{workingComponent["hash"]} {workingComponent["url"]}");
+                        writer.WriteLine($"{workingComponent["hash"]} {workingComponent["size"]} {workingComponent["url"]}");
                     }
 
                     while (cancelStatus == 0 && reader.MoveToNextEntry())
                     {
                         if (reader.Entry.IsDirectory) continue;
 
-                        reader.WriteEntryToDirectory(
-                            FPM.Path, new ExtractionOptions { ExtractFullPath = true, Overwrite = true }
-                        );
+                        reader.WriteEntryToDirectory(FPM.DownloadPath, new ExtractionOptions {
+                            ExtractFullPath = true, Overwrite = true, PreserveFileTime = true
+                        });
 
                         using (TextWriter writer = File.AppendText(infoPath + infoFile))
                         {
@@ -161,7 +155,7 @@ namespace FlashpointInstaller
             }
         }
 
-        private async void FinishInstallation()
+        private async void FinishDownload()
         {
             await Task.Run(() =>
             {
@@ -179,8 +173,8 @@ namespace FlashpointInstaller
                 foreach (string path in shortcutPaths)
                 {
                     IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
-                    shortcut.TargetPath = Path.Combine(FPM.Path, @"Launcher\Flashpoint.exe");
-                    shortcut.WorkingDirectory = Path.Combine(FPM.Path, @"Launcher");
+                    shortcut.TargetPath = Path.Combine(FPM.DownloadPath, @"Launcher\Flashpoint.exe");
+                    shortcut.WorkingDirectory = Path.Combine(FPM.DownloadPath, @"Launcher");
                     shortcut.Description = "Shortcut to Flashpoint";
                     shortcut.Save();
                 }
@@ -189,8 +183,8 @@ namespace FlashpointInstaller
             Hide();
             FPM.Main.Hide();
 
-            var FinishWindow = new Finish();
-            FinishWindow.ShowDialog();
+            var finishWindow = new Finish();
+            finishWindow.ShowDialog();
         }
 
         private async void Cancel_Click(object sender, EventArgs e)
@@ -202,10 +196,7 @@ namespace FlashpointInstaller
             { 
                 while (cancelStatus != 2) { }
 
-                if (Directory.Exists(FPM.Path))
-                {
-                    Directory.Delete(FPM.Path, true);
-                }
+                if (Directory.Exists(FPM.DownloadPath)) Directory.Delete(FPM.DownloadPath, true);
             });
             
             Close();

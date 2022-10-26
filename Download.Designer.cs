@@ -1,6 +1,6 @@
 ﻿namespace FlashpointInstaller
 {
-    partial class Install
+    partial class Download
     {
         /// <summary>
         /// Required designer variable.
@@ -74,7 +74,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Downloading Flashpoint...";
-            this.Load += new System.EventHandler(this.Install_Load);
+            this.Load += new System.EventHandler(this.Download_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
