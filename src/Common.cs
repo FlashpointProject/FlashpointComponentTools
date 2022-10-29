@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -14,44 +15,53 @@ namespace FlashpointInstaller
             public static Main Main { get { return (Main)Application.OpenForms["Main"]; } }
             public static XmlDocument XmlTree { get; set; }
             public static string ListURL { get; set; }
-            public static string DownloadPath
+
+            public static string DestinationPath
             {
-                get { return Main.DownloadPath.Text; }
-                set { Main.DownloadPath.Text = value; }
+                get { return Main.DestinationPath.Text; }
+                set { Main.DestinationPath.Text = value; }
             }
-            public static string FlashpointPath
+            public static string SourcePath
             {
-                get { return Main.FlashpointPath.Text; }
-                set { Main.FlashpointPath.Text = value; }
+                get { return Main.SourcePath.Text; }
+                set { Main.SourcePath.Text = value; }
             }
 
-            private static long downloadSize;
-            public static long DownloadSize
+            public static int DownloadMode { get; set; } = 0;
+
+            public static class SizeTracker
             {
-                get => downloadSize;
-                set
+                private static long toDownload;
+                private static long modified;
+
+                public static long Downloaded { get; set; }
+                public static long ToDownload
                 {
-                    Main.DownloadSizeDisplay.Text = GetFormattedBytes(value);
-                    downloadSize = value;
+                    get => toDownload;
+                    set
+                    {
+                        toDownload = value;
+                        Main.DownloadSizeDisplay.Text = GetFormattedBytes(toDownload);
+                    }
+                }
+                public static long Modified
+                {
+                    get => modified;
+                    set {
+                        modified = value;
+                        Main.ManagerSizeDisplay.Text = GetFormattedBytes(modified - Downloaded);
+                    }
                 }
             }
-            private static long modifiedSize;
-            public static long ModifiedSize
+
+            public static class ComponentTracker
             {
-                get => modifiedSize;
-                set
-                {
-                    modifiedSize = value;
-                    Main.ManagerSizeDisplay.Text = GetFormattedBytes(modifiedSize - InitialSize);
-                }
+                public static List<Dictionary<string, string>> ToDownload { get; set; } = new List<Dictionary<string, string>>();
+                public static List<Dictionary<string, string>> Downloaded { get; set; } = new List<Dictionary<string, string>>();
+                public static List<Dictionary<string, string>> ToAdd      { get; set; } = new List<Dictionary<string, string>>();
+                public static List<Dictionary<string, string>> ToRemove   { get; set; } = new List<Dictionary<string, string>>();
+                public static List<Dictionary<string, string>> ToUpdate   { get; set; } = new List<Dictionary<string, string>>();
             }
-            public static long InitialSize { get; set; }
-
-            public static bool UpdateMode { get; set; } = false;
-
-            public static List<Dictionary<string, string>> InitialComponentInfo { get; set; } = new List<Dictionary<string, string>>();
-            public static List<Dictionary<string, string>> AddedComponentInfo   { get; set; } = new List<Dictionary<string, string>>();
-            public static List<Dictionary<string, string>> RemovedComponentInfo { get; set; } = new List<Dictionary<string, string>>();
 
             public static void Iterate(TreeNodeCollection parent, Action<TreeNode> action)
             {
@@ -90,9 +100,10 @@ namespace FlashpointInstaller
                 {
                     (listNode.Tag as Dictionary<string, string>).Add("size", child.Attributes["size"].Value);
                     (listNode.Tag as Dictionary<string, string>).Add("hash", child.Attributes["hash"].Value);
-
-                    if (setCheckState) listNode.Checked = bool.Parse(child.Attributes["checked"].Value);
                 }
+
+                listNode.Checked = (setCheckState && child.Attributes["checked"] != null)
+                    ? bool.Parse(child.Attributes["checked"].Value) : listNode.Checked;
 
                 if ((child.ParentNode.Name == "category" && child.ParentNode.Attributes["required"].Value == "true")
                  || (child.Name == "category" && child.Attributes["required"].Value == "true"))
@@ -102,6 +113,46 @@ namespace FlashpointInstaller
                 }
 
                 return listNode;
+            }
+
+            public static void SyncManager(bool setCheckState = false)
+            {
+                ComponentTracker.Downloaded.Clear();
+
+                Iterate(Main.ComponentList2.Nodes, node =>
+                {
+                    var attributes = node.Tag as Dictionary<string, string>;
+
+                    if (attributes["type"] == "component")
+                    {
+                        string infoPath = Path.Combine(SourcePath, "Components", attributes["path"], $"{attributes["title"]}.txt");
+
+                        if (File.Exists(infoPath)) ComponentTracker.Downloaded.Add(attributes);
+
+                        if (setCheckState) node.Checked = File.Exists(infoPath) ? true : false;
+                    }
+                });
+
+                SizeTracker.Downloaded  = GetEstimatedSize(Main.ComponentList2.Nodes);
+                SizeTracker.Modified    = GetEstimatedSize(Main.ComponentList2.Nodes);
+            }
+
+            public static void DeleteFileAndDirectories(string file)
+            {
+                if (File.Exists(file)) File.Delete(file);
+
+                string folder = Path.GetDirectoryName(file);
+
+                while (folder != SourcePath)
+                {
+                    if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
+                    {
+                        Directory.Delete(folder, false);
+                    }
+                    else break;
+
+                    folder = Directory.GetParent(folder).ToString();
+                }
             }
 
             public static bool SetDownloadPath(string path, bool updateText)
@@ -123,7 +174,7 @@ namespace FlashpointInstaller
                 }
                 else
                 {
-                    if (updateText) DownloadPath = Path.Combine(path, "Flashpoint");
+                    if (updateText) DestinationPath = Path.Combine(path, "Flashpoint");
 
                     return true;
                 }
@@ -155,7 +206,7 @@ namespace FlashpointInstaller
 
                 if (isFlashpoint)
                 {
-                    if (updateText) FlashpointPath = path;
+                    if (updateText) SourcePath = path;
 
                     return true;
                 }
@@ -175,7 +226,7 @@ namespace FlashpointInstaller
 
                     if (node.Checked && attributes["type"] == "component")
                     {
-                        size += int.Parse(attributes["size"]);
+                        size += long.Parse(attributes["size"]);
                     }
                 });
 

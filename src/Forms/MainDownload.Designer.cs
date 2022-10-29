@@ -32,10 +32,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.Logo = new System.Windows.Forms.PictureBox();
             this.About = new System.Windows.Forms.Label();
-            this.DownloadPathBox = new System.Windows.Forms.GroupBox();
-            this.DownloadPath = new System.Windows.Forms.TextBox();
-            this.DownloadPathBrowse = new System.Windows.Forms.Button();
-            this.Install = new System.Windows.Forms.Button();
+            this.DestinationPathBox = new System.Windows.Forms.GroupBox();
+            this.DestinationPath = new System.Windows.Forms.TextBox();
+            this.DestinationPathBrowse = new System.Windows.Forms.Button();
+            this.DownloadButton = new System.Windows.Forms.Button();
             this.Link = new System.Windows.Forms.LinkLabel();
             this.TabControl = new System.Windows.Forms.TabControl();
             this.DownloadTab = new System.Windows.Forms.TabPage();
@@ -50,28 +50,28 @@
             this.DownloadSizeLabel = new System.Windows.Forms.Label();
             this.DownloadMessage = new System.Windows.Forms.Label();
             this.ComponentList = new RikTheVeggie.TriStateTreeView();
-            this.UpdateTab = new System.Windows.Forms.TabPage();
+            this.ManageTab = new System.Windows.Forms.TabPage();
             this.ManagerMessage2 = new System.Windows.Forms.Label();
             this.ManagerMessage = new System.Windows.Forms.Label();
             this.ManagerSizeDisplay = new System.Windows.Forms.Label();
             this.ManagerSizeLabel = new System.Windows.Forms.Label();
             this.UpdateButton = new System.Windows.Forms.Button();
             this.ChangeButton = new System.Windows.Forms.Button();
-            this.FlashpointPathBox = new System.Windows.Forms.GroupBox();
-            this.FlashpointPath = new System.Windows.Forms.TextBox();
-            this.FlashpointPathBrowse = new System.Windows.Forms.Button();
+            this.SourcePathBox = new System.Windows.Forms.GroupBox();
+            this.SourcePath = new System.Windows.Forms.TextBox();
+            this.SourcePathBrowse = new System.Windows.Forms.Button();
             this.DescriptionBox2 = new System.Windows.Forms.GroupBox();
             this.Description2 = new System.Windows.Forms.Label();
             this.ComponentList2 = new RikTheVeggie.TriStateTreeView();
             this.RemoveTab = new System.Windows.Forms.TabPage();
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).BeginInit();
-            this.DownloadPathBox.SuspendLayout();
+            this.DestinationPathBox.SuspendLayout();
             this.TabControl.SuspendLayout();
             this.DownloadTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.UpdateTab.SuspendLayout();
-            this.FlashpointPathBox.SuspendLayout();
+            this.ManageTab.SuspendLayout();
+            this.SourcePathBox.SuspendLayout();
             this.DescriptionBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -94,47 +94,47 @@
             this.About.TabIndex = 1;
             this.About.Text = "Flashpoint Manager v1.0";
             // 
-            // DownloadPathBox
+            // DestinationPathBox
             // 
-            this.DownloadPathBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.DownloadPathBox.Controls.Add(this.DownloadPath);
-            this.DownloadPathBox.Controls.Add(this.DownloadPathBrowse);
-            this.DownloadPathBox.Location = new System.Drawing.Point(7, 199);
-            this.DownloadPathBox.Name = "DownloadPathBox";
-            this.DownloadPathBox.Size = new System.Drawing.Size(576, 49);
-            this.DownloadPathBox.TabIndex = 2;
-            this.DownloadPathBox.TabStop = false;
-            this.DownloadPathBox.Text = "Destination folder:";
+            this.DestinationPathBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.DestinationPathBox.Controls.Add(this.DestinationPath);
+            this.DestinationPathBox.Controls.Add(this.DestinationPathBrowse);
+            this.DestinationPathBox.Location = new System.Drawing.Point(7, 199);
+            this.DestinationPathBox.Name = "DestinationPathBox";
+            this.DestinationPathBox.Size = new System.Drawing.Size(576, 49);
+            this.DestinationPathBox.TabIndex = 2;
+            this.DestinationPathBox.TabStop = false;
+            this.DestinationPathBox.Text = "Destination folder:";
             // 
-            // DownloadPath
+            // DestinationPath
             // 
-            this.DownloadPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DownloadPath.Location = new System.Drawing.Point(9, 18);
-            this.DownloadPath.Name = "DownloadPath";
-            this.DownloadPath.Size = new System.Drawing.Size(477, 20);
-            this.DownloadPath.TabIndex = 1;
-            this.DownloadPath.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DownloadPath_KeyPress);
+            this.DestinationPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DestinationPath.Location = new System.Drawing.Point(9, 18);
+            this.DestinationPath.Name = "DestinationPath";
+            this.DestinationPath.Size = new System.Drawing.Size(477, 20);
+            this.DestinationPath.TabIndex = 1;
+            this.DestinationPath.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DestinationPath_KeyPress);
             // 
-            // DownloadPathBrowse
+            // DestinationPathBrowse
             // 
-            this.DownloadPathBrowse.Location = new System.Drawing.Point(495, 17);
-            this.DownloadPathBrowse.Name = "DownloadPathBrowse";
-            this.DownloadPathBrowse.Size = new System.Drawing.Size(73, 22);
-            this.DownloadPathBrowse.TabIndex = 0;
-            this.DownloadPathBrowse.Text = "Browse";
-            this.DownloadPathBrowse.UseVisualStyleBackColor = true;
-            this.DownloadPathBrowse.Click += new System.EventHandler(this.DownloadPathBrowse_Click);
+            this.DestinationPathBrowse.Location = new System.Drawing.Point(495, 17);
+            this.DestinationPathBrowse.Name = "DestinationPathBrowse";
+            this.DestinationPathBrowse.Size = new System.Drawing.Size(73, 22);
+            this.DestinationPathBrowse.TabIndex = 0;
+            this.DestinationPathBrowse.Text = "Browse";
+            this.DestinationPathBrowse.UseVisualStyleBackColor = true;
+            this.DestinationPathBrowse.Click += new System.EventHandler(this.DestinationPathBrowse_Click);
             // 
-            // Install
+            // DownloadButton
             // 
-            this.Install.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.Install.Location = new System.Drawing.Point(300, 256);
-            this.Install.Name = "Install";
-            this.Install.Size = new System.Drawing.Size(284, 26);
-            this.Install.TabIndex = 2;
-            this.Install.Text = "Download Flashpoint";
-            this.Install.UseVisualStyleBackColor = true;
-            this.Install.Click += new System.EventHandler(this.Download_Start);
+            this.DownloadButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.DownloadButton.Location = new System.Drawing.Point(300, 256);
+            this.DownloadButton.Name = "DownloadButton";
+            this.DownloadButton.Size = new System.Drawing.Size(284, 26);
+            this.DownloadButton.TabIndex = 2;
+            this.DownloadButton.Text = "Download Flashpoint";
+            this.DownloadButton.UseVisualStyleBackColor = true;
+            this.DownloadButton.Click += new System.EventHandler(this.DownloadButton_Click);
             // 
             // Link
             // 
@@ -151,7 +151,7 @@
             // TabControl
             // 
             this.TabControl.Controls.Add(this.DownloadTab);
-            this.TabControl.Controls.Add(this.UpdateTab);
+            this.TabControl.Controls.Add(this.ManageTab);
             this.TabControl.Controls.Add(this.RemoveTab);
             this.TabControl.ItemSize = new System.Drawing.Size(150, 20);
             this.TabControl.Location = new System.Drawing.Point(12, 229);
@@ -160,6 +160,7 @@
             this.TabControl.Size = new System.Drawing.Size(600, 320);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.TabControl.TabIndex = 5;
+            this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
             // DownloadTab
             // 
@@ -170,8 +171,8 @@
             this.DownloadTab.Controls.Add(this.DownloadSizeLabel);
             this.DownloadTab.Controls.Add(this.DownloadMessage);
             this.DownloadTab.Controls.Add(this.ComponentList);
-            this.DownloadTab.Controls.Add(this.DownloadPathBox);
-            this.DownloadTab.Controls.Add(this.Install);
+            this.DownloadTab.Controls.Add(this.DestinationPathBox);
+            this.DownloadTab.Controls.Add(this.DownloadButton);
             this.DownloadTab.Location = new System.Drawing.Point(4, 24);
             this.DownloadTab.Name = "DownloadTab";
             this.DownloadTab.Padding = new System.Windows.Forms.Padding(3);
@@ -265,18 +266,22 @@
             // 
             // DownloadSizeDisplay
             // 
-            this.DownloadSizeDisplay.Location = new System.Drawing.Point(477, 85);
+            this.DownloadSizeDisplay.AutoSize = true;
+            this.DownloadSizeDisplay.Location = new System.Drawing.Point(478, 85);
+            this.DownloadSizeDisplay.Margin = new System.Windows.Forms.Padding(0);
             this.DownloadSizeDisplay.Name = "DownloadSizeDisplay";
-            this.DownloadSizeDisplay.Size = new System.Drawing.Size(105, 15);
+            this.DownloadSizeDisplay.Size = new System.Drawing.Size(38, 13);
             this.DownloadSizeDisplay.TabIndex = 8;
             this.DownloadSizeDisplay.Text = "0.0MB";
             // 
             // DownloadSizeLabel
             // 
+            this.DownloadSizeLabel.AutoSize = true;
             this.DownloadSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DownloadSizeLabel.Location = new System.Drawing.Point(410, 85);
+            this.DownloadSizeLabel.Margin = new System.Windows.Forms.Padding(0);
             this.DownloadSizeLabel.Name = "DownloadSizeLabel";
-            this.DownloadSizeLabel.Size = new System.Drawing.Size(70, 15);
+            this.DownloadSizeLabel.Size = new System.Drawing.Size(68, 13);
             this.DownloadSizeLabel.TabIndex = 7;
             this.DownloadSizeLabel.Text = "Total Size:";
             // 
@@ -300,24 +305,24 @@
             this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
             this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
             // 
-            // UpdateTab
+            // ManageTab
             // 
-            this.UpdateTab.Controls.Add(this.ManagerMessage2);
-            this.UpdateTab.Controls.Add(this.ManagerMessage);
-            this.UpdateTab.Controls.Add(this.ManagerSizeDisplay);
-            this.UpdateTab.Controls.Add(this.ManagerSizeLabel);
-            this.UpdateTab.Controls.Add(this.UpdateButton);
-            this.UpdateTab.Controls.Add(this.ChangeButton);
-            this.UpdateTab.Controls.Add(this.FlashpointPathBox);
-            this.UpdateTab.Controls.Add(this.DescriptionBox2);
-            this.UpdateTab.Controls.Add(this.ComponentList2);
-            this.UpdateTab.Location = new System.Drawing.Point(4, 24);
-            this.UpdateTab.Name = "UpdateTab";
-            this.UpdateTab.Padding = new System.Windows.Forms.Padding(3);
-            this.UpdateTab.Size = new System.Drawing.Size(592, 292);
-            this.UpdateTab.TabIndex = 1;
-            this.UpdateTab.Text = "Manage Components";
-            this.UpdateTab.UseVisualStyleBackColor = true;
+            this.ManageTab.Controls.Add(this.ManagerMessage2);
+            this.ManageTab.Controls.Add(this.ManagerMessage);
+            this.ManageTab.Controls.Add(this.ManagerSizeDisplay);
+            this.ManageTab.Controls.Add(this.ManagerSizeLabel);
+            this.ManageTab.Controls.Add(this.UpdateButton);
+            this.ManageTab.Controls.Add(this.ChangeButton);
+            this.ManageTab.Controls.Add(this.SourcePathBox);
+            this.ManageTab.Controls.Add(this.DescriptionBox2);
+            this.ManageTab.Controls.Add(this.ComponentList2);
+            this.ManageTab.Location = new System.Drawing.Point(4, 24);
+            this.ManageTab.Name = "ManageTab";
+            this.ManageTab.Padding = new System.Windows.Forms.Padding(3);
+            this.ManageTab.Size = new System.Drawing.Size(592, 292);
+            this.ManageTab.TabIndex = 1;
+            this.ManageTab.Text = "Manage Components";
+            this.ManageTab.UseVisualStyleBackColor = true;
             // 
             // ManagerMessage2
             // 
@@ -337,19 +342,23 @@
             // 
             // ManagerSizeDisplay
             // 
+            this.ManagerSizeDisplay.AutoSize = true;
             this.ManagerSizeDisplay.Location = new System.Drawing.Point(492, 85);
+            this.ManagerSizeDisplay.Margin = new System.Windows.Forms.Padding(0);
             this.ManagerSizeDisplay.Name = "ManagerSizeDisplay";
-            this.ManagerSizeDisplay.Size = new System.Drawing.Size(90, 15);
+            this.ManagerSizeDisplay.Size = new System.Drawing.Size(38, 13);
             this.ManagerSizeDisplay.TabIndex = 19;
             this.ManagerSizeDisplay.Text = "0.0MB";
             this.ManagerSizeDisplay.Visible = false;
             // 
             // ManagerSizeLabel
             // 
+            this.ManagerSizeLabel.AutoSize = true;
             this.ManagerSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ManagerSizeLabel.Location = new System.Drawing.Point(410, 85);
+            this.ManagerSizeLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ManagerSizeLabel.Name = "ManagerSizeLabel";
-            this.ManagerSizeLabel.Size = new System.Drawing.Size(85, 15);
+            this.ManagerSizeLabel.Size = new System.Drawing.Size(82, 13);
             this.ManagerSizeLabel.TabIndex = 18;
             this.ManagerSizeLabel.Text = "Size Change:";
             this.ManagerSizeLabel.Visible = false;
@@ -357,53 +366,56 @@
             // UpdateButton
             // 
             this.UpdateButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.UpdateButton.Enabled = false;
             this.UpdateButton.Location = new System.Drawing.Point(6, 256);
             this.UpdateButton.Name = "UpdateButton";
             this.UpdateButton.Size = new System.Drawing.Size(284, 26);
             this.UpdateButton.TabIndex = 17;
             this.UpdateButton.Text = "Check for updates";
             this.UpdateButton.UseVisualStyleBackColor = true;
+            this.UpdateButton.Click += new System.EventHandler(this.UpdateButton_Click);
             // 
             // ChangeButton
             // 
             this.ChangeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.ChangeButton.Enabled = false;
             this.ChangeButton.Location = new System.Drawing.Point(300, 256);
             this.ChangeButton.Name = "ChangeButton";
             this.ChangeButton.Size = new System.Drawing.Size(284, 26);
             this.ChangeButton.TabIndex = 16;
             this.ChangeButton.Text = "Apply changes";
             this.ChangeButton.UseVisualStyleBackColor = true;
-            this.ChangeButton.Click += new System.EventHandler(this.ApplyChanges_Start);
+            this.ChangeButton.Click += new System.EventHandler(this.ChangeButton_Click);
             // 
-            // FlashpointPathBox
+            // SourcePathBox
             // 
-            this.FlashpointPathBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.FlashpointPathBox.Controls.Add(this.FlashpointPath);
-            this.FlashpointPathBox.Controls.Add(this.FlashpointPathBrowse);
-            this.FlashpointPathBox.Location = new System.Drawing.Point(7, 199);
-            this.FlashpointPathBox.Name = "FlashpointPathBox";
-            this.FlashpointPathBox.Size = new System.Drawing.Size(576, 49);
-            this.FlashpointPathBox.TabIndex = 15;
-            this.FlashpointPathBox.TabStop = false;
-            this.FlashpointPathBox.Text = "Containing folder:";
+            this.SourcePathBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.SourcePathBox.Controls.Add(this.SourcePath);
+            this.SourcePathBox.Controls.Add(this.SourcePathBrowse);
+            this.SourcePathBox.Location = new System.Drawing.Point(7, 199);
+            this.SourcePathBox.Name = "SourcePathBox";
+            this.SourcePathBox.Size = new System.Drawing.Size(576, 49);
+            this.SourcePathBox.TabIndex = 15;
+            this.SourcePathBox.TabStop = false;
+            this.SourcePathBox.Text = "Containing folder:";
             // 
-            // FlashpointPath
+            // SourcePath
             // 
-            this.FlashpointPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FlashpointPath.Location = new System.Drawing.Point(9, 18);
-            this.FlashpointPath.Name = "FlashpointPath";
-            this.FlashpointPath.Size = new System.Drawing.Size(477, 20);
-            this.FlashpointPath.TabIndex = 1;
+            this.SourcePath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SourcePath.Location = new System.Drawing.Point(9, 18);
+            this.SourcePath.Name = "SourcePath";
+            this.SourcePath.Size = new System.Drawing.Size(477, 20);
+            this.SourcePath.TabIndex = 1;
             // 
-            // FlashpointPathBrowse
+            // SourcePathBrowse
             // 
-            this.FlashpointPathBrowse.Location = new System.Drawing.Point(495, 17);
-            this.FlashpointPathBrowse.Name = "FlashpointPathBrowse";
-            this.FlashpointPathBrowse.Size = new System.Drawing.Size(73, 22);
-            this.FlashpointPathBrowse.TabIndex = 0;
-            this.FlashpointPathBrowse.Text = "Browse";
-            this.FlashpointPathBrowse.UseVisualStyleBackColor = true;
-            this.FlashpointPathBrowse.Click += new System.EventHandler(this.FlashpointPathBrowse_Click);
+            this.SourcePathBrowse.Location = new System.Drawing.Point(495, 17);
+            this.SourcePathBrowse.Name = "SourcePathBrowse";
+            this.SourcePathBrowse.Size = new System.Drawing.Size(73, 22);
+            this.SourcePathBrowse.TabIndex = 0;
+            this.SourcePathBrowse.Text = "Browse";
+            this.SourcePathBrowse.UseVisualStyleBackColor = true;
+            this.SourcePathBrowse.Click += new System.EventHandler(this.SourcePathBrowse_Click);
             // 
             // DescriptionBox2
             // 
@@ -433,6 +445,7 @@
             this.ComponentList2.Size = new System.Drawing.Size(384, 176);
             this.ComponentList2.TabIndex = 13;
             this.ComponentList2.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList2.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList2_BeforeSelect);
             // 
             // RemoveTab
             // 
@@ -462,16 +475,18 @@
             this.Text = "Flashpoint Manager";
             this.Load += new System.EventHandler(this.Main_Load);
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).EndInit();
-            this.DownloadPathBox.ResumeLayout(false);
-            this.DownloadPathBox.PerformLayout();
+            this.DestinationPathBox.ResumeLayout(false);
+            this.DestinationPathBox.PerformLayout();
             this.TabControl.ResumeLayout(false);
             this.DownloadTab.ResumeLayout(false);
+            this.DownloadTab.PerformLayout();
             this.DescriptionBox.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
-            this.UpdateTab.ResumeLayout(false);
-            this.FlashpointPathBox.ResumeLayout(false);
-            this.FlashpointPathBox.PerformLayout();
+            this.ManageTab.ResumeLayout(false);
+            this.ManageTab.PerformLayout();
+            this.SourcePathBox.ResumeLayout(false);
+            this.SourcePathBox.PerformLayout();
             this.DescriptionBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -482,14 +497,14 @@
 
         private System.Windows.Forms.PictureBox Logo;
         private System.Windows.Forms.Label About;
-        private System.Windows.Forms.GroupBox DownloadPathBox;
-        public System.Windows.Forms.TextBox DownloadPath;
-        private System.Windows.Forms.Button DownloadPathBrowse;
-        private System.Windows.Forms.Button Install;
+        private System.Windows.Forms.GroupBox DestinationPathBox;
+        public System.Windows.Forms.TextBox DestinationPath;
+        private System.Windows.Forms.Button DestinationPathBrowse;
+        private System.Windows.Forms.Button DownloadButton;
         private System.Windows.Forms.LinkLabel Link;
         private System.Windows.Forms.TabControl TabControl;
         private System.Windows.Forms.TabPage DownloadTab;
-        private System.Windows.Forms.TabPage UpdateTab;
+        private System.Windows.Forms.TabPage ManageTab;
         private System.Windows.Forms.Label DownloadSizeLabel;
         private System.Windows.Forms.Label DownloadMessage;
         public RikTheVeggie.TriStateTreeView ComponentList;
@@ -503,10 +518,9 @@
         private System.Windows.Forms.Label Description;
         private System.Windows.Forms.Label DownloadMessage2;
         private System.Windows.Forms.Button UpdateButton;
-        private System.Windows.Forms.Button ChangeButton;
-        private System.Windows.Forms.GroupBox FlashpointPathBox;
-        public System.Windows.Forms.TextBox FlashpointPath;
-        private System.Windows.Forms.Button FlashpointPathBrowse;
+        private System.Windows.Forms.GroupBox SourcePathBox;
+        public System.Windows.Forms.TextBox SourcePath;
+        private System.Windows.Forms.Button SourcePathBrowse;
         private System.Windows.Forms.GroupBox DescriptionBox2;
         private System.Windows.Forms.Label Description2;
         private System.Windows.Forms.Label ManagerSizeLabel;
@@ -514,6 +528,7 @@
         private System.Windows.Forms.Label ManagerMessage2;
         public System.Windows.Forms.Label DownloadSizeDisplay;
         public System.Windows.Forms.Label ManagerSizeDisplay;
+        public System.Windows.Forms.Button ChangeButton;
     }
 }
 

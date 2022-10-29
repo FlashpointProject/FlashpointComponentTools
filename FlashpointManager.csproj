@@ -264,41 +264,47 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common.cs" />
-    <Compile Include="Finish.cs">
+    <Compile Include="src\Common.cs" />
+    <Compile Include="src\Forms\FinishDownload.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Finish.Designer.cs">
-      <DependentUpon>Finish.cs</DependentUpon>
+    <Compile Include="src\Forms\FinishDownload.Designer.cs">
+      <DependentUpon>FinishDownload.cs</DependentUpon>
     </Compile>
-    <Compile Include="Download.cs">
+    <Compile Include="src\Forms\Operation.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Download.Designer.cs">
-      <DependentUpon>Download.cs</DependentUpon>
+    <Compile Include="src\Forms\Operation.Designer.cs">
+      <DependentUpon>Operation.cs</DependentUpon>
     </Compile>
-    <Compile Include="Main.cs">
+    <Compile Include="src\Forms\MainDownload.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Main.Designer.cs">
-      <DependentUpon>Main.cs</DependentUpon>
+    <Compile Include="src\Forms\MainDownload.Designer.cs">
+      <DependentUpon>MainDownload.cs</DependentUpon>
     </Compile>
-    <Compile Include="Manager.cs">
+    <Compile Include="src\Forms\MainManage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TriStateTreeView.cs">
+    <Compile Include="src\TriStateTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <EmbeddedResource Include="Finish.resx">
-      <DependentUpon>Finish.cs</DependentUpon>
+    <Compile Include="src\Forms\UpdateCheck.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\Forms\UpdateCheck.Designer.cs">
+      <DependentUpon>UpdateCheck.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="src\Forms\FinishDownload.resx">
+      <DependentUpon>FinishDownload.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Download.resx">
-      <DependentUpon>Download.cs</DependentUpon>
+    <EmbeddedResource Include="src\Forms\Operation.resx">
+      <DependentUpon>Operation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Main.resx">
-      <DependentUpon>Main.cs</DependentUpon>
+    <EmbeddedResource Include="src\Forms\MainDownload.resx">
+      <DependentUpon>MainDownload.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -309,6 +315,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="src\Forms\UpdateCheck.resx">
+      <DependentUpon>UpdateCheck.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

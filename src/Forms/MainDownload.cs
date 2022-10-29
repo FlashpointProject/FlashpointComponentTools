@@ -14,7 +14,7 @@ namespace FlashpointInstaller
     public partial class Main : Form
     {
         public Main() => InitializeComponent();
-        
+
         private async void Main_Load(object sender, EventArgs e)
         {
             FPM.ListURL = "http://localhost/components.xml";
@@ -25,7 +25,6 @@ namespace FlashpointInstaller
             FPM.XmlTree = new XmlDocument(); FPM.XmlTree.Load(listStream);
             
             FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes, true);
-            FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList2.Nodes, false);
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -35,36 +34,22 @@ namespace FlashpointInstaller
 
         private void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
         {
-            var nodeAttributes = e.Node.Tag as Dictionary<string, string>;
+            var attributes = e.Node.Tag as Dictionary<string, string>;
 
-            if (bool.Parse(nodeAttributes["disabled"])) e.Cancel = true;
+            if (bool.Parse(attributes["disabled"])) e.Cancel = true;
         }
 
         private void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if (e.Node.TreeView.Name == "ComponentList")
-            {
-                FPM.DownloadSize = FPM.GetEstimatedSize(ComponentList.Nodes);
-            }
-            else if (e.Node.TreeView.Name == "ComponentList2")
-            {
-                FPM.ModifiedSize = FPM.GetEstimatedSize(ComponentList2.Nodes);
-            }
+            FPM.SizeTracker.ToDownload = FPM.GetEstimatedSize(ComponentList.Nodes);
         }
 
-        private void ComponentList_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        private void ComponentList_BeforeSelect(object _, TreeViewCancelEventArgs e)
         {
-            if (e.Node.TreeView.Name == "ComponentList")
-            {
-                Description.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
-            }
-            else if (e.Node.TreeView.Name == "ComponentList2")
-            {
-                Description2.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
-            }
+            Description.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
         }
 
-        private void DownloadPathBrowse_Click(object sender, EventArgs e)
+        private void DestinationPathBrowse_Click(object _, EventArgs e)
         {
             var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
             
@@ -74,14 +59,14 @@ namespace FlashpointInstaller
             }
         }
 
-        private void DownloadPath_KeyPress(object sender, KeyPressEventArgs e)
+        private void DestinationPath_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Return) Download_Start(this, e);
+            if (e.KeyChar == (char)Keys.Return) DownloadButton_Click(this, e);
         }
 
-        private void Download_Start(object sender, EventArgs e)
+        private void DownloadButton_Click(object sender, EventArgs e)
         {
-            if (FPM.DownloadSize >= 1000000000000)
+            if (FPM.SizeTracker.ToDownload >= 1000000000000)
             {
                 var terabyteWarning = MessageBox.Show(
                     "You are about to download OVER A TERABYTE of data. The Complete Offline Archive " +
@@ -92,11 +77,11 @@ namespace FlashpointInstaller
                 if (terabyteWarning == DialogResult.No) return;
             }
 
-            if (FPM.SetDownloadPath(FPM.DownloadPath, false))
+            if (FPM.SetDownloadPath(FPM.DestinationPath, false))
             {
-                FPM.UpdateMode = false;
+                FPM.DownloadMode = 0;
 
-                var downloadWindow = new Download();
+                var downloadWindow = new Operation();
                 downloadWindow.ShowDialog();
             }
         }

@@ -1,6 +1,6 @@
 ﻿namespace FlashpointInstaller
 {
-    partial class Finish
+    partial class FinishDownload
     {
         /// <summary>
         /// Required designer variable.
@@ -62,7 +62,7 @@
             this.CloseButton.TabIndex = 2;
             this.CloseButton.Text = "Close";
             this.CloseButton.UseVisualStyleBackColor = true;
-            this.CloseButton.Click += new System.EventHandler(this.Exit);
+            this.CloseButton.Click += new System.EventHandler(this.FinishDownload_Exit);
             // 
             // Finish
             // 
@@ -81,7 +81,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Download Complete";
             this.TopMost = true;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Exit);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FinishDownload_Exit);
             this.ResumeLayout(false);
             this.PerformLayout();
 
