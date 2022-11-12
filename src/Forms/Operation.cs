@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,18 +7,18 @@ using System.Windows.Forms;
 
 using Downloader;
 using FlashpointInstaller.Common;
-using IWshRuntimeLibrary;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Readers;
-
-using File = System.IO.File;
 
 namespace FlashpointInstaller
 {
     public partial class Operation : Form
     {
-        Dictionary<string, string> workingComponent;
+        Component workingComponent;
+
+        List<Component> addedComponents   = new List<Component>();
+        List<Component> removedComponents = new List<Component>();
 
         DownloadService downloader = new DownloadService(new DownloadConfiguration { OnTheFlyDownload = false });
 
@@ -28,7 +27,7 @@ namespace FlashpointInstaller
         IReader reader;
 
         long byteProgress = 0;
-        long byteTotal;
+        long byteTotal = 0;
 
         int cancelStatus = 0;
 
@@ -36,103 +35,82 @@ namespace FlashpointInstaller
 
         private async void Operation_Load(object sender, EventArgs e)
         {
-            if (FPM.DownloadMode != 0)
-            {
-                Text = "Modifying Flashpoint...";
-                CancelButton.Visible = false;
-            }
-
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
             downloader.DownloadFileCompleted += OnDownloadFileCompleted;
 
-            if (FPM.DownloadMode != 0)
+            if (FPM.OperateMode == 0)
             {
-                FPM.ComponentTracker.ToAdd.Clear();
-                FPM.ComponentTracker.ToRemove.Clear();
+                FPM.Iterate(FPM.Main.ComponentList.Nodes, node =>
+                {
+                    if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
+                    {
+                        addedComponents.Add(node.Tag as Component);
+                    }
+                });
 
-                if (FPM.DownloadMode == 1)
+                byteTotal = FPM.SizeTracker.ToDownload;
+            }
+            else
+            {
+                Text = "Modifying Flashpoint...";
+                CancelButton.Visible = false;
+
+                if (FPM.OperateMode == 1)
                 {
                     FPM.Iterate(FPM.Main.ComponentList2.Nodes, node =>
                     {
-                        var attributes = node.Tag as Dictionary<string, string>;
-
-                        if (attributes["type"] == "component")
+                        if (node.Tag.GetType().ToString().EndsWith("Component"))
                         {
-                            if (!node.Checked && FPM.ComponentTracker.Downloaded.Contains(attributes))
+                            var component = node.Tag as Component;
+
+                            if (!node.Checked && FPM.ComponentTracker.Downloaded.Contains(component))
                             {
-                                FPM.ComponentTracker.ToRemove.Add(attributes);
+                                removedComponents.Add(component);
                             }
-                            if (node.Checked && !FPM.ComponentTracker.Downloaded.Contains(attributes))
+                            if (node.Checked && !FPM.ComponentTracker.Downloaded.Contains(component))
                             {
-                                FPM.ComponentTracker.ToAdd.Add(attributes);
+                                addedComponents.Add(component);
                             }
                         }
                     });
                 }
-                else if (FPM.DownloadMode == 2)
+                if (FPM.OperateMode == 2)
                 {
                     foreach (var component in FPM.ComponentTracker.ToUpdate)
                     {
-                        FPM.ComponentTracker.ToRemove.Add(component);
-                        FPM.ComponentTracker.ToAdd.Add(component);
+                        removedComponents.Add(component);
+                        addedComponents.Add(component);
                     }
                 }
 
-                byteTotal = 0;
-
-                foreach (var component in FPM.ComponentTracker.ToRemove.Concat(FPM.ComponentTracker.ToAdd))
-                {
-                    byteTotal += long.Parse(component["size"]);
-                }
-
-                foreach (var component in FPM.ComponentTracker.ToRemove)
-                {
-                    workingComponent = component;
-
-                    await Task.Run(RemoveTask);
-                    
-                    byteProgress += long.Parse(component["size"]);
-                }
-
-                foreach (var component in FPM.ComponentTracker.ToAdd)
-                {
-                    workingComponent = component;
-                    stream = await downloader.DownloadFileTaskAsync(component["url"]);
-
-                    await Task.Run(ExtractTask);
-
-                    byteProgress += long.Parse(component["size"]);
-                }
+                byteTotal = removedComponents.Concat(addedComponents).Sum(item => item.Size);
             }
-            else
+
+            foreach (var component in removedComponents)
             {
-                FPM.ComponentTracker.ToDownload.Clear();
-                byteTotal = FPM.SizeTracker.ToDownload;
+                workingComponent = component;
 
-                FPM.Iterate(FPM.Main.ComponentList.Nodes, node =>
-                {
-                    var attributes = node.Tag as Dictionary<string, string>;
+                await Task.Run(RemoveTask);
 
-                    if (attributes["type"] == "component" && node.Checked) FPM.ComponentTracker.ToDownload.Add(attributes);
-                });
+                byteProgress += component.Size;
+            }
 
-                foreach (var component in FPM.ComponentTracker.ToDownload)
-                {
-                    workingComponent = component;
-                    stream = await downloader.DownloadFileTaskAsync(component["url"]);
+            foreach (var component in addedComponents)
+            {
+                workingComponent = component;
+                stream = await downloader.DownloadFileTaskAsync(component.GetURL());
 
-                    if (cancelStatus != 0) return;
+                if (cancelStatus != 0) return;
 
-                    Directory.CreateDirectory(FPM.DestinationPath);
-                    await Task.Run(ExtractTask);
+                Directory.CreateDirectory(FPM.DestinationPath);
+                await Task.Run(ExtractTask);
 
-                    byteProgress += long.Parse(component["size"]);
-                }
+                byteProgress += component.Size;
             }
 
             if (cancelStatus == 0) FinishDownload();
         }
-
+        
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             if (cancelStatus != 0)
@@ -142,7 +120,7 @@ namespace FlashpointInstaller
             }
 
             double currentProgress = (double)e.ReceivedBytesSize / e.TotalBytesToReceive;
-            long currentSize = long.Parse(workingComponent["size"]);
+            long currentSize = workingComponent.Size;
             double totalProgress = (byteProgress + (currentProgress / 2 * currentSize)) / byteTotal;
 
             ProgressMeasure.Invoke((MethodInvoker)delegate
@@ -153,12 +131,12 @@ namespace FlashpointInstaller
             ProgressLabel.Invoke((MethodInvoker)delegate
             {
                 ProgressLabel.Text =
-                    $"[{(int)((double)totalProgress * 100)}%] Downloading component \"{workingComponent["title"]}\"... " +
+                    $"[{(int)((double)totalProgress * 100)}%] Downloading component \"{workingComponent.Title}\"... " +
                     $"{FPM.GetFormattedBytes(e.ReceivedBytesSize)} of {FPM.GetFormattedBytes(e.TotalBytesToReceive)}";
             });
         }
 
-        private void OnDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        private void OnDownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             if (e.Cancelled) cancelStatus = 2;
         }
@@ -172,15 +150,15 @@ namespace FlashpointInstaller
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
 
-                    string destPath = FPM.DownloadMode > 0 ? FPM.SourcePath : FPM.DestinationPath;
-                    string infoPath = Path.Combine(destPath, "Components", workingComponent["path"]);
-                    string infoFile = Path.Combine(infoPath, $"{workingComponent["title"]}.txt");
+                    string destPath = FPM.OperateMode > 0 ? FPM.SourcePath : FPM.DestinationPath;
+                    string infoPath = Path.Combine(destPath, "Components");
+                    string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
 
                     Directory.CreateDirectory(infoPath);
 
                     using (TextWriter writer = File.CreateText(infoFile))
                     {
-                        writer.WriteLine($"{workingComponent["hash"]} {workingComponent["size"]} {workingComponent["url"]}");
+                        writer.WriteLine($"{workingComponent.Hash} {workingComponent.Size} {workingComponent.GetURL()}");
                     }
 
                     while (cancelStatus == 0 && reader.MoveToNextEntry())
@@ -199,7 +177,7 @@ namespace FlashpointInstaller
                         extractedSize += reader.Entry.Size;
 
                         double currentProgress = (double)extractedSize / totalSize;
-                        long currentSize = long.Parse(workingComponent["size"]);
+                        long currentSize = workingComponent.Size;
                         double totalProgress = (byteProgress + (currentSize / 2) + (currentProgress / 2 * currentSize)) / byteTotal;
 
                         ProgressMeasure.Invoke((MethodInvoker)delegate
@@ -210,7 +188,7 @@ namespace FlashpointInstaller
                         ProgressLabel.Invoke((MethodInvoker)delegate
                         {
                             ProgressLabel.Text = 
-                                $"[{(int)((double)totalProgress * 100)}%] Extracting component \"{workingComponent["title"]}\"... " +
+                                $"[{(int)((double)totalProgress * 100)}%] Extracting component \"{workingComponent.Title}\"... " +
                                 $"{FPM.GetFormattedBytes(extractedSize)} of {FPM.GetFormattedBytes(totalSize)}";
                         });
                     }
@@ -226,14 +204,12 @@ namespace FlashpointInstaller
 
         private void RemoveTask()
         {
-            string infoFile = Path.Combine(
-                FPM.SourcePath, "Components", workingComponent["path"], $"{workingComponent["title"]}.txt"
-            );
+            string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{workingComponent.ID}.txt");
             string[] infoText = File.ReadAllLines(infoFile);
 
             long removedFiles = 0;
             long totalFiles = infoText.Length - 1;
-            long totalSize = long.Parse(workingComponent["size"]);
+            long totalSize = workingComponent.Size;
 
             for (int i = 1; i < infoText.Length; i++)
             {
@@ -249,7 +225,7 @@ namespace FlashpointInstaller
                 ProgressLabel.Invoke((MethodInvoker)delegate
                 {
                     ProgressLabel.Text =
-                        $"[{(int)((double)totalProgress * 100)}%] Removing component \"{workingComponent["title"]}\"... " +
+                        $"[{(int)((double)totalProgress * 100)}%] Removing component \"{workingComponent.Title}\"... " +
                         $"{removedFiles} of {totalFiles} files";
                 });
 
@@ -263,7 +239,7 @@ namespace FlashpointInstaller
 
         private async void FinishDownload()
         {
-            if (FPM.DownloadMode == 0)
+            if (FPM.OperateMode == 0)
             {
                 await Task.Run(() =>
                 {
@@ -280,7 +256,7 @@ namespace FlashpointInstaller
 
                     foreach (string path in shortcutPaths)
                     {
-                        IWshShortcut shortcut = new WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
+                        var shortcut = new IWshRuntimeLibrary.WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
                         shortcut.TargetPath = Path.Combine(FPM.DestinationPath, @"Launcher\Flashpoint.exe");
                         shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, @"Launcher");
                         shortcut.Description = "Shortcut to Flashpoint";

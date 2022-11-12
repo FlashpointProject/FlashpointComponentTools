@@ -25,24 +25,24 @@ namespace FlashpointInstaller
             {
                 foreach (XmlNode node in sourceNode.ChildNodes)
                 {
-                    var query = FPM.ComponentTracker.Downloaded.FirstOrDefault(item => item["url"] == FPM.GetComponentURL(node));
+                    var query = FPM.ComponentTracker.Downloaded.FirstOrDefault(item => item.ID == new Category(node).ID);
 
                     if (query != null)
                     {
-                        string infoFile = Path.Combine(FPM.SourcePath, "Components", query["path"], $"{query["title"]}.txt");
+                        string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{query.ID}.txt");
                         string[] componentData = File.ReadLines(infoFile).First().Split(' ');
 
-                        if (componentData[0] != query["hash"])
+                        if (componentData[0] != query.Hash)
                         {
-                            long sizeChange = long.Parse(query["size"]) - long.Parse(componentData[1]);
+                            long sizeChange = query.Size - long.Parse(componentData[1]);
                             totalSizeChange += sizeChange;
 
                             string displayedSize = FPM.GetFormattedBytes(sizeChange);
                             if (displayedSize[0] != '-') displayedSize = "+" + displayedSize;
 
                             ListViewItem item = new ListViewItem();
-                            item.Text = query["title"];
-                            item.SubItems.Add(query["description"]);
+                            item.Text = query.Title;
+                            item.SubItems.Add(query.Description);
                             item.SubItems.Add(displayedSize);
                             UpdateList.Items.Add(item);
 
@@ -67,9 +67,9 @@ namespace FlashpointInstaller
 
         private void UpdateButton_Click(object sender, System.EventArgs e)
         {
-            if (FPM.SetFlashpointPath(FPM.SourcePath, false))
+            if (FPM.VerifySourcePath(FPM.SourcePath, false))
             {
-                FPM.DownloadMode = 2;
+                FPM.OperateMode = 2;
 
                 var downloadWindow = new Operation();
                 downloadWindow.ShowDialog();

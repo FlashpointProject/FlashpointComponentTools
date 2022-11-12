@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 using FlashpointInstaller.Common;
@@ -22,7 +21,7 @@ namespace FlashpointInstaller
             var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
 
             if (pathDialog.ShowDialog() != CommonFileDialogResult.Ok) return;
-            if (!FPM.SetFlashpointPath(pathDialog.FileName, true)) return;
+            if (!FPM.VerifySourcePath(pathDialog.FileName, true)) return;
 
             ComponentList2.Enabled = true; ManagerMessage2.Visible = false;
             ManagerSizeLabel.Visible = true; ManagerSizeDisplay.Visible = true;
@@ -36,17 +35,19 @@ namespace FlashpointInstaller
 
         private void ComponentList2_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.SizeTracker.Modified = FPM.GetEstimatedSize(ComponentList2.Nodes);
+            FPM.SizeTracker.Modified = FPM.GetTotalSize(ComponentList2.Nodes);
         }
 
         private void ComponentList2_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
-            Description2.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
+            Description2.Text = e.Node.Tag.GetType().ToString().EndsWith("Component")
+                ? (e.Node.Tag as Component).Description
+                : (e.Node.Tag as Category).Description;
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            if (FPM.SetFlashpointPath(FPM.SourcePath, false))
+            if (FPM.VerifySourcePath(FPM.SourcePath, false))
             {
                 var updateWindow = new UpdateCheck();
                 updateWindow.ShowDialog();
@@ -55,9 +56,9 @@ namespace FlashpointInstaller
 
         private void ChangeButton_Click(object sender, EventArgs e)
         {
-            if (FPM.SetFlashpointPath(FPM.SourcePath, false))
+            if (FPM.VerifySourcePath(FPM.SourcePath, false))
             {
-                FPM.DownloadMode = 1;
+                FPM.OperateMode = 1;
 
                 var downloadWindow = new Operation();
                 downloadWindow.ShowDialog();

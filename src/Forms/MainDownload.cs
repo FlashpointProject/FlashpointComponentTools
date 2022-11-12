@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
@@ -17,12 +16,13 @@ namespace FlashpointInstaller
 
         private async void Main_Load(object sender, EventArgs e)
         {
-            FPM.ListURL = "http://localhost/components.xml";
-
-            FPM.SetDownloadPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
+            FPM.VerifyDestinationPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
             
-            Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL); listStream.Position = 0;
-            FPM.XmlTree = new XmlDocument(); FPM.XmlTree.Load(listStream);
+            Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL);
+            listStream.Position = 0;
+
+            FPM.XmlTree = new XmlDocument();
+            FPM.XmlTree.Load(listStream);
             
             FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes, true);
         }
@@ -34,19 +34,23 @@ namespace FlashpointInstaller
 
         private void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
         {
-            var attributes = e.Node.Tag as Dictionary<string, string>;
+            bool required = e.Node.Tag.GetType().ToString().EndsWith("Component")
+                ? (e.Node.Tag as Component).Required
+                : (e.Node.Tag as Category).Required;
 
-            if (bool.Parse(attributes["disabled"])) e.Cancel = true;
+            if (required && e.Node.Checked) e.Cancel = true;
         }
 
         private void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.SizeTracker.ToDownload = FPM.GetEstimatedSize(ComponentList.Nodes);
+            FPM.SizeTracker.ToDownload = FPM.GetTotalSize(ComponentList.Nodes);
         }
 
         private void ComponentList_BeforeSelect(object _, TreeViewCancelEventArgs e)
         {
-            Description.Text = (e.Node.Tag as Dictionary<string, string>)["description"];
+            Description.Text = e.Node.Tag.GetType().ToString().EndsWith("Component")
+                ? (e.Node.Tag as Component).Description
+                : (e.Node.Tag as Category).Description;
         }
 
         private void DestinationPathBrowse_Click(object _, EventArgs e)
@@ -55,7 +59,7 @@ namespace FlashpointInstaller
             
             if (pathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                FPM.SetDownloadPath(pathDialog.FileName, true);
+                FPM.VerifyDestinationPath(pathDialog.FileName, true);
             }
         }
 
@@ -77,9 +81,9 @@ namespace FlashpointInstaller
                 if (terabyteWarning == DialogResult.No) return;
             }
 
-            if (FPM.SetDownloadPath(FPM.DestinationPath, false))
+            if (FPM.VerifyDestinationPath(FPM.DestinationPath, false))
             {
-                FPM.DownloadMode = 0;
+                FPM.OperateMode = 0;
 
                 var downloadWindow = new Operation();
                 downloadWindow.ShowDialog();
