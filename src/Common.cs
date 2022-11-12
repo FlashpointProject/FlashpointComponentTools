@@ -141,11 +141,17 @@ namespace FlashpointInstaller
                 get { return Main.DestinationPath.Text; }
                 set { Main.DestinationPath.Text = value; }
             }
-            // Pointer to source path textbox
+            // Pointer to source path textbox in Manage tab
             public static string SourcePath
             {
                 get { return Main.SourcePath.Text; }
                 set { Main.SourcePath.Text = value; }
+            }
+            // Pointer to source path textbox in Remove tab
+            public static string SourcePath2
+            {
+                get { return Main.SourcePath2.Text; }
+                set { Main.SourcePath2.Text = value; }
             }
 
             // Flag to control how operation window will function
@@ -331,12 +337,12 @@ namespace FlashpointInstaller
                 return false;
             }
 
-            // Checks if specified Flashpoint source path is valid, and optionally updates its respective textbox
-            public static bool VerifySourcePath(string path, bool updateText)
+            // Checks if specified Flashpoint source path is valid, and optionally updates one of the textboxes
+            public static bool VerifySourcePath(string path, int textBox = 0)
             {
                 bool isFlashpoint = false;
 
-                Iterate(Main.ComponentList2.Nodes, node =>
+                Iterate(Main.ComponentList.Nodes, node =>
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
@@ -354,7 +360,8 @@ namespace FlashpointInstaller
 
                 if (isFlashpoint)
                 {
-                    if (updateText) SourcePath = path;
+                    if (textBox == 1) SourcePath  = path;
+                    if (textBox == 2) SourcePath2 = path;
 
                     return true;
                 }

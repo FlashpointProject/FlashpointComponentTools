@@ -1,6 +1,6 @@
 ﻿namespace FlashpointInstaller
 {
-    partial class FinishDownload
+    partial class FinishOperation
     {
         /// <summary>
         /// Required designer variable.
@@ -64,7 +64,7 @@
             this.CloseButton.UseVisualStyleBackColor = true;
             this.CloseButton.Click += new System.EventHandler(this.FinishDownload_Exit);
             // 
-            // Finish
+            // FinishOperation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -75,13 +75,14 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Finish";
+            this.Name = "FinishOperation";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Download Complete";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FinishDownload_Exit);
+            this.Load += new System.EventHandler(this.FinishOperation_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

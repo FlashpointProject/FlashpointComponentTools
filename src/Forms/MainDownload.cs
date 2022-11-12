@@ -85,8 +85,8 @@ namespace FlashpointInstaller
             {
                 FPM.OperateMode = 0;
 
-                var downloadWindow = new Operation();
-                downloadWindow.ShowDialog();
+                var operationWindow = new Operation();
+                operationWindow.ShowDialog();
             }
         }
     }

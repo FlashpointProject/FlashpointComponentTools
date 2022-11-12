@@ -49,7 +49,6 @@
             this.DownloadSizeDisplay = new System.Windows.Forms.Label();
             this.DownloadSizeLabel = new System.Windows.Forms.Label();
             this.DownloadMessage = new System.Windows.Forms.Label();
-            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.ManageTab = new System.Windows.Forms.TabPage();
             this.ManagerMessage2 = new System.Windows.Forms.Label();
             this.ManagerMessage = new System.Windows.Forms.Label();
@@ -62,8 +61,15 @@
             this.SourcePathBrowse = new System.Windows.Forms.Button();
             this.DescriptionBox2 = new System.Windows.Forms.GroupBox();
             this.Description2 = new System.Windows.Forms.Label();
-            this.ComponentList2 = new RikTheVeggie.TriStateTreeView();
             this.RemoveTab = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.RemoveShortcuts = new System.Windows.Forms.CheckBox();
+            this.SourcePathBox2 = new System.Windows.Forms.GroupBox();
+            this.SourcePath2 = new System.Windows.Forms.TextBox();
+            this.SourcePathBrowse2 = new System.Windows.Forms.Button();
+            this.RemoveButton = new System.Windows.Forms.Button();
+            this.ComponentList = new RikTheVeggie.TriStateTreeView();
+            this.ComponentList2 = new RikTheVeggie.TriStateTreeView();
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).BeginInit();
             this.DestinationPathBox.SuspendLayout();
             this.TabControl.SuspendLayout();
@@ -73,6 +79,8 @@
             this.ManageTab.SuspendLayout();
             this.SourcePathBox.SuspendLayout();
             this.DescriptionBox2.SuspendLayout();
+            this.RemoveTab.SuspendLayout();
+            this.SourcePathBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // Logo
@@ -293,18 +301,6 @@
             this.DownloadMessage.TabIndex = 6;
             this.DownloadMessage.Text = "Choose components to include in your Flashpoint download.";
             // 
-            // ComponentList
-            // 
-            this.ComponentList.Indent = 20;
-            this.ComponentList.Location = new System.Drawing.Point(16, 14);
-            this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(384, 176);
-            this.ComponentList.TabIndex = 5;
-            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
-            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
-            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
-            // 
             // ManageTab
             // 
             this.ManageTab.Controls.Add(this.ManagerMessage2);
@@ -436,6 +432,97 @@
             this.Description2.Size = new System.Drawing.Size(143, 44);
             this.Description2.TabIndex = 0;
             // 
+            // RemoveTab
+            // 
+            this.RemoveTab.Controls.Add(this.label1);
+            this.RemoveTab.Controls.Add(this.RemoveShortcuts);
+            this.RemoveTab.Controls.Add(this.SourcePathBox2);
+            this.RemoveTab.Controls.Add(this.RemoveButton);
+            this.RemoveTab.Location = new System.Drawing.Point(4, 24);
+            this.RemoveTab.Name = "RemoveTab";
+            this.RemoveTab.Padding = new System.Windows.Forms.Padding(3);
+            this.RemoveTab.Size = new System.Drawing.Size(592, 292);
+            this.RemoveTab.TabIndex = 2;
+            this.RemoveTab.Text = "Remove Flashpoint";
+            this.RemoveTab.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.Location = new System.Drawing.Point(9, 11);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(574, 40);
+            this.label1.TabIndex = 20;
+            this.label1.Text = "Remove a local Flashpoint copy by selecting its folder and then clicking the butt" +
+    "on below.\r\n\r\nRemoving Flashpoint will not delete save data, but it will delete y" +
+    "our favorites and any custom playlists.";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // RemoveShortcuts
+            // 
+            this.RemoveShortcuts.AutoSize = true;
+            this.RemoveShortcuts.Checked = true;
+            this.RemoveShortcuts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.RemoveShortcuts.Location = new System.Drawing.Point(169, 72);
+            this.RemoveShortcuts.Name = "RemoveShortcuts";
+            this.RemoveShortcuts.Size = new System.Drawing.Size(239, 17);
+            this.RemoveShortcuts.TabIndex = 19;
+            this.RemoveShortcuts.Text = "Remove shortcuts in desktop and Start menu";
+            this.RemoveShortcuts.UseVisualStyleBackColor = true;
+            // 
+            // SourcePathBox2
+            // 
+            this.SourcePathBox2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.SourcePathBox2.Controls.Add(this.SourcePath2);
+            this.SourcePathBox2.Controls.Add(this.SourcePathBrowse2);
+            this.SourcePathBox2.Location = new System.Drawing.Point(7, 199);
+            this.SourcePathBox2.Name = "SourcePathBox2";
+            this.SourcePathBox2.Size = new System.Drawing.Size(576, 49);
+            this.SourcePathBox2.TabIndex = 18;
+            this.SourcePathBox2.TabStop = false;
+            this.SourcePathBox2.Text = "Containing folder:";
+            // 
+            // SourcePath2
+            // 
+            this.SourcePath2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SourcePath2.Location = new System.Drawing.Point(9, 18);
+            this.SourcePath2.Name = "SourcePath2";
+            this.SourcePath2.Size = new System.Drawing.Size(477, 20);
+            this.SourcePath2.TabIndex = 1;
+            // 
+            // SourcePathBrowse2
+            // 
+            this.SourcePathBrowse2.Location = new System.Drawing.Point(495, 17);
+            this.SourcePathBrowse2.Name = "SourcePathBrowse2";
+            this.SourcePathBrowse2.Size = new System.Drawing.Size(73, 22);
+            this.SourcePathBrowse2.TabIndex = 0;
+            this.SourcePathBrowse2.Text = "Browse";
+            this.SourcePathBrowse2.UseVisualStyleBackColor = true;
+            this.SourcePathBrowse2.Click += new System.EventHandler(this.SourcePathBrowse2_Click);
+            // 
+            // RemoveButton
+            // 
+            this.RemoveButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.RemoveButton.Enabled = false;
+            this.RemoveButton.Location = new System.Drawing.Point(6, 256);
+            this.RemoveButton.Name = "RemoveButton";
+            this.RemoveButton.Size = new System.Drawing.Size(578, 26);
+            this.RemoveButton.TabIndex = 17;
+            this.RemoveButton.Text = "Remove Flashpoint";
+            this.RemoveButton.UseVisualStyleBackColor = true;
+            this.RemoveButton.Click += new System.EventHandler(this.RemoveButton_Click);
+            // 
+            // ComponentList
+            // 
+            this.ComponentList.Indent = 20;
+            this.ComponentList.Location = new System.Drawing.Point(16, 14);
+            this.ComponentList.Name = "ComponentList";
+            this.ComponentList.Size = new System.Drawing.Size(384, 176);
+            this.ComponentList.TabIndex = 5;
+            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
+            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
+            // 
             // ComponentList2
             // 
             this.ComponentList2.Enabled = false;
@@ -445,17 +532,6 @@
             this.ComponentList2.Size = new System.Drawing.Size(384, 176);
             this.ComponentList2.TabIndex = 13;
             this.ComponentList2.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList2.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList2_BeforeSelect);
-            // 
-            // RemoveTab
-            // 
-            this.RemoveTab.Location = new System.Drawing.Point(4, 24);
-            this.RemoveTab.Name = "RemoveTab";
-            this.RemoveTab.Padding = new System.Windows.Forms.Padding(3);
-            this.RemoveTab.Size = new System.Drawing.Size(592, 292);
-            this.RemoveTab.TabIndex = 2;
-            this.RemoveTab.Text = "Remove Flashpoint";
-            this.RemoveTab.UseVisualStyleBackColor = true;
             // 
             // Main
             // 
@@ -488,6 +564,10 @@
             this.SourcePathBox.ResumeLayout(false);
             this.SourcePathBox.PerformLayout();
             this.DescriptionBox2.ResumeLayout(false);
+            this.RemoveTab.ResumeLayout(false);
+            this.RemoveTab.PerformLayout();
+            this.SourcePathBox2.ResumeLayout(false);
+            this.SourcePathBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -529,6 +609,12 @@
         public System.Windows.Forms.Label DownloadSizeDisplay;
         public System.Windows.Forms.Label ManagerSizeDisplay;
         public System.Windows.Forms.Button ChangeButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.GroupBox SourcePathBox2;
+        public System.Windows.Forms.TextBox SourcePath2;
+        private System.Windows.Forms.Button SourcePathBrowse2;
+        public System.Windows.Forms.Button RemoveButton;
+        public System.Windows.Forms.CheckBox RemoveShortcuts;
     }
 }
 

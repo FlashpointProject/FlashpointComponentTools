@@ -67,7 +67,7 @@ namespace FlashpointInstaller
 
         private void UpdateButton_Click(object sender, System.EventArgs e)
         {
-            if (FPM.VerifySourcePath(FPM.SourcePath, false))
+            if (FPM.VerifySourcePath(FPM.SourcePath))
             {
                 FPM.OperateMode = 2;
 

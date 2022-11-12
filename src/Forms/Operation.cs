@@ -50,7 +50,7 @@ namespace FlashpointInstaller
 
                 byteTotal = FPM.SizeTracker.ToDownload;
             }
-            else
+            else if (FPM.OperateMode != 3)
             {
                 Text = "Modifying Flashpoint...";
                 CancelButton.Visible = false;
@@ -85,12 +85,21 @@ namespace FlashpointInstaller
 
                 byteTotal = removedComponents.Concat(addedComponents).Sum(item => item.Size);
             }
+            else if (FPM.OperateMode == 3)
+            {
+                Text = "Removing Flashpoint...";
+                CancelButton.Visible = false;
+
+                await Task.Run(RemoveFlashpoint);
+
+                FinishOperation();
+            }
 
             foreach (var component in removedComponents)
             {
                 workingComponent = component;
 
-                await Task.Run(RemoveTask);
+                await Task.Run(RemoveComponents);
 
                 byteProgress += component.Size;
             }
@@ -103,12 +112,12 @@ namespace FlashpointInstaller
                 if (cancelStatus != 0) return;
 
                 Directory.CreateDirectory(FPM.DestinationPath);
-                await Task.Run(ExtractTask);
+                await Task.Run(ExtractComponents);
 
                 byteProgress += component.Size;
             }
 
-            if (cancelStatus == 0) FinishDownload();
+            if (cancelStatus == 0) FinishOperation();
         }
         
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -141,7 +150,7 @@ namespace FlashpointInstaller
             if (e.Cancelled) cancelStatus = 2;
         }
 
-        private void ExtractTask()
+        private void ExtractComponents()
         {
             using (archive = ZipArchive.Open(stream))
             {
@@ -202,7 +211,7 @@ namespace FlashpointInstaller
             }
         }
 
-        private void RemoveTask()
+        private void RemoveComponents()
         {
             string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{workingComponent.ID}.txt");
             string[] infoText = File.ReadAllLines(infoFile);
@@ -237,7 +246,37 @@ namespace FlashpointInstaller
             FPM.DeleteFileAndDirectories(infoFile);
         }
 
-        private async void FinishDownload()
+        private void RemoveFlashpoint()
+        {
+            string[] files = Directory.GetFiles(FPM.SourcePath2);
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                double progress = (i + 1) / files.Length;
+                string fileName = files[i].Substring(files[i].LastIndexOf(@"\"));
+
+                ProgressMeasure.Invoke((MethodInvoker)delegate
+                {
+                    ProgressMeasure.Value = (int)((double)progress * ProgressMeasure.Maximum);
+                });
+
+                ProgressLabel.Invoke((MethodInvoker)delegate
+                {
+                    ProgressLabel.Text = $"[{(int)((double)progress * 100)}%] Removing \"{fileName}\"... {i + 1} of {files.Length} files";
+                });
+
+                File.Delete(files[i]);
+            }
+
+            ProgressLabel.Invoke((MethodInvoker)delegate
+            {
+                ProgressLabel.Text = $"[100%] Removing directories...";
+            });
+
+            Directory.Delete(FPM.SourcePath2, true);
+        }
+
+        private async void FinishOperation()
         {
             if (FPM.OperateMode == 0)
             {
@@ -267,7 +306,26 @@ namespace FlashpointInstaller
                 Hide();
                 FPM.Main.Hide();
 
-                var finishWindow = new FinishDownload();
+                var finishWindow = new FinishOperation();
+                finishWindow.ShowDialog();
+            }
+            else if (FPM.OperateMode == 3)
+            {
+                if (FPM.Main.RemoveShortcuts.Checked)
+                {
+                    var shortcutPaths = new List<string>()
+                    {
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Flashpoint.lnk"),
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),   "Flashpoint.lnk")
+                    };
+
+                    foreach (string path in shortcutPaths) if (File.Exists(path)) File.Delete(path);
+                }
+
+                Hide();
+                FPM.Main.Hide();
+
+                var finishWindow = new FinishOperation();
                 finishWindow.ShowDialog();
             }
 

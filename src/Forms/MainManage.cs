@@ -21,11 +21,11 @@ namespace FlashpointInstaller
             var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
 
             if (pathDialog.ShowDialog() != CommonFileDialogResult.Ok) return;
-            if (!FPM.VerifySourcePath(pathDialog.FileName, true)) return;
+            if (!FPM.VerifySourcePath(pathDialog.FileName, 1)) return;
 
-            ComponentList2.Enabled = true; ManagerMessage2.Visible = false;
-            ManagerSizeLabel.Visible = true; ManagerSizeDisplay.Visible = true;
-            UpdateButton.Enabled = true; ChangeButton.Enabled = true;
+            ComponentList2.Enabled = true; ManagerMessage2.Visible    = false;
+            UpdateButton.Enabled   = true; ManagerSizeLabel.Visible   = true;
+            ChangeButton.Enabled   = true; ManagerSizeDisplay.Visible = true;
 
             FPM.SyncManager(true);
 
@@ -47,7 +47,7 @@ namespace FlashpointInstaller
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            if (FPM.VerifySourcePath(FPM.SourcePath, false))
+            if (FPM.VerifySourcePath(FPM.SourcePath))
             {
                 var updateWindow = new UpdateCheck();
                 updateWindow.ShowDialog();
@@ -56,12 +56,12 @@ namespace FlashpointInstaller
 
         private void ChangeButton_Click(object sender, EventArgs e)
         {
-            if (FPM.VerifySourcePath(FPM.SourcePath, false))
+            if (FPM.VerifySourcePath(FPM.SourcePath))
             {
                 FPM.OperateMode = 1;
 
-                var downloadWindow = new Operation();
-                downloadWindow.ShowDialog();
+                var operationWindow = new Operation();
+                operationWindow.ShowDialog();
 
                 FPM.SyncManager();
             }

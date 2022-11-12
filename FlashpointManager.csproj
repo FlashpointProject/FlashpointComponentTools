@@ -265,11 +265,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Common.cs" />
-    <Compile Include="src\Forms\FinishDownload.cs">
+    <Compile Include="src\Forms\FinishOperation.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="src\Forms\FinishDownload.Designer.cs">
-      <DependentUpon>FinishDownload.cs</DependentUpon>
+    <Compile Include="src\Forms\FinishOperation.Designer.cs">
+      <DependentUpon>FinishOperation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="src\Forms\MainRemove.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="src\Forms\Operation.cs">
       <SubType>Form</SubType>
@@ -297,8 +300,8 @@
     <Compile Include="src\Forms\UpdateCheck.Designer.cs">
       <DependentUpon>UpdateCheck.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="src\Forms\FinishDownload.resx">
-      <DependentUpon>FinishDownload.cs</DependentUpon>
+    <EmbeddedResource Include="src\Forms\FinishOperation.resx">
+      <DependentUpon>FinishOperation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="src\Forms\Operation.resx">
       <DependentUpon>Operation.cs</DependentUpon>
