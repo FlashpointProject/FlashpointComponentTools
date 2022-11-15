@@ -35,7 +35,7 @@ namespace FlashpointInstaller
 
         private void ComponentList2_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.SizeTracker.Modified = FPM.GetTotalSize(ComponentList2.Nodes);
+            FPM.SizeTracker.Modified = FPM.GetTotalSize(ComponentList2);
         }
 
         private void ComponentList2_BeforeSelect(object sender, TreeViewCancelEventArgs e)
@@ -58,6 +58,8 @@ namespace FlashpointInstaller
         {
             if (FPM.VerifySourcePath(FPM.SourcePath))
             {
+                if (!FPM.CheckDependencies(ComponentList2)) return;
+
                 FPM.OperateMode = 1;
 
                 var operationWindow = new Operation();

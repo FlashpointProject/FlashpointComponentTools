@@ -15,7 +15,7 @@ namespace FlashpointInstaller
         {
             public string Hash { get; set; }
             public long Size { get; set; }
-            public string[] Depends { get; set; }
+            public string[] Depends { get; set; } = new string[] {};
             public bool Extra { get; set; }
 
             public Component(XmlNode node) : base(node)
@@ -194,7 +194,7 @@ namespace FlashpointInstaller
             {
                 // Information about components that are available locally
                 public static List<Component> Downloaded { get; set; } = new List<Component>();
-                // Information about components that are to be updated
+                // Information about components that are to be updated or added through the updater
                 public static List<Component> ToUpdate   { get; set; } = new List<Component>();
             }
 
@@ -277,12 +277,12 @@ namespace FlashpointInstaller
 
                         if (File.Exists(infoPath)) ComponentTracker.Downloaded.Add(component);
 
-                        if (setCheckState) node.Checked = File.Exists(infoPath) ? true : false;
+                        if (setCheckState) node.Checked = File.Exists(infoPath);
                     }
                 });
 
-                SizeTracker.Downloaded = GetTotalSize(Main.ComponentList2.Nodes);
-                SizeTracker.Modified   = GetTotalSize(Main.ComponentList2.Nodes);
+                SizeTracker.Downloaded = GetTotalSize(Main.ComponentList2);
+                SizeTracker.Modified   = GetTotalSize(Main.ComponentList2);
             }
 
             // Deletes a file as well as any directories made empty by its deletion
@@ -371,16 +371,92 @@ namespace FlashpointInstaller
                 return false;
             }
 
-            // Gets total size in bytes of all checked components in the specified TreeView
-            public static long GetTotalSize(TreeNodeCollection sourceNodes)
+            // Checks if any dependencies were not marked for download by the user, and marks them accordingly
+            public static bool CheckDependencies(TreeView sourceTree)
             {
-                long size = 0;
+                List<string> requiredDepends = new List<string>();
+                List<string> persistDepends  = new List<string>();
+                List<string> missingDepends  = new List<string>();
 
-                Iterate(sourceNodes, node =>
+                // First, fill out a list of dependencies
+                Iterate(sourceTree.Nodes, node =>
                 {
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
-                        size += (node.Tag as Component).Size;
+                        Component component = node.Tag as Component;
+                        string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
+
+                        if (sourceTree.Name == "ComponentList2" && File.Exists(infoPath))
+                        {
+                            requiredDepends.AddRange(File.ReadLines(infoPath).First().Split(' ').Skip(2).ToArray());
+                        }
+                        else
+                        {
+                            requiredDepends.AddRange((node.Tag as Component).Depends);
+                        }
+                    }
+                });
+
+                // Then make sure they're all marked for installation 
+                Iterate(sourceTree.Nodes, node =>
+                {
+                    if (node.Tag.GetType().ToString().EndsWith("Component"))
+                    {
+                        Component component = node.Tag as Component;
+
+                        if (requiredDepends.Any(depend => depend == component.ID) && !node.Checked)
+                        {
+                            node.Checked = true;
+
+                            if (ComponentTracker.Downloaded.Any(depend => depend.ID == component.ID))
+                            {
+                                persistDepends.Add(component.Title);
+                            }
+                            else
+                            {
+                                missingDepends.Add(component.Title);
+                            }
+                        }
+                    }
+                });
+
+                if (persistDepends.Count > 0)
+                {
+                    MessageBox.Show(
+                        "The following components cannot be removed because one or more components depend on them:\n\n" +
+                        string.Join(", ", persistDepends), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
+
+                    return false;
+                }
+
+                if (missingDepends.Count > 0)
+                {
+                    MessageBox.Show(
+                        "The following dependencies will also be installed:\n\n" +
+                        string.Join(", ", missingDepends) + "\n\nClick the OK button to proceed.",
+                        "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information
+                    );
+                }
+
+                return true;
+            }
+
+            // Gets total size in bytes of all checked components in the specified TreeView
+            public static long GetTotalSize(TreeView sourceTree)
+            {
+                long size = 0;
+
+                Iterate(sourceTree.Nodes, node =>
+                {
+                    if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
+                    {
+                        Component component = node.Tag as Component;
+                        string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
+
+                        size += sourceTree.Name == "ComponentList2" && File.Exists(infoPath)
+                            ? long.Parse(File.ReadLines(infoPath).First().Split(' ')[1])
+                            : component.Size;
                     }
                 });
 

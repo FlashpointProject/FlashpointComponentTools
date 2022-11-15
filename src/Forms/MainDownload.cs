@@ -43,7 +43,7 @@ namespace FlashpointInstaller
 
         private void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.SizeTracker.ToDownload = FPM.GetTotalSize(ComponentList.Nodes);
+            FPM.SizeTracker.ToDownload = FPM.GetTotalSize(ComponentList);
         }
 
         private void ComponentList_BeforeSelect(object _, TreeViewCancelEventArgs e)
@@ -70,6 +70,10 @@ namespace FlashpointInstaller
 
         private void DownloadButton_Click(object sender, EventArgs e)
         {
+            if (!FPM.VerifyDestinationPath(FPM.DestinationPath, false)) return;
+
+            FPM.CheckDependencies(ComponentList);
+
             if (FPM.SizeTracker.ToDownload >= 1000000000000)
             {
                 var terabyteWarning = MessageBox.Show(
@@ -81,13 +85,10 @@ namespace FlashpointInstaller
                 if (terabyteWarning == DialogResult.No) return;
             }
 
-            if (FPM.VerifyDestinationPath(FPM.DestinationPath, false))
-            {
-                FPM.OperateMode = 0;
+            FPM.OperateMode = 0;
 
-                var operationWindow = new Operation();
-                operationWindow.ShowDialog();
-            }
+            var operationWindow = new Operation();
+            operationWindow.ShowDialog();
         }
     }
 }

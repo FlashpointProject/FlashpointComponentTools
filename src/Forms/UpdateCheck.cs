@@ -21,32 +21,66 @@ namespace FlashpointInstaller
             FPM.SyncManager();
             FPM.ComponentTracker.ToUpdate.Clear();
 
+            void AddToQueue(Component component, long oldSize)
+            {
+                long sizeChange = component.Size - oldSize;
+                totalSizeChange += sizeChange;
+
+                string displayedSize = FPM.GetFormattedBytes(sizeChange);
+                if (displayedSize[0] != '-') displayedSize = "+" + displayedSize;
+
+                ListViewItem item = new ListViewItem();
+                item.Text = component.Title;
+                item.SubItems.Add(component.Description);
+                item.SubItems.Add(displayedSize);
+                UpdateList.Items.Add(item);
+
+                FPM.ComponentTracker.ToUpdate.Add(component);
+            }
+
             void IterateXML(XmlNode sourceNode)
             {
                 foreach (XmlNode node in sourceNode.ChildNodes)
                 {
-                    var query = FPM.ComponentTracker.Downloaded.FirstOrDefault(item => item.ID == new Category(node).ID);
-
-                    if (query != null)
+                    if (node.Name == "component")
                     {
-                        string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{query.ID}.txt");
-                        string[] componentData = File.ReadLines(infoFile).First().Split(' ');
+                        Component component = new Component(node);
 
-                        if (componentData[0] != query.Hash)
+                        bool update = false;
+                        long oldSize = 0;
+
+                        if (FPM.ComponentTracker.Downloaded.Any(item => item.ID == component.ID))
                         {
-                            long sizeChange = query.Size - long.Parse(componentData[1]);
-                            totalSizeChange += sizeChange;
+                            string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{component.ID}.txt");
+                            string[] componentData = File.ReadLines(infoFile).First().Split(' ');
 
-                            string displayedSize = FPM.GetFormattedBytes(sizeChange);
-                            if (displayedSize[0] != '-') displayedSize = "+" + displayedSize;
+                            update = componentData[0] != component.Hash;
+                            oldSize = long.Parse(componentData[1]);
+                        }
+                        else if (component.ID.StartsWith("required"))
+                        {
+                            update = true;
+                        }
 
-                            ListViewItem item = new ListViewItem();
-                            item.Text = query.Title;
-                            item.SubItems.Add(query.Description);
-                            item.SubItems.Add(displayedSize);
-                            UpdateList.Items.Add(item);
+                        if (update)
+                        {
+                            AddToQueue(component, oldSize);
 
-                            FPM.ComponentTracker.ToUpdate.Add(query);
+                            foreach (string dependID in component.Depends)
+                            {
+                                if (!FPM.ComponentTracker.Downloaded.Any(item => item.ID == dependID))
+                                {
+                                    FPM.Iterate(FPM.Main.ComponentList.Nodes, treeNode =>
+                                    {
+                                        if (treeNode.Tag.GetType().ToString().EndsWith("Component"))
+                                        {
+                                            Component treeComponent = treeNode.Tag as Component;
+
+                                            if (treeComponent.ID == dependID) AddToQueue(treeComponent, 0);
+                                        }
+                                    });
+                                }
+                            }
 
                             UpdateButton.Enabled = true;
                         }
@@ -74,7 +108,7 @@ namespace FlashpointInstaller
                 var downloadWindow = new Operation();
                 downloadWindow.ShowDialog();
 
-                FPM.SyncManager();
+                FPM.SyncManager(true);
 
                 Close();
             }

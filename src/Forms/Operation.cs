@@ -78,7 +78,11 @@ namespace FlashpointInstaller
                 {
                     foreach (var component in FPM.ComponentTracker.ToUpdate)
                     {
-                        removedComponents.Add(component);
+                        if (FPM.ComponentTracker.Downloaded.Contains(component))
+                        {
+                            removedComponents.Add(component);
+                        }
+
                         addedComponents.Add(component);
                     }
                 }
@@ -167,7 +171,10 @@ namespace FlashpointInstaller
 
                     using (TextWriter writer = File.CreateText(infoFile))
                     {
-                        writer.WriteLine($"{workingComponent.Hash} {workingComponent.Size} {workingComponent.GetURL()}");
+                        string[] header = new string[] { workingComponent.Hash, workingComponent.Size.ToString() }
+                            .Concat(workingComponent.Depends).ToArray();
+
+                        writer.WriteLine(string.Join(" ", header));
                     }
 
                     while (cancelStatus == 0 && reader.MoveToNextEntry())
