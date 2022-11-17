@@ -49,6 +49,7 @@
             this.DownloadSizeDisplay = new System.Windows.Forms.Label();
             this.DownloadSizeLabel = new System.Windows.Forms.Label();
             this.DownloadMessage = new System.Windows.Forms.Label();
+            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.ManageTab = new System.Windows.Forms.TabPage();
             this.ManagerMessage2 = new System.Windows.Forms.Label();
             this.ManagerMessage = new System.Windows.Forms.Label();
@@ -61,6 +62,7 @@
             this.SourcePathBrowse = new System.Windows.Forms.Button();
             this.DescriptionBox2 = new System.Windows.Forms.GroupBox();
             this.Description2 = new System.Windows.Forms.Label();
+            this.ComponentList2 = new RikTheVeggie.TriStateTreeView();
             this.RemoveTab = new System.Windows.Forms.TabPage();
             this.label1 = new System.Windows.Forms.Label();
             this.RemoveShortcuts = new System.Windows.Forms.CheckBox();
@@ -68,8 +70,6 @@
             this.SourcePath2 = new System.Windows.Forms.TextBox();
             this.SourcePathBrowse2 = new System.Windows.Forms.Button();
             this.RemoveButton = new System.Windows.Forms.Button();
-            this.ComponentList = new RikTheVeggie.TriStateTreeView();
-            this.ComponentList2 = new RikTheVeggie.TriStateTreeView();
             ((System.ComponentModel.ISupportInitialize)(this.Logo)).BeginInit();
             this.DestinationPathBox.SuspendLayout();
             this.TabControl.SuspendLayout();
@@ -301,6 +301,18 @@
             this.DownloadMessage.TabIndex = 6;
             this.DownloadMessage.Text = "Choose components to include in your Flashpoint download.";
             // 
+            // ComponentList
+            // 
+            this.ComponentList.Indent = 20;
+            this.ComponentList.Location = new System.Drawing.Point(16, 14);
+            this.ComponentList.Name = "ComponentList";
+            this.ComponentList.Size = new System.Drawing.Size(384, 176);
+            this.ComponentList.TabIndex = 5;
+            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
+            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
+            // 
             // ManageTab
             // 
             this.ManageTab.Controls.Add(this.ManagerMessage2);
@@ -432,6 +444,16 @@
             this.Description2.Size = new System.Drawing.Size(143, 44);
             this.Description2.TabIndex = 0;
             // 
+            // ComponentList2
+            // 
+            this.ComponentList2.Enabled = false;
+            this.ComponentList2.Indent = 20;
+            this.ComponentList2.Location = new System.Drawing.Point(16, 14);
+            this.ComponentList2.Name = "ComponentList2";
+            this.ComponentList2.Size = new System.Drawing.Size(384, 176);
+            this.ComponentList2.TabIndex = 13;
+            this.ComponentList2.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            // 
             // RemoveTab
             // 
             this.RemoveTab.Controls.Add(this.label1);
@@ -510,28 +532,6 @@
             this.RemoveButton.Text = "Remove Flashpoint";
             this.RemoveButton.UseVisualStyleBackColor = true;
             this.RemoveButton.Click += new System.EventHandler(this.RemoveButton_Click);
-            // 
-            // ComponentList
-            // 
-            this.ComponentList.Indent = 20;
-            this.ComponentList.Location = new System.Drawing.Point(16, 14);
-            this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(384, 176);
-            this.ComponentList.TabIndex = 5;
-            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
-            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
-            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
-            // 
-            // ComponentList2
-            // 
-            this.ComponentList2.Enabled = false;
-            this.ComponentList2.Indent = 20;
-            this.ComponentList2.Location = new System.Drawing.Point(16, 14);
-            this.ComponentList2.Name = "ComponentList2";
-            this.ComponentList2.Size = new System.Drawing.Size(384, 176);
-            this.ComponentList2.TabIndex = 13;
-            this.ComponentList2.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
             // 
             // Main
             // 
