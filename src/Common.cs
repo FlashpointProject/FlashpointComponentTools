@@ -258,7 +258,7 @@ namespace FlashpointInstaller
 
                 // Initialize checkbox
                 // (the Checked attribute needs to be explicitly set or else the checkbox won't appear)
-                listNode.Checked = (child.Name == "component") && !(listNode.Tag as Component).Extra;
+                listNode.Checked = setCheckState && (child.Name == "component") && !(listNode.Tag as Component).Extra;
 
                 return listNode;
             }
