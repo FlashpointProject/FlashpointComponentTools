@@ -115,7 +115,6 @@ namespace FlashpointInstaller
 
                 if (cancelStatus != 0) return;
 
-                Directory.CreateDirectory(FPM.DestinationPath);
                 await Task.Run(ExtractComponents);
 
                 byteProgress += component.Size;
