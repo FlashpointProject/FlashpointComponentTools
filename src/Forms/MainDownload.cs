@@ -74,17 +74,6 @@ namespace FlashpointInstaller
 
             FPM.CheckDependencies(ComponentList);
 
-            if (FPM.SizeTracker.ToDownload >= 1000000000000)
-            {
-                var terabyteWarning = MessageBox.Show(
-                    "You are about to download OVER A TERABYTE of data. The Complete Offline Archive " +
-                    "component is optional and Flashpoint will work without it. Proceed anyway?",
-                    "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation
-                );
-
-                if (terabyteWarning == DialogResult.No) return;
-            }
-
             FPM.OperateMode = 0;
 
             var operationWindow = new Operation();

@@ -15,8 +15,7 @@ namespace FlashpointInstaller
         {
             public string Hash { get; set; }
             public long Size { get; set; }
-            public string[] Depends { get; set; } = new string[] {};
-            public bool Extra { get; set; }
+            public string[] Depends { get; set; } = new string[] { };
 
             public Component(XmlNode node) : base(node)
             {
@@ -61,10 +60,6 @@ namespace FlashpointInstaller
                 string depends = GetAttribute(node, "depends", false);
 
                 if (depends.Length > 0) Depends = depends.Split(' ');
-
-                // Extra
-
-                Extra = GetAttribute(node, "extra", false) == "true";
             }
 
             // Get internet location of component's ZIP archive
@@ -258,7 +253,7 @@ namespace FlashpointInstaller
 
                 // Initialize checkbox
                 // (the Checked attribute needs to be explicitly set or else the checkbox won't appear)
-                listNode.Checked = setCheckState && (child.Name == "component") && !(listNode.Tag as Component).Extra;
+                listNode.Checked = setCheckState && child.Name == "component";
 
                 return listNode;
             }
@@ -466,17 +461,17 @@ namespace FlashpointInstaller
             // Formats bytes as a human-readable string
             public static string GetFormattedBytes(long bytes)
             {
-                if (bytes >= 1000000000000)
-                {
-                    return (Math.Truncate((double)bytes / 100000000000) / 10).ToString("N1") + "TB";
-                }
-                else if (bytes >= 1000000000)
+                if (bytes >= 1000000000)
                 {
                     return (Math.Truncate((double)bytes / 100000000) / 10).ToString("N1") + "GB";
                 }
-                else
+                else if (bytes >= 1000000)
                 {
                     return (Math.Truncate((double)bytes / 100000) / 10).ToString("N1") + "MB";
+                }
+                else
+                {
+                    return (Math.Truncate((double)bytes / 100) / 10).ToString("N1") + "KB";
                 }
             }
         }

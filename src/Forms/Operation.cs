@@ -20,7 +20,7 @@ namespace FlashpointInstaller
         List<Component> addedComponents   = new List<Component>();
         List<Component> removedComponents = new List<Component>();
 
-        DownloadService downloader = new DownloadService(new DownloadConfiguration { OnTheFlyDownload = false });
+        DownloadService downloader = new DownloadService();
 
         Stream stream;
         ZipArchive archive;
@@ -170,8 +170,7 @@ namespace FlashpointInstaller
 
                     using (TextWriter writer = File.CreateText(infoFile))
                     {
-                        string[] header = new string[] { workingComponent.Hash, workingComponent.Size.ToString() }
-                            .Concat(workingComponent.Depends).ToArray();
+                        string[] header = new[] { workingComponent.Hash, workingComponent.Size.ToString() }.ToArray();
 
                         writer.WriteLine(string.Join(" ", header));
                     }
