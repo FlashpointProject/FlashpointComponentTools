@@ -24,11 +24,11 @@ namespace FlashpointInstaller
             FPM.XmlTree = new XmlDocument();
             FPM.XmlTree.Load(listStream);
 
-            XmlNodeList rootElement = FPM.XmlTree.GetElementsByTagName("list");
+            XmlNodeList rootElements = FPM.XmlTree.GetElementsByTagName("list");
 
-            if (rootElement.Count > 0)
+            if (rootElements.Count > 0)
             {
-                FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes, true);
+                FPM.RecursiveAddToList(rootElements[0], ComponentList.Nodes, true);
             }
             else
             {

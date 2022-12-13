@@ -22,11 +22,11 @@ namespace FlashpointInstaller
             {
                 // URL
 
-                var root = node.OwnerDocument.GetElementsByTagName("list")[0];
+                XmlNode rootElement = node.OwnerDocument.GetElementsByTagName("list")[0];
 
-                if (root.Attributes != null && root.Attributes["url"] != null)
+                if (rootElement.Attributes != null && rootElement.Attributes["url"] != null)
                 {
-                    URL = root.Attributes["url"].Value + ID + ".zip";
+                    URL = rootElement.Attributes["url"].Value + ID + ".zip";
                 }
                 else
                 {
