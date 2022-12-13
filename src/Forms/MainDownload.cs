@@ -23,8 +23,23 @@ namespace FlashpointInstaller
 
             FPM.XmlTree = new XmlDocument();
             FPM.XmlTree.Load(listStream);
-            
-            FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes, true);
+
+            XmlNodeList rootElement = FPM.XmlTree.GetElementsByTagName("list");
+
+            if (rootElement.Count > 0)
+            {
+                FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList.Nodes, true);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
+                    "Description: Root element was not found",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                );
+
+                Environment.Exit(1);
+            }
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

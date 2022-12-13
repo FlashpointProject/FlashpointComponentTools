@@ -111,7 +111,7 @@ namespace FlashpointInstaller
             foreach (var component in addedComponents)
             {
                 workingComponent = component;
-                stream = await downloader.DownloadFileTaskAsync(component.GetURL());
+                stream = await downloader.DownloadFileTaskAsync(component.URL);
 
                 if (cancelStatus != 0) return;
 

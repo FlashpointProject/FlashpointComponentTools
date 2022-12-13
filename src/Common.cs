@@ -13,12 +13,32 @@ namespace FlashpointInstaller
         // Component object definition
         public class Component : Category
         {
+            public string URL { get; set; }
             public string Hash { get; set; }
             public long Size { get; set; }
             public string[] Depends { get; set; } = new string[] { };
 
             public Component(XmlNode node) : base(node)
             {
+                // URL
+
+                var root = node.OwnerDocument.GetElementsByTagName("list")[0];
+
+                if (root.Attributes != null && root.Attributes["url"] != null)
+                {
+                    URL = root.Attributes["url"].Value + ID + ".zip";
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
+                        "Description: Root element does not contain URL attribute",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
+
+                    Environment.Exit(1);
+                }
+
                 // Hash
 
                 string hash = GetAttribute(node, "hash", true);
@@ -34,6 +54,8 @@ namespace FlashpointInstaller
                         $"Description: Hash of component \"{Title}\" is invalid",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
                     );
+
+                    Environment.Exit(1);
                 }
 
                 // Size
@@ -61,9 +83,6 @@ namespace FlashpointInstaller
 
                 if (depends.Length > 0) Depends = depends.Split(' ');
             }
-
-            // Get internet location of component's ZIP archive
-            public string GetURL() => FPM.XmlTree.GetElementsByTagName("list")[0].Attributes["url"].Value + ID + ".zip";
         }
 
         // Category object definition
