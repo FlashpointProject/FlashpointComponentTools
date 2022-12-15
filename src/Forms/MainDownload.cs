@@ -19,6 +19,17 @@ namespace FlashpointInstaller
             FPM.VerifyDestinationPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
             
             Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL);
+
+            if (listStream == null)
+            {
+                MessageBox.Show(
+                    "The component list could not be downloaded! Do you have an internet connection?",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                );
+
+                Environment.Exit(1);
+            }
+
             listStream.Position = 0;
 
             FPM.XmlTree = new XmlDocument();
