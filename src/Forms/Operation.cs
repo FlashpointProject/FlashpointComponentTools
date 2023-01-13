@@ -301,8 +301,17 @@ namespace FlashpointInstaller
                     foreach (string path in shortcutPaths)
                     {
                         var shortcut = new IWshRuntimeLibrary.WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
-                        shortcut.TargetPath = Path.Combine(FPM.DestinationPath, @"Launcher\Flashpoint.exe");
-                        shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, @"Launcher");
+
+                        if (FPM.LauncherPath != "")
+                        {
+                            shortcut.TargetPath = Path.Combine(FPM.DestinationPath, FPM.LauncherPath);
+                            shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, FPM.LauncherPath.Split('\\')[0]);
+                        }
+                        else
+                        {
+                            shortcut.TargetPath = FPM.DestinationPath;
+                        }
+
                         shortcut.Description = "Shortcut to Flashpoint";
                         shortcut.Save();
                     }

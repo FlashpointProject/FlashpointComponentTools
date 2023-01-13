@@ -27,11 +27,20 @@ namespace FlashpointInstaller
             {
                 if (RunOnClose.Checked)
                 {
-                    var flashpointProcess = new Process();
-                    flashpointProcess.StartInfo.UseShellExecute = true;
-                    flashpointProcess.StartInfo.FileName = "Flashpoint.exe";
-                    flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(FPM.DestinationPath, @"Launcher");
-                    flashpointProcess.Start();
+                    if (FPM.LauncherPath != "")
+                    {
+                        string[] path = FPM.LauncherPath.Split('\\');
+
+                        var flashpointProcess = new Process();
+                        flashpointProcess.StartInfo.UseShellExecute = true;
+                        flashpointProcess.StartInfo.FileName = path[1];
+                        flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(FPM.DestinationPath, path[0]);
+                        flashpointProcess.Start();
+                    }
+                    else
+                    {
+                        Process.Start("explorer.exe", FPM.DestinationPath);
+                    }
                 }
             }
 

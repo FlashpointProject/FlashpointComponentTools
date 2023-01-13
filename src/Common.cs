@@ -168,6 +168,9 @@ namespace FlashpointInstaller
                 set { Main.SourcePath2.Text = value; }
             }
 
+            // Path to launcher executable based on selection
+            public static string LauncherPath { get; set; } = "";
+
             // Flag to control how operation window will function
             // 0 is for downloading Flashpoint
             // 1 is for adding/removing components
@@ -246,6 +249,7 @@ namespace FlashpointInstaller
                     Component component = new Component(child);
 
                     listNode.Text = component.Title;
+                    listNode.Name = component.ID;
 
                     if (component.ID.StartsWith("required"))
                     {
@@ -259,6 +263,7 @@ namespace FlashpointInstaller
                     Category category = new Category(child);
 
                     listNode.Text = category.Title;
+                    listNode.Name = category.ID;
 
                     if (category.ID.StartsWith("required"))
                     {
