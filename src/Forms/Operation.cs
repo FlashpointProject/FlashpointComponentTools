@@ -162,8 +162,9 @@ namespace FlashpointInstaller
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
 
-                    string destPath = FPM.OperateMode > 0 ? FPM.SourcePath : FPM.DestinationPath;
-                    string infoPath = Path.Combine(destPath, "Components");
+                    string rootPath = FPM.OperateMode > 0 ? FPM.SourcePath : FPM.DestinationPath;
+                    string destPath = Path.Combine(rootPath, workingComponent.Path.Replace('/', '\\'));
+                    string infoPath = Path.Combine(rootPath, "Components");
                     string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
 
                     Directory.CreateDirectory(infoPath);
@@ -179,13 +180,15 @@ namespace FlashpointInstaller
                     {
                         if (reader.Entry.IsDirectory) continue;
 
+                        Directory.CreateDirectory(destPath);
+
                         reader.WriteEntryToDirectory(destPath, new ExtractionOptions {
-                            ExtractFullPath = true, Overwrite = true, PreserveFileTime = true
+                            ExtractFullPath = true, Overwrite = true, PreserveFileTime = true 
                         });
 
                         using (TextWriter writer = File.AppendText(infoFile))
                         {
-                            writer.WriteLine(reader.Entry.Key.Replace("/", @"\"));
+                            writer.WriteLine(Path.Combine(workingComponent.Path, reader.Entry.Key).Replace("/", @"\"));
                         }
 
                         extractedSize += reader.Entry.Size;
@@ -301,17 +304,8 @@ namespace FlashpointInstaller
                     foreach (string path in shortcutPaths)
                     {
                         var shortcut = new IWshRuntimeLibrary.WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
-
-                        if (FPM.LauncherPath != "")
-                        {
-                            shortcut.TargetPath = Path.Combine(FPM.DestinationPath, FPM.LauncherPath);
-                            shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, FPM.LauncherPath.Split('\\')[0]);
-                        }
-                        else
-                        {
-                            shortcut.TargetPath = FPM.DestinationPath;
-                        }
-
+                        shortcut.TargetPath = Path.Combine(FPM.DestinationPath, "Launcher", "Flashpoint.exe");
+                        shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, "Launcher");
                         shortcut.Description = "Shortcut to Flashpoint";
                         shortcut.Save();
                     }

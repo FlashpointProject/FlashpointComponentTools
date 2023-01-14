@@ -100,24 +100,6 @@ namespace FlashpointInstaller
 
             FPM.CheckDependencies(ComponentList);
 
-            FPM.LauncherPath = "";
-            foreach (TreeNode launcher in ComponentList.Nodes["launcher"].Nodes)
-            {
-                if (launcher.Checked)
-                {
-                    if (launcher.Name == "launcher-electron")
-                    {
-                        FPM.LauncherPath = @"Launcher\Flashpoint.exe";
-                        break;
-                    }
-                    else if (launcher.Name == "launcher-winforms")
-                    {
-                        FPM.LauncherPath = @"SharpLauncher\SharpLauncher.exe";
-                        break;
-                    }
-                }
-            }
-
             FPM.OperateMode = 0;
 
             var operationWindow = new Operation();

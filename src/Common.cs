@@ -16,6 +16,7 @@ namespace FlashpointInstaller
             public string URL { get; set; }
             public string Hash { get; set; }
             public long Size { get; set; }
+            public string Path { get; set; }
             public string[] Depends { get; set; } = new string[] { };
 
             public Component(XmlNode node) : base(node)
@@ -77,6 +78,10 @@ namespace FlashpointInstaller
                     Environment.Exit(1);
                 }
 
+                // Path
+
+                Path = GetAttribute(node, "path", false);
+
                 // Depends
 
                 string depends = GetAttribute(node, "depends", false);
@@ -116,7 +121,7 @@ namespace FlashpointInstaller
 
                 Title = GetAttribute(node, "title", true);
                 Description = GetAttribute(node, "description", true);
-                Required = ID.StartsWith("required");
+                Required = ID.StartsWith("core");
             }
 
             protected static string GetAttribute(XmlNode node, string attribute, bool throwError)
@@ -167,9 +172,6 @@ namespace FlashpointInstaller
                 get { return Main.SourcePath2.Text; }
                 set { Main.SourcePath2.Text = value; }
             }
-
-            // Path to launcher executable based on selection
-            public static string LauncherPath { get; set; } = "";
 
             // Flag to control how operation window will function
             // 0 is for downloading Flashpoint
@@ -251,7 +253,7 @@ namespace FlashpointInstaller
                     listNode.Text = component.Title;
                     listNode.Name = component.ID;
 
-                    if (component.ID.StartsWith("required"))
+                    if (component.Required)
                     {
                         listNode.ForeColor = Color.FromArgb(255, 96, 96, 96);
                     }
@@ -265,7 +267,7 @@ namespace FlashpointInstaller
                     listNode.Text = category.Title;
                     listNode.Name = category.ID;
 
-                    if (category.ID.StartsWith("required"))
+                    if (category.Required)
                     {
                         listNode.ForeColor = Color.FromArgb(255, 96, 96, 96);
                     }
