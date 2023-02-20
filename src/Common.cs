@@ -335,8 +335,18 @@ namespace FlashpointInstaller
             // Checks if specified Flashpoint destination path is valid, and optionally updates its respective textbox
             public static bool VerifyDestinationPath(string path, bool updateText)
             {
-                string errorPath;
+                if (!Path.IsPathRooted(path))
+                {
+                    MessageBox.Show(
+                        $"The specified directory is not valid! Choose a different folder.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
 
+                    return false;
+                }
+
+                string errorPath;
+                
                 if (path.StartsWith(Environment.ExpandEnvironmentVariables("%ProgramW6432%"))
                  || path.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)))
                 {
