@@ -102,9 +102,9 @@
             this.About.AutoSize = true;
             this.About.Location = new System.Drawing.Point(12, 192);
             this.About.Name = "About";
-            this.About.Size = new System.Drawing.Size(124, 13);
+            this.About.Size = new System.Drawing.Size(100, 13);
             this.About.TabIndex = 1;
-            this.About.Text = "Flashpoint Manager v1.0";
+            this.About.Text = "Flashpoint Manager";
             // 
             // DestinationPathBox
             // 

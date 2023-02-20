@@ -16,6 +16,8 @@ namespace FlashpointInstaller
 
         private async void Main_Load(object sender, EventArgs e)
         {
+            About.Text += $" v{Application.ProductVersion}";
+
             FPM.VerifyDestinationPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
 
             TabControl.Enabled = false;
