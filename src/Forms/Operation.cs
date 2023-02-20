@@ -8,6 +8,7 @@ using System.Windows.Forms;
 
 using Downloader;
 using FlashpointInstaller.Common;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Readers;
@@ -36,6 +37,8 @@ namespace FlashpointInstaller
 
         private async void Operation_Load(object sender, EventArgs e)
         {
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
+
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
             downloader.DownloadFileCompleted += OnDownloadFileCompleted;
 
@@ -149,9 +152,9 @@ namespace FlashpointInstaller
                             );
                         }
                     });
-
-                    FinishOperation();
                 }
+
+                FinishOperation();
             }
         }
 
@@ -177,6 +180,13 @@ namespace FlashpointInstaller
                 ProgressLabel.Text =
                     $"[{(int)((double)totalProgress * 100)}%] Downloading component \"{workingComponent.Title}\"... " +
                     $"{FPM.GetFormattedBytes(e.ReceivedBytesSize)} of {FPM.GetFormattedBytes(e.TotalBytesToReceive)}";
+            });
+
+            FPM.Main.Invoke((MethodInvoker)delegate
+            {
+                TaskbarManager.Instance.SetProgressValue(
+                    (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                );
             });
         }
 
@@ -240,6 +250,13 @@ namespace FlashpointInstaller
                                 $"[{(int)((double)totalProgress * 100)}%] Extracting component \"{workingComponent.Title}\"... " +
                                 $"{FPM.GetFormattedBytes(extractedSize)} of {FPM.GetFormattedBytes(totalSize)}";
                         });
+
+                        FPM.Main.Invoke((MethodInvoker)delegate
+                        {
+                            TaskbarManager.Instance.SetProgressValue(
+                                (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                            );
+                        });
                     }
 
                     if (cancelStatus != 0)
@@ -276,6 +293,13 @@ namespace FlashpointInstaller
                     ProgressLabel.Text =
                         $"[{(int)((double)totalProgress * 100)}%] Removing component \"{workingComponent.Title}\"... " +
                         $"{removedFiles} of {totalFiles} files";
+                });
+
+                FPM.Main.Invoke((MethodInvoker)delegate
+                {
+                    TaskbarManager.Instance.SetProgressValue(
+                        (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                    );
                 });
 
                 FPM.DeleteFileAndDirectories(filePath);
@@ -383,6 +407,8 @@ namespace FlashpointInstaller
 
                 if (Directory.Exists(FPM.DestinationPath)) Directory.Delete(FPM.DestinationPath, true);
             });
+
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
             
             Close();
         }
