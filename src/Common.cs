@@ -201,7 +201,7 @@ namespace FlashpointInstaller
                     set
                     {
                         toDownload = value;
-                        Main.DownloadSizeDisplay.Text = GetFormattedBytes(toDownload);
+                        Main.TotalSizeDisplay.Text = GetFormattedBytes(toDownload);
                     }
                 }
                 // Tracks size difference from checking/unchecking components in the manager tab
@@ -210,7 +210,7 @@ namespace FlashpointInstaller
                     get => modified;
                     set {
                         modified = value;
-                        Main.ManagerSizeDisplay.Text = GetFormattedBytes(modified - Downloaded);
+                        Main.TotalSizeDisplay2.Text = GetFormattedBytes(modified - Downloaded);
                     }
                 }
             }

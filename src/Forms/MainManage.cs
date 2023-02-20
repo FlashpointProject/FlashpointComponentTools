@@ -23,9 +23,12 @@ namespace FlashpointInstaller
             if (pathDialog.ShowDialog() != CommonFileDialogResult.Ok) return;
             if (!FPM.VerifySourcePath(pathDialog.FileName, 1)) return;
 
-            ComponentList2.Enabled = true; ManagerMessage2.Visible    = false;
-            UpdateButton.Enabled   = true; ManagerSizeLabel.Visible   = true;
-            ChangeButton.Enabled   = true; ManagerSizeDisplay.Visible = true;
+            ComponentList2.Enabled = true;
+
+            UpdateButton.Enabled = true; TotalSizeLabel2.Visible   = true;
+            ChangeButton.Enabled = true; TotalSizeDisplay2.Visible = true;
+
+            ManagerMessage2.Text = "Click on a component to learn more about it.";
 
             FPM.SyncManager(true);
 
@@ -40,9 +43,22 @@ namespace FlashpointInstaller
 
         private void ComponentList2_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
-            Description2.Text = e.Node.Tag.GetType().ToString().EndsWith("Component")
-                ? (e.Node.Tag as Component).Description
-                : (e.Node.Tag as Category).Description;
+            bool isComponent = e.Node.Tag.GetType().ToString().EndsWith("Component");
+
+            if (isComponent)
+            {
+                var component = e.Node.Tag as Component;
+
+                Description2.Text = component.Description;
+                SizeDisplay2.Text = FPM.GetFormattedBytes(component.Size);
+            }
+            else
+            {
+                Description2.Text = (e.Node.Tag as Category).Description;
+            }
+
+            SizeLabel2.Visible = isComponent;
+            SizeDisplay2.Visible = isComponent;
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)

@@ -41,26 +41,30 @@
             this.DownloadTab = new System.Windows.Forms.TabPage();
             this.DownloadMessage2 = new System.Windows.Forms.Label();
             this.DescriptionBox = new System.Windows.Forms.GroupBox();
+            this.SizeDisplay = new System.Windows.Forms.Label();
+            this.SizeLabel = new System.Windows.Forms.Label();
             this.Description = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.ShortcutStartMenu = new System.Windows.Forms.CheckBox();
             this.ShortcutLabel = new System.Windows.Forms.Label();
             this.ShortcutDesktop = new System.Windows.Forms.CheckBox();
-            this.DownloadSizeDisplay = new System.Windows.Forms.Label();
-            this.DownloadSizeLabel = new System.Windows.Forms.Label();
+            this.TotalSizeDisplay = new System.Windows.Forms.Label();
+            this.TotalSizeLabel = new System.Windows.Forms.Label();
             this.DownloadMessage = new System.Windows.Forms.Label();
             this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.ManageTab = new System.Windows.Forms.TabPage();
             this.ManagerMessage2 = new System.Windows.Forms.Label();
             this.ManagerMessage = new System.Windows.Forms.Label();
-            this.ManagerSizeDisplay = new System.Windows.Forms.Label();
-            this.ManagerSizeLabel = new System.Windows.Forms.Label();
+            this.TotalSizeDisplay2 = new System.Windows.Forms.Label();
+            this.TotalSizeLabel2 = new System.Windows.Forms.Label();
             this.UpdateButton = new System.Windows.Forms.Button();
             this.ChangeButton = new System.Windows.Forms.Button();
             this.SourcePathBox = new System.Windows.Forms.GroupBox();
             this.SourcePath = new System.Windows.Forms.TextBox();
             this.SourcePathBrowse = new System.Windows.Forms.Button();
             this.DescriptionBox2 = new System.Windows.Forms.GroupBox();
+            this.SizeDisplay2 = new System.Windows.Forms.Label();
+            this.SizeLabel2 = new System.Windows.Forms.Label();
             this.Description2 = new System.Windows.Forms.Label();
             this.ComponentList2 = new RikTheVeggie.TriStateTreeView();
             this.RemoveTab = new System.Windows.Forms.TabPage();
@@ -175,8 +179,8 @@
             this.DownloadTab.Controls.Add(this.DownloadMessage2);
             this.DownloadTab.Controls.Add(this.DescriptionBox);
             this.DownloadTab.Controls.Add(this.tableLayoutPanel1);
-            this.DownloadTab.Controls.Add(this.DownloadSizeDisplay);
-            this.DownloadTab.Controls.Add(this.DownloadSizeLabel);
+            this.DownloadTab.Controls.Add(this.TotalSizeDisplay);
+            this.DownloadTab.Controls.Add(this.TotalSizeLabel);
             this.DownloadTab.Controls.Add(this.DownloadMessage);
             this.DownloadTab.Controls.Add(this.ComponentList);
             this.DownloadTab.Controls.Add(this.DestinationPathBox);
@@ -199,18 +203,43 @@
             // 
             // DescriptionBox
             // 
+            this.DescriptionBox.Controls.Add(this.SizeDisplay);
+            this.DescriptionBox.Controls.Add(this.SizeLabel);
             this.DescriptionBox.Controls.Add(this.Description);
-            this.DescriptionBox.Location = new System.Drawing.Point(411, 116);
+            this.DescriptionBox.Location = new System.Drawing.Point(411, 100);
             this.DescriptionBox.Name = "DescriptionBox";
             this.DescriptionBox.Padding = new System.Windows.Forms.Padding(10, 8, 10, 10);
-            this.DescriptionBox.Size = new System.Drawing.Size(163, 75);
+            this.DescriptionBox.Size = new System.Drawing.Size(163, 91);
             this.DescriptionBox.TabIndex = 12;
             this.DescriptionBox.TabStop = false;
             this.DescriptionBox.Text = "Component Description";
             // 
+            // SizeDisplay
+            // 
+            this.SizeDisplay.AutoSize = true;
+            this.SizeDisplay.Location = new System.Drawing.Point(45, 68);
+            this.SizeDisplay.Margin = new System.Windows.Forms.Padding(0);
+            this.SizeDisplay.Name = "SizeDisplay";
+            this.SizeDisplay.Size = new System.Drawing.Size(38, 13);
+            this.SizeDisplay.TabIndex = 9;
+            this.SizeDisplay.Text = "0.0MB";
+            this.SizeDisplay.Visible = false;
+            // 
+            // SizeLabel
+            // 
+            this.SizeLabel.AutoSize = true;
+            this.SizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SizeLabel.Location = new System.Drawing.Point(10, 68);
+            this.SizeLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.SizeLabel.Name = "SizeLabel";
+            this.SizeLabel.Size = new System.Drawing.Size(35, 13);
+            this.SizeLabel.TabIndex = 8;
+            this.SizeLabel.Text = "Size:";
+            this.SizeLabel.Visible = false;
+            // 
             // Description
             // 
-            this.Description.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Description.Dock = System.Windows.Forms.DockStyle.Top;
             this.Description.Location = new System.Drawing.Point(10, 21);
             this.Description.Name = "Description";
             this.Description.Size = new System.Drawing.Size(143, 44);
@@ -272,26 +301,25 @@
             this.ShortcutDesktop.Text = "Desktop";
             this.ShortcutDesktop.UseVisualStyleBackColor = true;
             // 
-            // DownloadSizeDisplay
+            // TotalSizeDisplay
             // 
-            this.DownloadSizeDisplay.AutoSize = true;
-            this.DownloadSizeDisplay.Location = new System.Drawing.Point(478, 85);
-            this.DownloadSizeDisplay.Margin = new System.Windows.Forms.Padding(0);
-            this.DownloadSizeDisplay.Name = "DownloadSizeDisplay";
-            this.DownloadSizeDisplay.Size = new System.Drawing.Size(38, 13);
-            this.DownloadSizeDisplay.TabIndex = 8;
-            this.DownloadSizeDisplay.Text = "0.0MB";
+            this.TotalSizeDisplay.AutoSize = true;
+            this.TotalSizeDisplay.Location = new System.Drawing.Point(478, 79);
+            this.TotalSizeDisplay.Margin = new System.Windows.Forms.Padding(0);
+            this.TotalSizeDisplay.Name = "TotalSizeDisplay";
+            this.TotalSizeDisplay.Size = new System.Drawing.Size(0, 13);
+            this.TotalSizeDisplay.TabIndex = 8;
             // 
-            // DownloadSizeLabel
+            // TotalSizeLabel
             // 
-            this.DownloadSizeLabel.AutoSize = true;
-            this.DownloadSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DownloadSizeLabel.Location = new System.Drawing.Point(410, 85);
-            this.DownloadSizeLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.DownloadSizeLabel.Name = "DownloadSizeLabel";
-            this.DownloadSizeLabel.Size = new System.Drawing.Size(68, 13);
-            this.DownloadSizeLabel.TabIndex = 7;
-            this.DownloadSizeLabel.Text = "Total Size:";
+            this.TotalSizeLabel.AutoSize = true;
+            this.TotalSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TotalSizeLabel.Location = new System.Drawing.Point(410, 79);
+            this.TotalSizeLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.TotalSizeLabel.Name = "TotalSizeLabel";
+            this.TotalSizeLabel.Size = new System.Drawing.Size(68, 13);
+            this.TotalSizeLabel.TabIndex = 7;
+            this.TotalSizeLabel.Text = "Total Size:";
             // 
             // DownloadMessage
             // 
@@ -317,8 +345,8 @@
             // 
             this.ManageTab.Controls.Add(this.ManagerMessage2);
             this.ManageTab.Controls.Add(this.ManagerMessage);
-            this.ManageTab.Controls.Add(this.ManagerSizeDisplay);
-            this.ManageTab.Controls.Add(this.ManagerSizeLabel);
+            this.ManageTab.Controls.Add(this.TotalSizeDisplay2);
+            this.ManageTab.Controls.Add(this.TotalSizeLabel2);
             this.ManageTab.Controls.Add(this.UpdateButton);
             this.ManageTab.Controls.Add(this.ChangeButton);
             this.ManageTab.Controls.Add(this.SourcePathBox);
@@ -348,28 +376,27 @@
             this.ManagerMessage.TabIndex = 20;
             this.ManagerMessage.Text = "Choose components to add or remove from your Flashpoint copy.";
             // 
-            // ManagerSizeDisplay
+            // TotalSizeDisplay2
             // 
-            this.ManagerSizeDisplay.AutoSize = true;
-            this.ManagerSizeDisplay.Location = new System.Drawing.Point(492, 85);
-            this.ManagerSizeDisplay.Margin = new System.Windows.Forms.Padding(0);
-            this.ManagerSizeDisplay.Name = "ManagerSizeDisplay";
-            this.ManagerSizeDisplay.Size = new System.Drawing.Size(38, 13);
-            this.ManagerSizeDisplay.TabIndex = 19;
-            this.ManagerSizeDisplay.Text = "0.0MB";
-            this.ManagerSizeDisplay.Visible = false;
+            this.TotalSizeDisplay2.AutoSize = true;
+            this.TotalSizeDisplay2.Location = new System.Drawing.Point(492, 79);
+            this.TotalSizeDisplay2.Margin = new System.Windows.Forms.Padding(0);
+            this.TotalSizeDisplay2.Name = "TotalSizeDisplay2";
+            this.TotalSizeDisplay2.Size = new System.Drawing.Size(0, 13);
+            this.TotalSizeDisplay2.TabIndex = 19;
+            this.TotalSizeDisplay2.Visible = false;
             // 
-            // ManagerSizeLabel
+            // TotalSizeLabel2
             // 
-            this.ManagerSizeLabel.AutoSize = true;
-            this.ManagerSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ManagerSizeLabel.Location = new System.Drawing.Point(410, 85);
-            this.ManagerSizeLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.ManagerSizeLabel.Name = "ManagerSizeLabel";
-            this.ManagerSizeLabel.Size = new System.Drawing.Size(82, 13);
-            this.ManagerSizeLabel.TabIndex = 18;
-            this.ManagerSizeLabel.Text = "Size Change:";
-            this.ManagerSizeLabel.Visible = false;
+            this.TotalSizeLabel2.AutoSize = true;
+            this.TotalSizeLabel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TotalSizeLabel2.Location = new System.Drawing.Point(410, 79);
+            this.TotalSizeLabel2.Margin = new System.Windows.Forms.Padding(0);
+            this.TotalSizeLabel2.Name = "TotalSizeLabel2";
+            this.TotalSizeLabel2.Size = new System.Drawing.Size(82, 13);
+            this.TotalSizeLabel2.TabIndex = 18;
+            this.TotalSizeLabel2.Text = "Size Change:";
+            this.TotalSizeLabel2.Visible = false;
             // 
             // UpdateButton
             // 
@@ -427,18 +454,43 @@
             // 
             // DescriptionBox2
             // 
+            this.DescriptionBox2.Controls.Add(this.SizeDisplay2);
+            this.DescriptionBox2.Controls.Add(this.SizeLabel2);
             this.DescriptionBox2.Controls.Add(this.Description2);
-            this.DescriptionBox2.Location = new System.Drawing.Point(411, 116);
+            this.DescriptionBox2.Location = new System.Drawing.Point(411, 100);
             this.DescriptionBox2.Name = "DescriptionBox2";
             this.DescriptionBox2.Padding = new System.Windows.Forms.Padding(10, 8, 10, 10);
-            this.DescriptionBox2.Size = new System.Drawing.Size(163, 75);
+            this.DescriptionBox2.Size = new System.Drawing.Size(163, 91);
             this.DescriptionBox2.TabIndex = 14;
             this.DescriptionBox2.TabStop = false;
             this.DescriptionBox2.Text = "Component Description";
             // 
+            // SizeDisplay2
+            // 
+            this.SizeDisplay2.AutoSize = true;
+            this.SizeDisplay2.Location = new System.Drawing.Point(45, 68);
+            this.SizeDisplay2.Margin = new System.Windows.Forms.Padding(0);
+            this.SizeDisplay2.Name = "SizeDisplay2";
+            this.SizeDisplay2.Size = new System.Drawing.Size(38, 13);
+            this.SizeDisplay2.TabIndex = 10;
+            this.SizeDisplay2.Text = "0.0MB";
+            this.SizeDisplay2.Visible = false;
+            // 
+            // SizeLabel2
+            // 
+            this.SizeLabel2.AutoSize = true;
+            this.SizeLabel2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SizeLabel2.Location = new System.Drawing.Point(10, 68);
+            this.SizeLabel2.Margin = new System.Windows.Forms.Padding(0);
+            this.SizeLabel2.Name = "SizeLabel2";
+            this.SizeLabel2.Size = new System.Drawing.Size(35, 13);
+            this.SizeLabel2.TabIndex = 9;
+            this.SizeLabel2.Text = "Size:";
+            this.SizeLabel2.Visible = false;
+            // 
             // Description2
             // 
-            this.Description2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Description2.Dock = System.Windows.Forms.DockStyle.Top;
             this.Description2.Location = new System.Drawing.Point(10, 21);
             this.Description2.Name = "Description2";
             this.Description2.Size = new System.Drawing.Size(143, 44);
@@ -453,6 +505,7 @@
             this.ComponentList2.Size = new System.Drawing.Size(384, 176);
             this.ComponentList2.TabIndex = 13;
             this.ComponentList2.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList2.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList2_BeforeSelect);
             // 
             // RemoveTab
             // 
@@ -557,6 +610,7 @@
             this.DownloadTab.ResumeLayout(false);
             this.DownloadTab.PerformLayout();
             this.DescriptionBox.ResumeLayout(false);
+            this.DescriptionBox.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ManageTab.ResumeLayout(false);
@@ -564,6 +618,7 @@
             this.SourcePathBox.ResumeLayout(false);
             this.SourcePathBox.PerformLayout();
             this.DescriptionBox2.ResumeLayout(false);
+            this.DescriptionBox2.PerformLayout();
             this.RemoveTab.ResumeLayout(false);
             this.RemoveTab.PerformLayout();
             this.SourcePathBox2.ResumeLayout(false);
@@ -585,7 +640,7 @@
         private System.Windows.Forms.TabControl TabControl;
         private System.Windows.Forms.TabPage DownloadTab;
         private System.Windows.Forms.TabPage ManageTab;
-        private System.Windows.Forms.Label DownloadSizeLabel;
+        private System.Windows.Forms.Label TotalSizeLabel;
         private System.Windows.Forms.Label DownloadMessage;
         public RikTheVeggie.TriStateTreeView ComponentList;
         private System.Windows.Forms.TabPage RemoveTab;
@@ -603,11 +658,11 @@
         private System.Windows.Forms.Button SourcePathBrowse;
         private System.Windows.Forms.GroupBox DescriptionBox2;
         private System.Windows.Forms.Label Description2;
-        private System.Windows.Forms.Label ManagerSizeLabel;
+        private System.Windows.Forms.Label TotalSizeLabel2;
         private System.Windows.Forms.Label ManagerMessage;
         private System.Windows.Forms.Label ManagerMessage2;
-        public System.Windows.Forms.Label DownloadSizeDisplay;
-        public System.Windows.Forms.Label ManagerSizeDisplay;
+        public System.Windows.Forms.Label TotalSizeDisplay;
+        public System.Windows.Forms.Label TotalSizeDisplay2;
         public System.Windows.Forms.Button ChangeButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox SourcePathBox2;
@@ -615,6 +670,10 @@
         private System.Windows.Forms.Button SourcePathBrowse2;
         public System.Windows.Forms.Button RemoveButton;
         public System.Windows.Forms.CheckBox RemoveShortcuts;
+        public System.Windows.Forms.Label SizeDisplay;
+        private System.Windows.Forms.Label SizeLabel;
+        public System.Windows.Forms.Label SizeDisplay2;
+        private System.Windows.Forms.Label SizeLabel2;
     }
 }
 

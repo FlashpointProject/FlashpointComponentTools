@@ -76,9 +76,22 @@ namespace FlashpointInstaller
 
         private void ComponentList_BeforeSelect(object _, TreeViewCancelEventArgs e)
         {
-            Description.Text = e.Node.Tag.GetType().ToString().EndsWith("Component")
-                ? (e.Node.Tag as Component).Description
-                : (e.Node.Tag as Category).Description;
+            bool isComponent = e.Node.Tag.GetType().ToString().EndsWith("Component");
+
+            if (isComponent)
+            {
+                var component = e.Node.Tag as Component;
+
+                Description.Text = component.Description;
+                SizeDisplay.Text = FPM.GetFormattedBytes(component.Size);
+            }
+            else
+            {
+                Description.Text = (e.Node.Tag as Category).Description;
+            }
+
+            SizeLabel.Visible = isComponent;
+            SizeDisplay.Visible = isComponent;
         }
 
         private void DestinationPathBrowse_Click(object _, EventArgs e)
