@@ -54,7 +54,7 @@ namespace FlashpointInstaller
 
                 byteTotal = FPM.SizeTracker.ToDownload;
             }
-            else if (FPM.OperateMode != 3)
+            else
             {
                 Text = "Modifying Flashpoint...";
                 CancelButton.Visible = false;
@@ -92,15 +92,6 @@ namespace FlashpointInstaller
                 }
 
                 byteTotal = removedComponents.Concat(addedComponents).Sum(item => item.Size);
-            }
-            else if (FPM.OperateMode == 3)
-            {
-                Text = "Removing Flashpoint...";
-                CancelButton.Visible = false;
-
-                await Task.Run(RemoveFlashpoint);
-
-                FinishOperation();
             }
 
             foreach (var component in removedComponents)
@@ -153,6 +144,8 @@ namespace FlashpointInstaller
                         }
                     });
                 }
+
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
 
                 FinishOperation();
             }
@@ -310,36 +303,6 @@ namespace FlashpointInstaller
             FPM.DeleteFileAndDirectories(infoFile);
         }
 
-        private void RemoveFlashpoint()
-        {
-            string[] files = Directory.GetFiles(FPM.SourcePath2);
-
-            for (int i = 0; i < files.Length; i++)
-            {
-                double progress = (i + 1) / files.Length;
-                string fileName = files[i].Substring(files[i].LastIndexOf(@"\"));
-
-                ProgressMeasure.Invoke((MethodInvoker)delegate
-                {
-                    ProgressMeasure.Value = (int)((double)progress * ProgressMeasure.Maximum);
-                });
-
-                ProgressLabel.Invoke((MethodInvoker)delegate
-                {
-                    ProgressLabel.Text = $"[{(int)((double)progress * 100)}%] Removing \"{fileName}\"... {i + 1} of {files.Length} files";
-                });
-
-                File.Delete(files[i]);
-            }
-
-            ProgressLabel.Invoke((MethodInvoker)delegate
-            {
-                ProgressLabel.Text = $"[100%] Removing directories...";
-            });
-
-            Directory.Delete(FPM.SourcePath2, true);
-        }
-
         private async void FinishOperation()
         {
             if (FPM.OperateMode == 0)
@@ -366,25 +329,6 @@ namespace FlashpointInstaller
                         shortcut.Save();
                     }
                 });
-
-                Hide();
-                FPM.Main.Hide();
-
-                var finishWindow = new FinishOperation();
-                finishWindow.ShowDialog();
-            }
-            else if (FPM.OperateMode == 3)
-            {
-                if (FPM.Main.RemoveShortcuts.Checked)
-                {
-                    var shortcutPaths = new List<string>()
-                    {
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Flashpoint.lnk"),
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),   "Flashpoint.lnk")
-                    };
-
-                    foreach (string path in shortcutPaths) if (File.Exists(path)) File.Delete(path);
-                }
 
                 Hide();
                 FPM.Main.Hide();
