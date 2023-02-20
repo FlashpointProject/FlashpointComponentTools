@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -63,7 +64,7 @@ namespace FlashpointInstaller
 
                 long size;
 
-                if (long.TryParse(GetAttribute(node, "size", true), out size))
+                if (long.TryParse(GetAttribute(node, "install-size", true), out size))
                 {
                     Size = size;
                 }
@@ -150,9 +151,15 @@ namespace FlashpointInstaller
             // Pointer to main form
             public static Main Main { get => (Main)Application.OpenForms["Main"]; }
             // Internet location of component list XML
-            public static string ListURL { get => "http://localhost/components.xml"; }
+            public static string ListURL { get => "https://nexus-dev.unstable.life/repository/development/components.xml"; }
             // The parsed component list XML
             public static XmlDocument XmlTree { get; set; }
+
+            // Check if Visual C++ 2015 x86 redistributable is installed
+            public static bool RedistInstalled
+            {
+                get => Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\X86") != null;
+            }
 
             // Pointer to destination path textbox
             public static string DestinationPath
@@ -335,7 +342,7 @@ namespace FlashpointInstaller
                 {
                     errorPath = "Program Files";
                 }
-                else if (path.StartsWith(Path.GetTempPath().Remove(Path.GetTempPath().Length - 1)))
+                else if (path.StartsWith(Path.GetTempPath().TrimEnd('\\')))
                 {
                     errorPath = "Temporary Files";
                 }

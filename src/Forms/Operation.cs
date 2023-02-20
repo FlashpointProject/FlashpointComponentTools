@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -120,9 +121,40 @@ namespace FlashpointInstaller
                 byteProgress += component.Size;
             }
 
-            if (cancelStatus == 0) FinishOperation();
+            if (cancelStatus == 0)
+            {
+                if (!FPM.RedistInstalled)
+                {
+                    ProgressLabel.Text = "Installing Visual C++ 2015 x86 redistributable...";
+                    CancelButton.Enabled = false;
+
+                    string redistPath = Path.GetTempPath() + "vc_redist.x86.exe";
+
+                    if (!File.Exists(redistPath))
+                    {
+                        await new DownloadService().DownloadFileTaskAsync("https://aka.ms/vs/17/release/vc_redist.x86.exe", redistPath);
+                    }
+
+                    await Task.Run(() =>
+                    {
+                        var redistProcess = Process.Start(redistPath, "/install /norestart /quiet");
+                        redistProcess.WaitForExit();
+
+                        if (redistProcess.ExitCode != 0)
+                        {
+                            MessageBox.Show(
+                                "Failed to install Visual C++ 2015 x86 redistributable.\n\n" +
+                                "You can try installing it manually from https://aka.ms/vs/17/release/vc_redist.x86.exe.",
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                            );
+                        }
+                    });
+
+                    FinishOperation();
+                }
+            }
         }
-        
+
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             if (cancelStatus != 0)

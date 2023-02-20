@@ -17,7 +17,8 @@ namespace FlashpointInstaller
         private async void Main_Load(object sender, EventArgs e)
         {
             FPM.VerifyDestinationPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
-            
+
+            TabControl.Enabled = false;
             Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL);
 
             if (listStream == null)
@@ -31,6 +32,7 @@ namespace FlashpointInstaller
             }
 
             listStream.Position = 0;
+            TabControl.Enabled = true;
 
             FPM.XmlTree = new XmlDocument();
             FPM.XmlTree.Load(listStream);
@@ -99,6 +101,17 @@ namespace FlashpointInstaller
             if (!FPM.VerifyDestinationPath(FPM.DestinationPath, false)) return;
 
             FPM.CheckDependencies(ComponentList);
+
+            if (!FPM.RedistInstalled)
+            {
+                var redistDialog = MessageBox.Show(
+                    "The Flashpoint launcher requires the Visual C++ 2015 x86 redistributable, which you do not appear to have installed.\n\n" +
+                    "It will be installed automatically if you choose to continue.",
+                    "Notice", MessageBoxButtons.OKCancel, MessageBoxIcon.Information
+                );
+
+                if (redistDialog == DialogResult.Cancel) return;
+            }
 
             FPM.OperateMode = 0;
 
