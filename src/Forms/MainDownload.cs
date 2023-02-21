@@ -18,8 +18,6 @@ namespace FlashpointInstaller
         {
             About.Text += $" v{Application.ProductVersion}";
 
-            FPM.VerifyDestinationPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
-
             TabControl.Enabled = false;
             Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL);
 
@@ -35,6 +33,8 @@ namespace FlashpointInstaller
 
             listStream.Position = 0;
             TabControl.Enabled = true;
+
+            FPM.VerifyDestinationPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
 
             FPM.XmlTree = new XmlDocument();
             FPM.XmlTree.Load(listStream);
@@ -78,22 +78,29 @@ namespace FlashpointInstaller
 
         private void ComponentList_BeforeSelect(object _, TreeViewCancelEventArgs e)
         {
-            bool isComponent = e.Node.Tag.GetType().ToString().EndsWith("Component");
-
-            if (isComponent)
+            if (e.Node.Tag.GetType().ToString().EndsWith("Component"))
             {
                 var component = e.Node.Tag as Component;
 
-                Description.Text = component.Description;
-                SizeDisplay.Text = FPM.GetFormattedBytes(component.Size);
+                DescriptionBox.Text = "Component Description";
+                Description.Text = component.Description + $" ({FPM.GetFormattedBytes(component.Size)})";
             }
             else
             {
-                Description.Text = (e.Node.Tag as Category).Description;
+                long categorySize = 0;
+                FPM.Iterate(e.Node.Nodes, node =>
+                {
+                    if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
+                    {
+                        categorySize += (node.Tag as Component).Size;
+                    }
+                });
+
+                DescriptionBox.Text = "Category Description";
+                Description.Text = (e.Node.Tag as Category).Description + $" ({FPM.GetFormattedBytes(categorySize)})";
             }
 
-            SizeLabel.Visible = isComponent;
-            SizeDisplay.Visible = isComponent;
+            if (!DescriptionBox.Visible) DescriptionBox.Visible = true;
         }
 
         private void DestinationPathBrowse_Click(object _, EventArgs e)

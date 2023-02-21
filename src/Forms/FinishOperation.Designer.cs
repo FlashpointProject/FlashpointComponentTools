@@ -49,9 +49,9 @@
             this.RunOnClose.CheckState = System.Windows.Forms.CheckState.Checked;
             this.RunOnClose.Location = new System.Drawing.Point(12, 45);
             this.RunOnClose.Name = "RunOnClose";
-            this.RunOnClose.Size = new System.Drawing.Size(131, 17);
+            this.RunOnClose.Size = new System.Drawing.Size(113, 17);
             this.RunOnClose.TabIndex = 1;
-            this.RunOnClose.Text = "Run Flashpoint on exit";
+            this.RunOnClose.Text = "Launch Flashpoint";
             this.RunOnClose.UseVisualStyleBackColor = true;
             // 
             // CloseButton

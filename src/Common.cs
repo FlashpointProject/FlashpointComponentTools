@@ -190,7 +190,7 @@ namespace FlashpointInstaller
             public static class SizeTracker
             {
                 private static long toDownload;
-                private static long modified;
+                private static long toChange;
 
                 // Tracks total size of components available locally
                 public static long Downloaded { get; set; }
@@ -201,16 +201,16 @@ namespace FlashpointInstaller
                     set
                     {
                         toDownload = value;
-                        Main.TotalSizeDisplay.Text = GetFormattedBytes(toDownload);
+                        Main.DownloadButton.Text = $"Download Flashpoint ({GetFormattedBytes(toDownload)})";
                     }
                 }
                 // Tracks size difference from checking/unchecking components in the manager tab
-                public static long Modified
+                public static long ToChange
                 {
-                    get => modified;
+                    get => toChange;
                     set {
-                        modified = value;
-                        Main.TotalSizeDisplay2.Text = GetFormattedBytes(modified - Downloaded);
+                        toChange = value;
+                        Main.ChangeButton.Text = $"Apply changes ({GetFormattedBytes(toChange - Downloaded)})";
                     }
                 }
             }
@@ -310,7 +310,7 @@ namespace FlashpointInstaller
                 });
 
                 SizeTracker.Downloaded = GetTotalSize(Main.ComponentList2);
-                SizeTracker.Modified   = GetTotalSize(Main.ComponentList2);
+                SizeTracker.ToChange   = GetTotalSize(Main.ComponentList2);
             }
 
             // Deletes a file as well as any directories made empty by its deletion

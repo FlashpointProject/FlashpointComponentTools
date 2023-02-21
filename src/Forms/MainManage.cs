@@ -25,8 +25,8 @@ namespace FlashpointInstaller
 
             ComponentList2.Enabled = true;
 
-            UpdateButton.Enabled = true; TotalSizeLabel2.Visible   = true;
-            ChangeButton.Enabled = true; TotalSizeDisplay2.Visible = true;
+            UpdateButton.Enabled = true;
+            ChangeButton.Enabled = true;
 
             ManagerMessage2.Text = "Click on a component to learn more about it.";
 
@@ -38,27 +38,34 @@ namespace FlashpointInstaller
 
         private void ComponentList2_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.SizeTracker.Modified = FPM.GetTotalSize(ComponentList2);
+            FPM.SizeTracker.ToChange = FPM.GetTotalSize(ComponentList2);
         }
 
         private void ComponentList2_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
-            bool isComponent = e.Node.Tag.GetType().ToString().EndsWith("Component");
-
-            if (isComponent)
+            if (e.Node.Tag.GetType().ToString().EndsWith("Component"))
             {
                 var component = e.Node.Tag as Component;
 
-                Description2.Text = component.Description;
-                SizeDisplay2.Text = FPM.GetFormattedBytes(component.Size);
+                DescriptionBox2.Text = "Component Description";
+                Description2.Text = component.Description + $" ({FPM.GetFormattedBytes(component.Size)})";
             }
             else
             {
-                Description2.Text = (e.Node.Tag as Category).Description;
+                long categorySize = 0;
+                FPM.Iterate(e.Node.Nodes, node =>
+                {
+                    if (node.Tag.GetType().ToString().EndsWith("Component"))
+                    {
+                        categorySize += (node.Tag as Component).Size;
+                    }
+                });
+
+                DescriptionBox2.Text = "Category Description";
+                Description2.Text = (e.Node.Tag as Category).Description + $" ({FPM.GetFormattedBytes(categorySize)})";
             }
 
-            SizeLabel2.Visible = isComponent;
-            SizeDisplay2.Visible = isComponent;
+            if (!DescriptionBox2.Visible) DescriptionBox2.Visible = true;
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
