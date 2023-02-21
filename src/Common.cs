@@ -316,20 +316,24 @@ namespace FlashpointInstaller
             // Deletes a file as well as any directories made empty by its deletion
             public static void DeleteFileAndDirectories(string file)
             {
-                if (File.Exists(file)) File.Delete(file);
-
-                string folder = Path.GetDirectoryName(file);
-
-                while (folder != SourcePath)
+                try
                 {
-                    if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
-                    {
-                        Directory.Delete(folder, false);
-                    }
-                    else break;
+                    if (File.Exists(file)) File.Delete(file);
 
-                    folder = Directory.GetParent(folder).ToString();
+                    string folder = Path.GetDirectoryName(file);
+
+                    while (folder != SourcePath)
+                    {
+                        if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
+                        {
+                            Directory.Delete(folder, false);
+                        }
+                        else break;
+
+                        folder = Directory.GetParent(folder).ToString();
+                    }
                 }
+                catch { }
             }
 
             // Checks if specified Flashpoint destination path is valid, and optionally updates its respective textbox
