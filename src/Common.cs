@@ -504,11 +504,11 @@ namespace FlashpointInstaller
             // Formats bytes as a human-readable string
             public static string GetFormattedBytes(long bytes)
             {
-                if (bytes >= 1000000000)
+                if (Math.Abs(bytes) >= 1000000000)
                 {
                     return (Math.Truncate((double)bytes / 100000000) / 10).ToString("N1") + "GB";
                 }
-                else if (bytes >= 1000000)
+                else if (Math.Abs(bytes) >= 1000000)
                 {
                     return (Math.Truncate((double)bytes / 100000) / 10).ToString("N1") + "MB";
                 }
