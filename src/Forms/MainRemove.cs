@@ -14,11 +14,10 @@ namespace FlashpointInstaller
         private void SourcePathBrowse2_Click(object sender, EventArgs e)
         {
             var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
-
             if (pathDialog.ShowDialog() != CommonFileDialogResult.Ok) return;
-            if (!FPM.VerifySourcePath(pathDialog.FileName, 2)) return;
 
-            RemoveButton.Enabled = true;
+            FPM.SourcePath2 = pathDialog.FileName;
+            if (FPM.SourcePath2 != pathDialog.FileName) return;
         }
 
         private async void RemoveButton_Click(object sender, EventArgs e)

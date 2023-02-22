@@ -8,35 +8,16 @@ namespace FlashpointInstaller
 {
     public partial class Main : Form
     {
-        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (((TabControl)sender).SelectedTab.Name == "ManageTab" && ComponentList2.Nodes.Count == 0)
-            {
-                FPM.RecursiveAddToList(FPM.XmlTree.GetElementsByTagName("list")[0], ComponentList2.Nodes, false);
-            }
-        }
-
         private void SourcePathBrowse_Click(object sender, EventArgs e)
         {
             var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
-
             if (pathDialog.ShowDialog() != CommonFileDialogResult.Ok) return;
-            if (!FPM.VerifySourcePath(pathDialog.FileName, 1)) return;
 
-            ComponentList2.Enabled = true;
-
-            UpdateButton.Enabled = true;
-            ChangeButton.Enabled = true;
-
-            ManagerMessage2.Text = "Click on a component to learn more about it.";
-
-            FPM.SyncManager(true);
-
-            ComponentList2.BeforeCheck += ComponentList_BeforeCheck;
-            ComponentList2.AfterCheck  += ComponentList2_AfterCheck;
+            FPM.SourcePath = pathDialog.FileName;
+            if (FPM.SourcePath != pathDialog.FileName) return;
         }
 
-        private void ComponentList2_AfterCheck(object sender, TreeViewEventArgs e)
+        public void ComponentList2_AfterCheck(object sender, TreeViewEventArgs e)
         {
             FPM.SizeTracker.ToChange = FPM.GetTotalSize(ComponentList2);
         }
@@ -53,7 +34,7 @@ namespace FlashpointInstaller
             else
             {
                 long categorySize = 0;
-                FPM.Iterate(e.Node.Nodes, node =>
+                FPM.IterateList(e.Node.Nodes, node =>
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {

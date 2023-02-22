@@ -4,7 +4,6 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml;
 
-using Downloader;
 using FlashpointInstaller.Common;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -14,36 +13,16 @@ namespace FlashpointInstaller
     {
         public Main() => InitializeComponent();
 
-        private async void Main_Load(object sender, EventArgs e)
+        private void Main_Load(object sender, EventArgs e)
         {
             About.Text += $" v{Application.ProductVersion}";
-
-            TabControl.Enabled = false;
-            Stream listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL);
-
-            if (listStream == null)
-            {
-                MessageBox.Show(
-                    "The component list could not be downloaded! Do you have an internet connection?",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                );
-
-                Environment.Exit(1);
-            }
-
-            listStream.Position = 0;
-            TabControl.Enabled = true;
-
-            FPM.VerifyDestinationPath(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), true);
-
-            FPM.XmlTree = new XmlDocument();
-            FPM.XmlTree.Load(listStream);
 
             XmlNodeList rootElements = FPM.XmlTree.GetElementsByTagName("list");
 
             if (rootElements.Count > 0)
             {
                 FPM.RecursiveAddToList(rootElements[0], ComponentList.Nodes, true);
+                FPM.RecursiveAddToList(rootElements[0], ComponentList2.Nodes, false);
             }
             else
             {
@@ -55,6 +34,15 @@ namespace FlashpointInstaller
 
                 Environment.Exit(1);
             }
+
+            FPM.DestinationPath = Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint");
+            if (File.Exists(FPM.ConfigFile))
+            {
+                string[] config = File.ReadAllLines(FPM.ConfigFile);
+                if (config.Length > 0) FPM.SourcePath  = config[0];
+            }
+
+            if (FPM.StartupMode == 1) TabControl.SelectTab(1);
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -62,7 +50,7 @@ namespace FlashpointInstaller
             Process.Start(new ProcessStartInfo("https://bluemaxima.org/flashpoint") { UseShellExecute = true });
         }
 
-        private void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
+        public void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
         {
             bool required = e.Node.Tag.GetType().ToString().EndsWith("Component")
                 ? (e.Node.Tag as Component).Required
@@ -88,7 +76,7 @@ namespace FlashpointInstaller
             else
             {
                 long categorySize = 0;
-                FPM.Iterate(e.Node.Nodes, node =>
+                FPM.IterateList(e.Node.Nodes, node =>
                 {
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
@@ -109,7 +97,7 @@ namespace FlashpointInstaller
             
             if (pathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                FPM.VerifyDestinationPath(pathDialog.FileName, true);
+                FPM.DestinationPath = Path.Combine(pathDialog.FileName, "Flashpoint");
             }
         }
 
@@ -120,7 +108,7 @@ namespace FlashpointInstaller
 
         private void DownloadButton_Click(object sender, EventArgs e)
         {
-            if (!FPM.VerifyDestinationPath(FPM.DestinationPath, false)) return;
+            if (!FPM.VerifyDestinationPath(FPM.DestinationPath)) return;
 
             FPM.CheckDependencies(ComponentList);
 

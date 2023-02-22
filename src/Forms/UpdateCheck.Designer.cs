@@ -35,8 +35,7 @@
             this.ComponentSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.UpdateButton = new System.Windows.Forms.Button();
             this.CloseButton = new System.Windows.Forms.Button();
-            this.UpdateSizeLabel = new System.Windows.Forms.Label();
-            this.UpdateSizeDisplay = new System.Windows.Forms.Label();
+            this.ComponentUpdated = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // UpdateMessage
@@ -53,6 +52,7 @@
             this.UpdateList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ComponentTitle,
             this.ComponentDescription,
+            this.ComponentUpdated,
             this.ComponentSize});
             this.UpdateList.FullRowSelect = true;
             this.UpdateList.GridLines = true;
@@ -70,12 +70,12 @@
             // ComponentTitle
             // 
             this.ComponentTitle.Text = "Title";
-            this.ComponentTitle.Width = 122;
+            this.ComponentTitle.Width = 120;
             // 
             // ComponentDescription
             // 
             this.ComponentDescription.Text = "Description";
-            this.ComponentDescription.Width = 304;
+            this.ComponentDescription.Width = 216;
             // 
             // ComponentSize
             // 
@@ -84,9 +84,9 @@
             // UpdateButton
             // 
             this.UpdateButton.Enabled = false;
-            this.UpdateButton.Location = new System.Drawing.Point(152, 277);
+            this.UpdateButton.Location = new System.Drawing.Point(11, 277);
             this.UpdateButton.Name = "UpdateButton";
-            this.UpdateButton.Size = new System.Drawing.Size(288, 23);
+            this.UpdateButton.Size = new System.Drawing.Size(429, 23);
             this.UpdateButton.TabIndex = 2;
             this.UpdateButton.Text = "Update Flashpoint";
             this.UpdateButton.UseVisualStyleBackColor = true;
@@ -102,34 +102,16 @@
             this.CloseButton.UseVisualStyleBackColor = true;
             this.CloseButton.Click += new System.EventHandler(this.CloseButton_Click);
             // 
-            // UpdateSizeLabel
+            // ComponentUpdated
             // 
-            this.UpdateSizeLabel.AutoSize = true;
-            this.UpdateSizeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.UpdateSizeLabel.Location = new System.Drawing.Point(12, 282);
-            this.UpdateSizeLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.UpdateSizeLabel.Name = "UpdateSizeLabel";
-            this.UpdateSizeLabel.Size = new System.Drawing.Size(81, 13);
-            this.UpdateSizeLabel.TabIndex = 4;
-            this.UpdateSizeLabel.Text = "Size change:";
-            // 
-            // UpdateSizeDisplay
-            // 
-            this.UpdateSizeDisplay.AutoSize = true;
-            this.UpdateSizeDisplay.Location = new System.Drawing.Point(93, 282);
-            this.UpdateSizeDisplay.Margin = new System.Windows.Forms.Padding(0);
-            this.UpdateSizeDisplay.Name = "UpdateSizeDisplay";
-            this.UpdateSizeDisplay.Size = new System.Drawing.Size(38, 13);
-            this.UpdateSizeDisplay.TabIndex = 5;
-            this.UpdateSizeDisplay.Text = "0.0MB";
+            this.ComponentUpdated.Text = "Last Updated";
+            this.ComponentUpdated.Width = 90;
             // 
             // UpdateCheck
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(534, 311);
-            this.Controls.Add(this.UpdateSizeDisplay);
-            this.Controls.Add(this.UpdateSizeLabel);
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.UpdateButton);
             this.Controls.Add(this.UpdateList);
@@ -144,7 +126,6 @@
             this.Text = "Update Checker";
             this.Load += new System.EventHandler(this.UpdateCheck_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -157,7 +138,6 @@
         private System.Windows.Forms.ColumnHeader ComponentTitle;
         private System.Windows.Forms.ColumnHeader ComponentDescription;
         private System.Windows.Forms.ColumnHeader ComponentSize;
-        private System.Windows.Forms.Label UpdateSizeLabel;
-        private System.Windows.Forms.Label UpdateSizeDisplay;
+        private System.Windows.Forms.ColumnHeader ComponentUpdated;
     }
 }

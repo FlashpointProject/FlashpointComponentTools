@@ -164,7 +164,6 @@
             this.TabControl.Size = new System.Drawing.Size(600, 300);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.TabControl.TabIndex = 5;
-            this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
             // DownloadTab
             // 
@@ -545,14 +544,12 @@
         private System.Windows.Forms.GroupBox DescriptionBox;
         private System.Windows.Forms.Label Description;
         private System.Windows.Forms.Label DownloadMessage2;
-        private System.Windows.Forms.Button UpdateButton;
         private System.Windows.Forms.GroupBox SourcePathBox;
         public System.Windows.Forms.TextBox SourcePath;
         private System.Windows.Forms.Button SourcePathBrowse;
         private System.Windows.Forms.GroupBox DescriptionBox2;
         private System.Windows.Forms.Label Description2;
         private System.Windows.Forms.Label ManagerMessage;
-        private System.Windows.Forms.Label ManagerMessage2;
         public System.Windows.Forms.Button ChangeButton;
         private System.Windows.Forms.Label RemoveDescription;
         private System.Windows.Forms.GroupBox SourcePathBox2;
@@ -561,6 +558,8 @@
         public System.Windows.Forms.Button RemoveButton;
         public System.Windows.Forms.CheckBox RemoveShortcuts;
         public System.Windows.Forms.Button DownloadButton;
+        public System.Windows.Forms.Button UpdateButton;
+        public System.Windows.Forms.Label ManagerMessage2;
     }
 }
 

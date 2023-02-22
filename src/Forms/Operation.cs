@@ -37,14 +37,17 @@ namespace FlashpointInstaller
 
         private async void Operation_Load(object sender, EventArgs e)
         {
-            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
+            if (FPM.StartupMode != 2)
+            {
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
+            }
 
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
             downloader.DownloadFileCompleted += OnDownloadFileCompleted;
 
             if (FPM.OperateMode == 0)
             {
-                FPM.Iterate(FPM.Main.ComponentList.Nodes, node =>
+                FPM.IterateList(FPM.Main.ComponentList.Nodes, node =>
                 {
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
@@ -61,17 +64,17 @@ namespace FlashpointInstaller
 
                 if (FPM.OperateMode == 1)
                 {
-                    FPM.Iterate(FPM.Main.ComponentList2.Nodes, node =>
+                    FPM.IterateList(FPM.Main.ComponentList2.Nodes, node =>
                     {
                         if (node.Tag.GetType().ToString().EndsWith("Component"))
                         {
                             var component = node.Tag as Component;
 
-                            if (!node.Checked && FPM.ComponentTracker.Downloaded.Contains(component))
+                            if (!node.Checked && FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
                             {
                                 removedComponents.Add(component);
                             }
-                            if (node.Checked && !FPM.ComponentTracker.Downloaded.Contains(component))
+                            if (node.Checked && !FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
                             {
                                 addedComponents.Add(component);
                             }
@@ -82,7 +85,7 @@ namespace FlashpointInstaller
                 {
                     foreach (var component in FPM.ComponentTracker.ToUpdate)
                     {
-                        if (FPM.ComponentTracker.Downloaded.Contains(component))
+                        if (FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
                         {
                             removedComponents.Add(component);
                         }
@@ -145,7 +148,10 @@ namespace FlashpointInstaller
                     });
                 }
 
-                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
+                if (FPM.StartupMode != 2)
+                {
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
+                }
 
                 FinishOperation();
             }
@@ -175,12 +181,15 @@ namespace FlashpointInstaller
                     $"{FPM.GetFormattedBytes(e.ReceivedBytesSize)} of {FPM.GetFormattedBytes(e.TotalBytesToReceive)}";
             });
 
-            FPM.Main.Invoke((MethodInvoker)delegate
+            if (FPM.StartupMode != 2)
             {
-                TaskbarManager.Instance.SetProgressValue(
-                    (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
-                );
-            });
+                FPM.Main.Invoke((MethodInvoker)delegate
+                {
+                    TaskbarManager.Instance.SetProgressValue(
+                        (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                    );
+                });
+            }
         }
 
         private void OnDownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -244,12 +253,15 @@ namespace FlashpointInstaller
                                 $"{FPM.GetFormattedBytes(extractedSize)} of {FPM.GetFormattedBytes(totalSize)}";
                         });
 
-                        FPM.Main.Invoke((MethodInvoker)delegate
+                        if (FPM.StartupMode != 2)
                         {
-                            TaskbarManager.Instance.SetProgressValue(
-                                (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
-                            );
-                        });
+                            FPM.Main.Invoke((MethodInvoker)delegate
+                            {
+                                TaskbarManager.Instance.SetProgressValue(
+                                    (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                                );
+                            });
+                        }
                     }
 
                     if (cancelStatus != 0)
@@ -288,12 +300,15 @@ namespace FlashpointInstaller
                         $"{removedFiles} of {totalFiles} files";
                 });
 
-                FPM.Main.Invoke((MethodInvoker)delegate
+                if (FPM.StartupMode != 2)
                 {
-                    TaskbarManager.Instance.SetProgressValue(
-                        (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
-                    );
-                });
+                    FPM.Main.Invoke((MethodInvoker)delegate
+                    {
+                        TaskbarManager.Instance.SetProgressValue(
+                            (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                        );
+                    });
+                }
 
                 FPM.DeleteFileAndDirectories(filePath);
 
@@ -355,6 +370,11 @@ namespace FlashpointInstaller
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
             
             Close();
+        }
+
+        private void Operation_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (FPM.OperateMode != 0 && ModifierKeys == Keys.Alt) e.Cancel = true;
         }
     }
 }
