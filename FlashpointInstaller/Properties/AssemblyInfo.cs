@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Flashpoint Manager")]
-[assembly: AssemblyDescription("Downloads Flashpoint and manages its components.")]
+[assembly: AssemblyTitle("Flashpoint Installer")]
+[assembly: AssemblyDescription("Installs Flashpoint and its components.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Flashpoint Manager")]
+[assembly: AssemblyProduct("Flashpoint Installer")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -32,4 +32,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0-beta2")]
+[assembly: AssemblyFileVersion("1.0-beta3")]

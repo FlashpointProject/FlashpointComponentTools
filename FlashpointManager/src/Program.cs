@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,11 +21,25 @@ namespace FlashpointInstaller
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            if (File.Exists(FPM.ConfigFile))
+            var config = new List<string>() { Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..")), FPM.ListURL };
+
+            try
             {
-                string[] config = File.ReadAllLines(FPM.ConfigFile);
-                if (config.Length > 1) FPM.ListURL = config[1];
+                var configReader = File.ReadAllLines("fpm.cfg");
+                config[0] = configReader[0];
+                config[1] = configReader[1];
             }
+            catch
+            {
+                using (var configWriter = File.CreateText("fpm.cfg"))
+                {
+                    configWriter.WriteLine(config[0]);
+                    configWriter.WriteLine(config[1]);
+                }
+            }
+
+            FPM.SourcePath = config[0];
+            FPM.ListURL    = config[1];
 
             Stream listStream = null;
             Task.Run(async () => { listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL); }).Wait();
@@ -44,27 +59,11 @@ namespace FlashpointInstaller
             FPM.XmlTree = new XmlDocument();
             FPM.XmlTree.Load(listStream);
 
-            if (args.Length > 0)
-            {
-                switch (args[0])
-                {
-                    case "/manage":
-                        FPM.StartupMode = 1;
-                        break;
-                    case "/update":
-                        FPM.StartupMode = 2;
-                        break;
-                }
-            }
-            
-            if (FPM.StartupMode != 2)
-            {
-                Application.Run(new Main());
-            }
-            else
-            {
-                Application.Run(new UpdateCheck());
-            }
+            FPM.VerifySourcePath();
+
+            if (args.Length > 0 && args[0].ToLower() == "/update") FPM.OpenUpdateTab = true;
+
+            Application.Run(new Main());
         }
     }
 }

@@ -1,8 +1,8 @@
-# Flashpoint Manager
-This is a component manager for [BlueMaxima's Flashpoint](https://bluemaxima.org/flashpoint/). If all goes well, it will eventually become the primary method of downloading Flashpoint and maintaining its individual components.
+# Flashpoint Component Tools
+This repository contains GUI utilities for downloading, managing, or removing a copy of [BlueMaxima's Flashpoint](https://bluemaxima.org/flashpoint) using the component system.
 
-A command-line version can be found [here](https://github.com/WumboSpasm/FlashpointManager-CLI).
+A general-purpose command-line tool can be found [here](https://github.com/WumboSpasm/fpm).
 
-## To-do
-* Add more error checking
-* Add more comments to code
+## Tools
+- `FlashpointInstaller` - "Installs" (downloads) Flashpoint with any selected components to a specified folder, and optionally creates desktop and Start menu shortcuts.
+- `FlashpointManager` - Allows the user to add or remove components from an existing copy, or remove Flashpoint completely; intended for integration with the [Flashpoint Launcher](https://github.com/FlashpointProject/launcher).

@@ -1,6 +1,6 @@
 ﻿namespace FlashpointInstaller
 {
-    partial class Operation
+    partial class Operate
     {
         /// <summary>
         /// Required designer variable.
@@ -28,20 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.CancelButton = new System.Windows.Forms.Button();
             this.ProgressMeasure = new System.Windows.Forms.ProgressBar();
             this.ProgressLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // CancelButton
-            // 
-            this.CancelButton.Location = new System.Drawing.Point(409, 42);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(75, 22);
-            this.CancelButton.TabIndex = 0;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // ProgressMeasure
             // 
@@ -68,15 +57,13 @@
             this.ControlBox = false;
             this.Controls.Add(this.ProgressLabel);
             this.Controls.Add(this.ProgressMeasure);
-            this.Controls.Add(this.CancelButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Operation";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Downloading Flashpoint...";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Operation_FormClosing);
+            this.Text = "Modifying Flashpoint...";
             this.Load += new System.EventHandler(this.Operation_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -84,8 +71,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.ProgressBar ProgressMeasure;
         private System.Windows.Forms.Label ProgressLabel;
     }

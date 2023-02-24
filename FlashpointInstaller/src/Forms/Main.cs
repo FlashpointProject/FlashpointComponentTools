@@ -22,7 +22,6 @@ namespace FlashpointInstaller
             if (rootElements.Count > 0)
             {
                 FPM.RecursiveAddToList(rootElements[0], ComponentList.Nodes, true);
-                FPM.RecursiveAddToList(rootElements[0], ComponentList2.Nodes, false);
             }
             else
             {
@@ -36,13 +35,6 @@ namespace FlashpointInstaller
             }
 
             FPM.DestinationPath = Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint");
-            if (File.Exists(FPM.ConfigFile))
-            {
-                string[] config = File.ReadAllLines(FPM.ConfigFile);
-                if (config.Length > 0) FPM.SourcePath  = config[0];
-            }
-
-            if (FPM.StartupMode == 1) TabControl.SelectTab(1);
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -123,9 +115,7 @@ namespace FlashpointInstaller
                 if (redistDialog == DialogResult.Cancel) return;
             }
 
-            FPM.OperateMode = 0;
-
-            var operationWindow = new Operation();
+            var operationWindow = new Operate();
             operationWindow.ShowDialog();
         }
     }

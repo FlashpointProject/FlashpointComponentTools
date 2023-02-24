@@ -1,6 +1,6 @@
 ﻿namespace FlashpointInstaller
 {
-    partial class FinishOperation
+    partial class Finish
     {
         /// <summary>
         /// Required designer variable.
@@ -39,7 +39,7 @@
             this.Message.Name = "Message";
             this.Message.Size = new System.Drawing.Size(280, 20);
             this.Message.TabIndex = 0;
-            this.Message.Text = "Flashpoint has been successfully downloaded.";
+            this.Message.Text = "Flashpoint has been successfully installed.";
             this.Message.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // RunOnClose
@@ -64,7 +64,7 @@
             this.CloseButton.UseVisualStyleBackColor = true;
             this.CloseButton.Click += new System.EventHandler(this.FinishDownload_Exit);
             // 
-            // FinishOperation
+            // Finish
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -75,14 +75,13 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FinishOperation";
+            this.Name = "Finish";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Download Complete";
+            this.Text = "Installation Complete";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FinishDownload_Exit);
-            this.Load += new System.EventHandler(this.FinishOperation_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

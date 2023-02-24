@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -172,124 +171,31 @@ namespace FlashpointInstaller
         {
             // Pointer to main form
             public static Main Main { get => (Main)Application.OpenForms["Main"]; }
-            // Pointer to update check form
-            public static UpdateCheck UpdateCheck { get => (UpdateCheck)Application.OpenForms["UpdateCheck"]; }
-            // Internet location of component list XML
-            public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/development/components.xml";
             // The parsed component list XML
             public static XmlDocument XmlTree { get; set; }
 
             // Name of configuration file
-            public static string ConfigFile { get => "fpm.cfg"; }
-
-            // Check if Visual C++ 2015 x86 redistributable is installed
-            public static bool RedistInstalled
-            {
-                get => Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\X86") != null;
-            }
-
-            // Pointer to destination path textbox
-            private static string destinationPath = "";
-            public static string DestinationPath
-            {
-                get { return destinationPath; }
-                set
-                {
-                    if (VerifyDestinationPath(value))
-                    {
-                        destinationPath = value;
-
-                        if (StartupMode != 2)
-                        {
-                            Main.DestinationPath.Text = destinationPath;
-                        }
-                    }
-                }
-            }
-            // Pointer to source path textbox in Manage tab
-            private static string sourcePath = "";
-            public static string SourcePath
-            {
-                get { return sourcePath; }
-                set
-                {
-                    if (VerifySourcePath(value))
-                    {
-                        sourcePath = value;
-
-                        if (StartupMode != 2)
-                        {
-                            Main.SourcePath.Text = sourcePath;
-
-                            if (!Main.ComponentList2.Enabled)
-                            {
-                                Main.ComponentList2.Enabled = true;
-
-                                Main.UpdateButton.Enabled = true;
-                                Main.ChangeButton.Enabled = true;
-
-                                Main.ManagerMessage2.Text = "Click on a component to learn more about it.";
-
-                                Main.ComponentList2.BeforeCheck += Main.ComponentList_BeforeCheck;
-                                Main.ComponentList2.AfterCheck += Main.ComponentList2_AfterCheck;
-                            }
-
-                            SyncManager(true);
-                        }
-                    }
-                }
-            }
-            // Pointer to source path textbox in Remove tab
-            private static string sourcePath2 = "";
-            public static string SourcePath2
-            {
-                get { return sourcePath2; }
-                set
-                {
-                    if (VerifySourcePath(value))
-                    {
-                        sourcePath2 = value;
-
-                        if (StartupMode != 2)
-                        {
-                            Main.SourcePath2.Text = sourcePath2;
-                            Main.RemoveButton.Enabled = true;
-                        }
-                    }
-                }
-            }
-
-            // Flag to control how the manager will start
-            // 0 starts the manager normally
-            // 1 starts the manager in the Manage Flashpoint tab
-            // 2 starts the manager in the update window and exits once closed
-            public static int StartupMode { get; set; } = 0;
+            public static string ConfigFile { get; } = "fpm.cfg";
+            // Internet location of component list XML
+            public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/development/components.xml";
+            // Path to the local Flashpoint copy
+            public static string SourcePath { get; set; } = "";
 
             // Flag to control how operation window will function
-            // 0 is for downloading Flashpoint
-            // 1 is for adding/removing components
-            // 2 is for updating components
+            // 0 is for adding/removing components
+            // 1 is for updating components
             public static int OperateMode { get; set; } = 0;
+
+            // Flag to control whether the update tab is selected at launch
+            public static bool OpenUpdateTab { get; set; } = false;
 
             // Object for tracking numerous file size sums
             public static class SizeTracker
             {
-                private static long toDownload;
-                private static long toChange;
-
                 // Tracks total size of components available locally
                 public static long Downloaded { get; set; }
-                // Tracks total size of the pending Flashpoint download
-                public static long ToDownload
-                {
-                    get => toDownload;
-                    set
-                    {
-                        toDownload = value;
-                        Main.DownloadButton.Text = $"Download Flashpoint ({GetFormattedBytes(toDownload)})";
-                    }
-                }
                 // Tracks size difference from checking/unchecking components in the manager tab
+                private static long toChange;
                 public static long ToChange
                 {
                     get => toChange;
@@ -388,9 +294,10 @@ namespace FlashpointInstaller
             }
 
             // Refreshes tracker objects with up-to-date information
-            public static void SyncManager(bool setCheckState = false)
+            public static void SyncManager(bool updateLists = false)
             {
                 ComponentTracker.Downloaded.Clear();
+                ComponentTracker.ToUpdate.Clear();
 
                 IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
                 {
@@ -401,18 +308,22 @@ namespace FlashpointInstaller
 
                     if (File.Exists(infoPath)) ComponentTracker.Downloaded.Add(component);
 
-                    if (setCheckState && StartupMode != 2)
+                    if (updateLists)
                     {
-                        TreeNode[] nodes = Main.ComponentList2.Nodes.Find(component.ID, true);
+                        TreeNode[] nodes = Main.ComponentList.Nodes.Find(component.ID, true);
                         if (nodes.Length > 0) nodes[0].Checked = File.Exists(infoPath);
                     }
                 });
 
-                if (StartupMode != 2)
+                if (updateLists)
                 {
-                    SizeTracker.Downloaded = GetTotalSize(Main.ComponentList2);
-                    SizeTracker.ToChange = GetTotalSize(Main.ComponentList2);
+                    Main.UpdateList.Items.Clear();
+                    Main.UpdateButton.Text = "Install updates";
+                    Main.UpdateButton.Enabled = false;
                 }
+
+                SizeTracker.Downloaded = GetTotalSize(Main.ComponentList);
+                SizeTracker.ToChange = SizeTracker.Downloaded;
             }
 
             // Deletes a file as well as any directories made empty by its deletion
@@ -438,49 +349,8 @@ namespace FlashpointInstaller
                 catch { }
             }
 
-            // Checks if specified Flashpoint destination path is valid
-            public static bool VerifyDestinationPath(string path)
-            {
-                if (!Path.IsPathRooted(path))
-                {
-                    MessageBox.Show(
-                        $"The specified directory is not valid! Choose a different folder.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
-
-                    return false;
-                }
-
-                string errorPath;
-                
-                if (path.StartsWith(Environment.ExpandEnvironmentVariables("%ProgramW6432%"))
-                 || path.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)))
-                {
-                    errorPath = "Program Files";
-                }
-                else if (path.StartsWith(Path.GetTempPath().TrimEnd('\\')))
-                {
-                    errorPath = "Temporary Files";
-                }
-                else if (path.StartsWith(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "OneDrive")))
-                {
-                    errorPath = "OneDrive";
-                }
-                else
-                {
-                    return true;
-                }
-
-                MessageBox.Show(
-                    $"Flashpoint cannot be installed to the {errorPath} directory! Choose a different folder.",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                );
-
-                return false;
-            }
-
             // Checks if specified Flashpoint source path is valid
-            public static bool VerifySourcePath(string path)
+            public static void VerifySourcePath()
             {
                 bool isFlashpoint = false;
 
@@ -489,7 +359,7 @@ namespace FlashpointInstaller
                     if (node.Name != "component") return;
 
                     Component component = new Component(node);
-                    string infoPath = Path.Combine(path, "Components", $"{component.ID}.txt");
+                    string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
                     if (File.Exists(infoPath))
                     {
@@ -498,14 +368,15 @@ namespace FlashpointInstaller
                     }
                 });
 
-                if (isFlashpoint)
+                if (!isFlashpoint)
                 {
-                    return true;
+                    MessageBox.Show(
+                        "The Flashpoint directory specified in fpm.cfg is invalid!",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
+
+                    Environment.Exit(1);
                 }
-
-                MessageBox.Show($"Flashpoint was not found in this directory!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                return false;
             }
 
             // Checks if any dependencies were not marked for download by the user, and marks them accordingly
@@ -523,7 +394,7 @@ namespace FlashpointInstaller
                         Component component = node.Tag as Component;
                         string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
-                        if (sourceTree.Name == "ComponentList2" && File.Exists(infoPath))
+                        if (File.Exists(infoPath))
                         {
                             requiredDepends.AddRange(File.ReadLines(infoPath).First().Split(' ').Skip(2).ToArray());
                         }
@@ -591,7 +462,7 @@ namespace FlashpointInstaller
                         Component component = node.Tag as Component;
                         string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
-                        size += sourceTree.Name == "ComponentList2" && File.Exists(infoPath)
+                        size += File.Exists(infoPath)
                             ? long.Parse(File.ReadLines(infoPath).First().Split(' ')[1])
                             : component.Size;
                     }

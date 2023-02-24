@@ -15,12 +15,11 @@ using SharpCompress.Readers;
 
 namespace FlashpointInstaller
 {
-    public partial class Operation : Form
+    public partial class Operate : Form
     {
         Component workingComponent;
 
-        List<Component> addedComponents   = new List<Component>();
-        List<Component> removedComponents = new List<Component>();
+        List<Component> markedComponents   = new List<Component>();
 
         DownloadService downloader = new DownloadService();
 
@@ -33,80 +32,26 @@ namespace FlashpointInstaller
 
         int cancelStatus = 0;
 
-        public Operation() => InitializeComponent();
+        public Operate() => InitializeComponent();
 
         private async void Operation_Load(object sender, EventArgs e)
         {
-            if (FPM.StartupMode != 2)
-            {
-                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
-            }
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
 
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
             downloader.DownloadFileCompleted += OnDownloadFileCompleted;
 
-            if (FPM.OperateMode == 0)
+            FPM.IterateList(FPM.Main.ComponentList.Nodes, node =>
             {
-                FPM.IterateList(FPM.Main.ComponentList.Nodes, node =>
+                if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                 {
-                    if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
-                    {
-                        addedComponents.Add(node.Tag as Component);
-                    }
-                });
-
-                byteTotal = FPM.SizeTracker.ToDownload;
-            }
-            else
-            {
-                Text = "Modifying Flashpoint...";
-                CancelButton.Visible = false;
-
-                if (FPM.OperateMode == 1)
-                {
-                    FPM.IterateList(FPM.Main.ComponentList2.Nodes, node =>
-                    {
-                        if (node.Tag.GetType().ToString().EndsWith("Component"))
-                        {
-                            var component = node.Tag as Component;
-
-                            if (!node.Checked && FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
-                            {
-                                removedComponents.Add(component);
-                            }
-                            if (node.Checked && !FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
-                            {
-                                addedComponents.Add(component);
-                            }
-                        }
-                    });
+                    markedComponents.Add(node.Tag as Component);
                 }
-                if (FPM.OperateMode == 2)
-                {
-                    foreach (var component in FPM.ComponentTracker.ToUpdate)
-                    {
-                        if (FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
-                        {
-                            removedComponents.Add(component);
-                        }
+            });
 
-                        addedComponents.Add(component);
-                    }
-                }
+            byteTotal = FPM.SizeTracker.ToDownload;
 
-                byteTotal = removedComponents.Concat(addedComponents).Sum(item => item.Size);
-            }
-
-            foreach (var component in removedComponents)
-            {
-                workingComponent = component;
-
-                await Task.Run(RemoveComponents);
-
-                byteProgress += component.Size;
-            }
-
-            foreach (var component in addedComponents)
+            foreach (var component in markedComponents)
             {
                 workingComponent = component;
                 stream = await downloader.DownloadFileTaskAsync(component.URL);
@@ -148,10 +93,7 @@ namespace FlashpointInstaller
                     });
                 }
 
-                if (FPM.StartupMode != 2)
-                {
-                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
-                }
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
 
                 FinishOperation();
             }
@@ -181,15 +123,12 @@ namespace FlashpointInstaller
                     $"{FPM.GetFormattedBytes(e.ReceivedBytesSize)} of {FPM.GetFormattedBytes(e.TotalBytesToReceive)}";
             });
 
-            if (FPM.StartupMode != 2)
+            FPM.Main.Invoke((MethodInvoker)delegate
             {
-                FPM.Main.Invoke((MethodInvoker)delegate
-                {
-                    TaskbarManager.Instance.SetProgressValue(
-                        (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
-                    );
-                });
-            }
+                TaskbarManager.Instance.SetProgressValue(
+                    (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                );
+            });
         }
 
         private void OnDownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -206,7 +145,7 @@ namespace FlashpointInstaller
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
 
-                    string rootPath = FPM.OperateMode > 0 ? FPM.SourcePath : FPM.DestinationPath;
+                    string rootPath = FPM.DestinationPath;
                     string destPath = Path.Combine(rootPath, workingComponent.Path.Replace('/', '\\'));
                     string infoPath = Path.Combine(rootPath, "Components");
                     string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
@@ -253,15 +192,12 @@ namespace FlashpointInstaller
                                 $"{FPM.GetFormattedBytes(extractedSize)} of {FPM.GetFormattedBytes(totalSize)}";
                         });
 
-                        if (FPM.StartupMode != 2)
+                        FPM.Main.Invoke((MethodInvoker)delegate
                         {
-                            FPM.Main.Invoke((MethodInvoker)delegate
-                            {
-                                TaskbarManager.Instance.SetProgressValue(
-                                    (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
-                                );
-                            });
-                        }
+                            TaskbarManager.Instance.SetProgressValue(
+                                (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                            );
+                        });
                     }
 
                     if (cancelStatus != 0)
@@ -273,108 +209,63 @@ namespace FlashpointInstaller
             }
         }
 
-        private void RemoveComponents()
-        {
-            string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{workingComponent.ID}.txt");
-            string[] infoText = File.ReadAllLines(infoFile);
-
-            long removedFiles = 0;
-            long totalFiles = infoText.Length - 1;
-            long totalSize = workingComponent.Size;
-
-            for (int i = 1; i < infoText.Length; i++)
-            {
-                string filePath = Path.Combine(FPM.SourcePath, infoText[i]);
-                double removeProgress = removedFiles / totalFiles;
-                double totalProgress = (byteProgress + (removeProgress * totalSize)) / byteTotal;
-
-                ProgressMeasure.Invoke((MethodInvoker)delegate
-                {
-                    ProgressMeasure.Value = (int)((double)totalProgress * ProgressMeasure.Maximum);
-                });
-
-                ProgressLabel.Invoke((MethodInvoker)delegate
-                {
-                    ProgressLabel.Text =
-                        $"[{(int)((double)totalProgress * 100)}%] Removing component \"{workingComponent.Title}\"... " +
-                        $"{removedFiles} of {totalFiles} files";
-                });
-
-                if (FPM.StartupMode != 2)
-                {
-                    FPM.Main.Invoke((MethodInvoker)delegate
-                    {
-                        TaskbarManager.Instance.SetProgressValue(
-                            (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
-                        );
-                    });
-                }
-
-                FPM.DeleteFileAndDirectories(filePath);
-
-                removedFiles++;
-            }
-
-            FPM.DeleteFileAndDirectories(infoFile);
-        }
-
         private async void FinishOperation()
         {
-            if (FPM.OperateMode == 0)
+            await Task.Run(() =>
             {
-                await Task.Run(() =>
+                var shortcutPaths = new List<string>();
+
+                if (FPM.Main.ShortcutDesktop.Checked)
                 {
-                    var shortcutPaths = new List<string>();
+                    shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+                }
+                if (FPM.Main.ShortcutStartMenu.Checked)
+                {
+                    shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
+                }
 
-                    if (FPM.Main.ShortcutDesktop.Checked)
-                    {
-                        shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-                    }
-                    if (FPM.Main.ShortcutStartMenu.Checked)
-                    {
-                        shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
-                    }
+                foreach (string path in shortcutPaths)
+                {
+                    var shortcut = new IWshRuntimeLibrary.WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
+                    shortcut.TargetPath = Path.Combine(FPM.DestinationPath, "Launcher", "Flashpoint.exe");
+                    shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, "Launcher");
+                    shortcut.Description = "Shortcut to Flashpoint";
+                    shortcut.Save();
+                }
+            });
 
-                    foreach (string path in shortcutPaths)
-                    {
-                        var shortcut = new IWshRuntimeLibrary.WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
-                        shortcut.TargetPath = Path.Combine(FPM.DestinationPath, "Launcher", "Flashpoint.exe");
-                        shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, "Launcher");
-                        shortcut.Description = "Shortcut to Flashpoint";
-                        shortcut.Save();
-                    }
-                });
+            Hide();
+            FPM.Main.Hide();
 
-                Hide();
-                FPM.Main.Hide();
-
-                var finishWindow = new FinishOperation();
-                finishWindow.ShowDialog();
-            }
-
-            Close();
+            var finishWindow = new Finish();
+            finishWindow.ShowDialog();
         }
 
         private async void CancelButton_Click(object sender, EventArgs e)
         {
-            CancelButton.Enabled = false;
             cancelStatus = 1;
 
+            CancelButton.Enabled = false;
+            ProgressLabel.Invoke((MethodInvoker)delegate
+            {
+                ProgressLabel.Text = "Cancelling...";
+            });
+
             await Task.Run(() =>
-            { 
+            {
                 while (cancelStatus != 2) { }
 
                 if (Directory.Exists(FPM.DestinationPath)) Directory.Delete(FPM.DestinationPath, true);
             });
 
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
-            
+
             Close();
         }
 
         private void Operation_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (FPM.OperateMode != 0 && ModifierKeys == Keys.Alt) e.Cancel = true;
+            if (cancelStatus != 2) e.Cancel = true;
         }
     }
 }

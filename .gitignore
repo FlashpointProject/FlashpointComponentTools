@@ -2,6 +2,6 @@
 bin/
 obj/
 packages/
-FlashpointManager.csproj.user
+*.csproj.user
 FodyWeavers.xsd
 FodyWeavers.xml
