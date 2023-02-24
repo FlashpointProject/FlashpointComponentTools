@@ -162,7 +162,7 @@ namespace FlashpointInstaller
             }
 
             // Pointer to destination path textbox
-            private static string destinationPath = "";
+            private static string destinationPath = Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint");
             public static string DestinationPath
             {
                 get { return destinationPath; }
@@ -274,6 +274,30 @@ namespace FlashpointInstaller
             // Checks if specified Flashpoint destination path is valid
             public static bool VerifyDestinationPath(string path)
             {
+                bool alreadyExists = false;
+
+                IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
+                {
+                    if (node.Name != "component") return;
+
+                    if (File.Exists(Path.Combine(path, "Components", $"{new Component(node).ID}.txt")))
+                    {
+                        alreadyExists = true;
+                        return;
+                    }
+                });
+
+                if (alreadyExists)
+                {
+                    MessageBox.Show(
+                        "Flashpoint is already installed to this directory! " +
+                        "Choose a different folder or uninstall the existing copy first.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
+
+                    return false;
+                }
+
                 if (!Path.IsPathRooted(path))
                 {
                     MessageBox.Show(
@@ -313,13 +337,13 @@ namespace FlashpointInstaller
             }
 
             // Checks if any dependencies were not marked for download by the user, and marks them accordingly
-            public static void CheckDependencies(TreeView sourceTree)
+            public static void CheckDependencies()
             {
                 List<string> requiredDepends = new List<string>();
                 List<string> missingDepends  = new List<string>();
 
                 // First, fill out a list of dependencies
-                IterateList(sourceTree.Nodes, node =>
+                IterateList(Main.ComponentList.Nodes, node =>
                 {
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
@@ -328,7 +352,7 @@ namespace FlashpointInstaller
                 });
 
                 // Then make sure they're all marked for installation 
-                IterateList(sourceTree.Nodes, node =>
+                IterateList(Main.ComponentList.Nodes, node =>
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {

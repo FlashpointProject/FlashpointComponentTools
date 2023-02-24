@@ -34,7 +34,7 @@ namespace FlashpointInstaller
                 Environment.Exit(1);
             }
 
-            FPM.DestinationPath = Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint");
+            DestinationPath.Text = FPM.DestinationPath;
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -70,7 +70,7 @@ namespace FlashpointInstaller
                 long categorySize = 0;
                 FPM.IterateList(e.Node.Nodes, node =>
                 {
-                    if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
+                    if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
                         categorySize += (node.Tag as Component).Size;
                     }
@@ -102,7 +102,7 @@ namespace FlashpointInstaller
         {
             if (!FPM.VerifyDestinationPath(FPM.DestinationPath)) return;
 
-            FPM.CheckDependencies(ComponentList);
+            FPM.CheckDependencies();
 
             if (!FPM.RedistInstalled)
             {
