@@ -216,18 +216,18 @@ namespace FlashpointInstaller
             }
 
             // Calls the AddNodeToList method on every child of the specified XML node
-            public static void RecursiveAddToList(XmlNode sourceNode, TreeNodeCollection destNode, bool setCheckState)
+            public static void RecursiveAddToList(XmlNode sourceNode, TreeNodeCollection destNode)
             {
                 foreach (XmlNode node in sourceNode.ChildNodes)
                 {
-                    var listNode = AddNodeToList(node, destNode, setCheckState);
+                    var listNode = AddNodeToList(node, destNode);
 
-                    RecursiveAddToList(node, listNode.Nodes, setCheckState);
+                    RecursiveAddToList(node, listNode.Nodes);
                 }
             }
 
             // Formats an XML node as a TreeView node and adds it to the specified TreeView 
-            public static TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent, bool setCheckState)
+            public static TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent)
             {
                 TreeNode listNode = new TreeNode();
 
@@ -235,7 +235,7 @@ namespace FlashpointInstaller
                 // (I can use the dynamic type to prevent redundancy, but I noticed it makes the application load significantly slower)
                 if (child.Name == "component")
                 {
-                    Component component = new Component(child);
+                    var component = new Component(child);
 
                     listNode.Text = component.Title;
                     listNode.Name = component.ID;
@@ -249,7 +249,7 @@ namespace FlashpointInstaller
                 }
                 else if (child.Name == "category")
                 {
-                    Category category = new Category(child);
+                    var category = new Category(child);
 
                     listNode.Text = category.Title;
                     listNode.Name = category.ID;
@@ -266,7 +266,7 @@ namespace FlashpointInstaller
 
                 // Initialize checkbox
                 // (the Checked attribute needs to be explicitly set or else the checkbox won't appear)
-                listNode.Checked = setCheckState && child.Name == "component";
+                listNode.Checked = child.Name == "component";
 
                 return listNode;
             }
@@ -278,12 +278,11 @@ namespace FlashpointInstaller
 
                 IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
                 {
-                    if (node.Name != "component") return;
+                    if (alreadyExists || node.Name != "component") return;
 
                     if (File.Exists(Path.Combine(path, "Components", $"{new Component(node).ID}.txt")))
                     {
                         alreadyExists = true;
-                        return;
                     }
                 });
 
@@ -356,7 +355,7 @@ namespace FlashpointInstaller
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
-                        Component component = node.Tag as Component;
+                        var component = node.Tag as Component;
 
                         if (requiredDepends.Any(depend => depend == component.ID) && !node.Checked)
                         {

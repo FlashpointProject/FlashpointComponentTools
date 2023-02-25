@@ -93,8 +93,6 @@ namespace FlashpointInstaller
                     });
                 }
 
-                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
-
                 FinishOperation();
             }
         }
@@ -211,6 +209,8 @@ namespace FlashpointInstaller
 
         private async void FinishOperation()
         {
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
+
             await Task.Run(() =>
             {
                 var shortcutPaths = new List<string>();

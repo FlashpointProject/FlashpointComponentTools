@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -50,28 +49,20 @@ namespace FlashpointInstaller
 
             // Load config, or create if it doesn't exist
 
-            var config = new List<string>() {
-                Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..")), 
-                FPM.ListURL
-            };
-
             try
             {
                 var configReader = File.ReadAllLines(FPM.ConfigFile);
-                config[0] = configReader[0];
-                config[1] = configReader[1];
+                FPM.SourcePath = configReader[0];
+                FPM.ListURL    = configReader[1];
             }
             catch
             {
                 using (var configWriter = File.CreateText(FPM.ConfigFile))
                 {
-                    configWriter.WriteLine(config[0]);
-                    configWriter.WriteLine(config[1]);
+                    configWriter.WriteLine(FPM.SourcePath);
+                    configWriter.WriteLine(FPM.ListURL);
                 }
             }
-
-            FPM.SourcePath = config[0];
-            FPM.ListURL    = config[1];
 
             // Download and parse component list
 

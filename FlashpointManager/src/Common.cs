@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -175,18 +176,20 @@ namespace FlashpointInstaller
             public static XmlDocument XmlTree { get; set; }
 
             // Name of configuration file
-            public static string ConfigFile { get; } = "fpm.cfg";
+            public static string ConfigFile { get; set; } = "fpm.cfg";
             // Internet location of component list XML
             public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/development/components.xml";
             // Path to the local Flashpoint copy
-            public static string SourcePath { get; set; } = "";
+            public static string SourcePath { get; set; } = Debugger.IsAttached
+                ? Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint")
+                : Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ".."));
 
             // Flag to control how operation window will function
             // 0 is for adding/removing components
             // 1 is for updating components
             public static int OperateMode { get; set; } = 0;
 
-            // Flag to control whether the update tab is selected at launch
+            // Controls whether the update tab is selected at launch
             public static bool OpenUpdateTab { get; set; } = false;
 
             // Object for tracking numerous file size sums
@@ -238,18 +241,18 @@ namespace FlashpointInstaller
             }
 
             // Calls the AddNodeToList method on every child of the specified XML node
-            public static void RecursiveAddToList(XmlNode sourceNode, TreeNodeCollection destNode, bool setCheckState)
+            public static void RecursiveAddToList(XmlNode sourceNode, TreeNodeCollection destNode)
             {
                 foreach (XmlNode node in sourceNode.ChildNodes)
                 {
-                    var listNode = AddNodeToList(node, destNode, setCheckState);
+                    var listNode = AddNodeToList(node, destNode);
 
-                    RecursiveAddToList(node, listNode.Nodes, setCheckState);
+                    RecursiveAddToList(node, listNode.Nodes);
                 }
             }
 
             // Formats an XML node as a TreeView node and adds it to the specified TreeView 
-            public static TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent, bool setCheckState)
+            public static TreeNode AddNodeToList(XmlNode child, TreeNodeCollection parent)
             {
                 TreeNode listNode = new TreeNode();
 
@@ -257,7 +260,7 @@ namespace FlashpointInstaller
                 // (I can use the dynamic type to prevent redundancy, but I noticed it makes the application load significantly slower)
                 if (child.Name == "component")
                 {
-                    Component component = new Component(child);
+                    var component = new Component(child);
 
                     listNode.Text = component.Title;
                     listNode.Name = component.ID;
@@ -271,7 +274,7 @@ namespace FlashpointInstaller
                 }
                 else if (child.Name == "category")
                 {
-                    Category category = new Category(child);
+                    var category = new Category(child);
 
                     listNode.Text = category.Title;
                     listNode.Name = category.ID;
@@ -288,7 +291,7 @@ namespace FlashpointInstaller
 
                 // Initialize checkbox
                 // (the Checked attribute needs to be explicitly set or else the checkbox won't appear)
-                listNode.Checked = setCheckState && child.Name == "component";
+                listNode.Checked = false;
 
                 return listNode;
             }
@@ -299,19 +302,18 @@ namespace FlashpointInstaller
                 ComponentTracker.Downloaded.Clear();
                 ComponentTracker.ToUpdate.Clear();
 
-                IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
+                IterateList(Main.ComponentList.Nodes, node =>
                 {
-                    if (node.Name != "component") return;
-
-                    Component component = new Component(node);
-                    string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
-
-                    if (File.Exists(infoPath)) ComponentTracker.Downloaded.Add(component);
-
-                    if (updateLists)
+                    if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
-                        TreeNode[] nodes = Main.ComponentList.Nodes.Find(component.ID, true);
-                        if (nodes.Length > 0) nodes[0].Checked = File.Exists(infoPath);
+                        var component = node.Tag as Component;
+                        string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
+
+                        if (File.Exists(infoPath))
+                        {
+                            ComponentTracker.Downloaded.Add(component);
+                            if (updateLists) node.Checked = true;
+                        }
                     }
                 });
 
@@ -356,15 +358,14 @@ namespace FlashpointInstaller
 
                 IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
                 {
-                    if (node.Name != "component") return;
+                    if (isFlashpoint || node.Name != "component") return;
 
-                    Component component = new Component(node);
+                    var component = new Component(node);
                     string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
                     if (File.Exists(infoPath))
                     {
                         isFlashpoint = true;
-                        return;
                     }
                 });
 
@@ -391,7 +392,7 @@ namespace FlashpointInstaller
                 {
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
-                        Component component = node.Tag as Component;
+                        var component = node.Tag as Component;
                         string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
                         if (File.Exists(infoPath))
@@ -410,7 +411,7 @@ namespace FlashpointInstaller
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
-                        Component component = node.Tag as Component;
+                        var component = node.Tag as Component;
 
                         if (requiredDepends.Any(depend => depend == component.ID) && !node.Checked)
                         {
@@ -459,7 +460,7 @@ namespace FlashpointInstaller
                 {
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
-                        Component component = node.Tag as Component;
+                        var component = node.Tag as Component;
                         string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
                         size += File.Exists(infoPath)

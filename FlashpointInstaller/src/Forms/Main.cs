@@ -21,7 +21,7 @@ namespace FlashpointInstaller
 
             if (rootElements.Count > 0)
             {
-                FPM.RecursiveAddToList(rootElements[0], ComponentList.Nodes, true);
+                FPM.RecursiveAddToList(rootElements[0], ComponentList.Nodes);
             }
             else
             {

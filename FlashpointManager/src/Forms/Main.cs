@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +21,7 @@ namespace FlashpointInstaller
             {
                 if (rootElements.Count > 0)
                 {
-                    FPM.RecursiveAddToList(rootElements[0], ComponentList.Nodes, false);
+                    FPM.RecursiveAddToList(rootElements[0], ComponentList.Nodes);
                 }
                 else
                 {
