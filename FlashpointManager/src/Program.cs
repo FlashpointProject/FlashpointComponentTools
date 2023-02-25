@@ -48,7 +48,6 @@ namespace FlashpointInstaller
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Load config, or create if it doesn't exist
-
             try
             {
                 var configReader = File.ReadAllLines(FPM.ConfigFile);
@@ -65,7 +64,6 @@ namespace FlashpointInstaller
             }
 
             // Download and parse component list
-
             Stream listStream = null;
             Task.Run(async () => { listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL); }).Wait();
 
@@ -87,11 +85,22 @@ namespace FlashpointInstaller
             // Verify that the configured Flashpoint path is valid
             FPM.VerifySourcePath();
 
-            // Open update tab on startup if /update argument is passed
-            if (args.Length > 0 && args[0].ToLower() == "/update") FPM.OpenUpdateTab = true;
+            if (args.Length > 0)
+            {
+                // Open update tab on startup if /update argument is passed
+                if (args[0].ToLower() == "/update")
+                {
+                    FPM.OpenUpdateTab = true;
+                }
+                // Automatically download component if /download argument is passed
+                else if (args.Length > 1 && args[0].ToLower() == "/download")
+                {
+                    FPM.AutoDownload = args[1].ToLower();
+                }
+            }
 
             // Display the application window
-            Application.Run(new Main());
+            Application.Run(new Main() { Opacity = FPM.AutoDownload.Length > 0 ? 0 : 1 });
         }
     }
 }

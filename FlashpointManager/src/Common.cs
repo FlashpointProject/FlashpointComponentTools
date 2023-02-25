@@ -191,6 +191,8 @@ namespace FlashpointInstaller
 
             // Controls whether the update tab is selected at launch
             public static bool OpenUpdateTab { get; set; } = false;
+            // Controls which component (if any) will be automatically downloaded at launch
+            public static string AutoDownload { get; set; } = "";
 
             // Object for tracking numerous file size sums
             public static class SizeTracker

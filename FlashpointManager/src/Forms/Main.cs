@@ -37,6 +37,7 @@ namespace FlashpointInstaller
 
             FPM.SyncManager(true);
 
+            if (FPM.AutoDownload.Length == 0)
             {
                 long totalSizeChange = 0;
 
@@ -105,6 +106,18 @@ namespace FlashpointInstaller
                     UpdateButton.Enabled = true;
                     UpdateButton.Text += $" ({FPM.GetFormattedBytes(totalSizeChange)})";
                 }
+            }
+            else
+            {
+                var query = ComponentList.Nodes.Find(FPM.AutoDownload, true);
+
+                if (query.Length > 0 && !query[0].Checked)
+                {
+                    query[0].Checked = true;
+                    ChangeButton_Click(this, new EventArgs());
+                }
+
+                Environment.Exit(0);
             }
 
             if (FPM.OpenUpdateTab) TabControl.SelectTab(1);
