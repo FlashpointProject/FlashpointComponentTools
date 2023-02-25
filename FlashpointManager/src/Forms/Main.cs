@@ -181,7 +181,7 @@ namespace FlashpointInstaller
             await Task.Run(() => {
                 foreach (string file in Directory.GetFiles(FPM.SourcePath, "*", SearchOption.AllDirectories))
                 {
-                    try { File.Delete(file); } catch { }
+                    try { FPM.DeleteFileAndDirectories(file); } catch { }
                 }
 
                 var shortcutPaths = new string[]
@@ -200,13 +200,6 @@ namespace FlashpointInstaller
                 "Flashpoint has been uninstalled from your system.",
                 "Uninstallation Complete", MessageBoxButtons.OK, MessageBoxIcon.Information
             );
-
-            Process.Start(new ProcessStartInfo()
-            {
-                FileName = "cmd.exe",
-                Arguments = $"/k timeout /nobreak /t 3 >nul & rmdir /Q /S \"{FPM.SourcePath}\"",
-                WindowStyle = ProcessWindowStyle.Hidden
-            });
 
             Close();
         }

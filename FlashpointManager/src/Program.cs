@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,20 +19,51 @@ namespace FlashpointInstaller
         [STAThread]
         static void Main(string[] args)
         {
+            // Run app from temp folder if it isn't already
+            // This allows the executable to be deleted when updating the component or uninstalling Flashpoint
+            if (!Debugger.IsAttached)
+            {
+                string realPath = AppDomain.CurrentDomain.BaseDirectory;
+                string realFile = AppDomain.CurrentDomain.FriendlyName;
+                string tempPath = Path.GetTempPath();
+                string tempFile = $"69McIKvK_{realFile}";
+
+                if (realPath != tempPath && realFile != tempFile)
+                {
+                    File.Copy(realPath + realFile, tempPath + tempFile, true);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = tempPath + tempFile,
+                        Arguments = string.Join(" ", args),
+                        WorkingDirectory = realPath
+                    });
+                    Environment.Exit(0);
+                }
+                else if (tempPath.TrimEnd('\\') == Directory.GetCurrentDirectory())
+                {
+                    Environment.Exit(0);
+                }
+            }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var config = new List<string>() { Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..")), FPM.ListURL };
+            // Load config, or create if it doesn't exist
+
+            var config = new List<string>() {
+                Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..")), 
+                FPM.ListURL
+            };
 
             try
             {
-                var configReader = File.ReadAllLines("fpm.cfg");
+                var configReader = File.ReadAllLines(FPM.ConfigFile);
                 config[0] = configReader[0];
                 config[1] = configReader[1];
             }
             catch
             {
-                using (var configWriter = File.CreateText("fpm.cfg"))
+                using (var configWriter = File.CreateText(FPM.ConfigFile))
                 {
                     configWriter.WriteLine(config[0]);
                     configWriter.WriteLine(config[1]);
@@ -40,6 +72,8 @@ namespace FlashpointInstaller
 
             FPM.SourcePath = config[0];
             FPM.ListURL    = config[1];
+
+            // Download and parse component list
 
             Stream listStream = null;
             Task.Run(async () => { listStream = await new DownloadService().DownloadFileTaskAsync(FPM.ListURL); }).Wait();
@@ -59,10 +93,13 @@ namespace FlashpointInstaller
             FPM.XmlTree = new XmlDocument();
             FPM.XmlTree.Load(listStream);
 
+            // Verify that the configured Flashpoint path is valid
             FPM.VerifySourcePath();
 
+            // Open update tab on startup if /update argument is passed
             if (args.Length > 0 && args[0].ToLower() == "/update") FPM.OpenUpdateTab = true;
 
+            // Display the application window
             Application.Run(new Main());
         }
     }
