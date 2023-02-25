@@ -38,7 +38,7 @@ namespace FlashpointInstaller
 
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
 
-            if (FPM.OperateMode == 0)
+            if (!FPM.UpdateMode)
             {
                 FPM.IterateList(FPM.Main.ComponentList.Nodes, node =>
                 {
@@ -57,7 +57,7 @@ namespace FlashpointInstaller
                     }
                 });
             }
-            if (FPM.OperateMode == 1)
+            else
             {
                 foreach (var component in FPM.ComponentTracker.ToUpdate)
                 {
@@ -200,8 +200,11 @@ namespace FlashpointInstaller
             for (int i = 1; i < infoText.Length; i++)
             {
                 string filePath = Path.Combine(FPM.SourcePath, infoText[i]);
-                double removeProgress = removedFiles / totalFiles;
+                double removeProgress = (double)removedFiles / totalFiles;
                 double totalProgress = (byteProgress + (removeProgress * totalSize)) / byteTotal;
+
+                FPM.DeleteFileAndDirectories(filePath);
+                removedFiles++;
 
                 ProgressMeasure.Invoke((MethodInvoker)delegate
                 {
@@ -221,10 +224,6 @@ namespace FlashpointInstaller
                         (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
                     );
                 });
-
-                FPM.DeleteFileAndDirectories(filePath);
-
-                removedFiles++;
             }
 
             FPM.DeleteFileAndDirectories(infoFile);

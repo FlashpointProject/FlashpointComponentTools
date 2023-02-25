@@ -182,7 +182,7 @@
             // ComponentDescription
             // 
             this.ComponentDescription.Text = "Description";
-            this.ComponentDescription.Width = 277;
+            this.ComponentDescription.Width = 272;
             // 
             // ComponentUpdated
             // 
@@ -192,6 +192,7 @@
             // ComponentSize
             // 
             this.ComponentSize.Text = "Size";
+            this.ComponentSize.Width = 65;
             // 
             // RemoveTab
             // 

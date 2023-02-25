@@ -35,79 +35,9 @@ namespace FlashpointInstaller
                 }
             }
 
-            FPM.SyncManager(true);
+            FPM.SyncManager();
 
-            if (FPM.AutoDownload.Length == 0)
-            {
-                long totalSizeChange = 0;
-
-                void AddToQueue(Component component, long oldSize)
-                {
-                    long sizeChange = component.Size - oldSize;
-                    totalSizeChange += sizeChange;
-
-                    string displayedSize = FPM.GetFormattedBytes(sizeChange);
-                    if (displayedSize[0] != '-') displayedSize = "+" + displayedSize;
-
-                    var item = new ListViewItem();
-                    item.Text = component.Title;
-                    item.SubItems.Add(component.Description);
-                    item.SubItems.Add(component.LastUpdated);
-                    item.SubItems.Add(displayedSize);
-                    UpdateList.Items.Add(item);
-
-                    FPM.ComponentTracker.ToUpdate.Add(component);
-                }
-
-                FPM.IterateXML(FPM.XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
-                {
-                    if (node.Name != "component") return;
-
-                    var component = new Component(node);
-
-                    bool update = false;
-                    long oldSize = 0;
-
-                    if (FPM.ComponentTracker.Downloaded.Any(item => item.ID == component.ID))
-                    {
-                        string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{component.ID}.txt");
-                        string[] componentData = File.ReadLines(infoFile).First().Split(' ');
-
-                        update = componentData[0] != component.Hash;
-                        oldSize = long.Parse(componentData[1]);
-                    }
-                    else if (component.ID.StartsWith("required"))
-                    {
-                        update = true;
-                    }
-
-                    if (update)
-                    {
-                        AddToQueue(component, oldSize);
-
-                        foreach (string dependID in component.Depends)
-                        {
-                            if (!FPM.ComponentTracker.Downloaded.Any(item => item.ID == dependID))
-                            {
-                                FPM.IterateXML(FPM.XmlTree.GetElementsByTagName("list")[0].ChildNodes, node2 =>
-                                {
-                                    if (node2.Name != "component") return;
-
-                                    var component2 = new Component(node2);
-                                    if (component2.ID == dependID) AddToQueue(component2, 0);
-                                });
-                            }
-                        }
-                    }
-                });
-
-                if (FPM.ComponentTracker.ToUpdate.Count > 0)
-                {
-                    UpdateButton.Enabled = true;
-                    UpdateButton.Text += $" ({FPM.GetFormattedBytes(totalSizeChange)})";
-                }
-            }
-            else
+            if (FPM.AutoDownload.Length > 0)
             {
                 var query = ComponentList.Nodes.Find(FPM.AutoDownload, true);
 
@@ -166,9 +96,9 @@ namespace FlashpointInstaller
 
         private void ChangeButton_Click(object sender, EventArgs e)
         {
-            if (!FPM.CheckDependencies(ComponentList)) return;
+            if (!FPM.CheckDependencies()) return;
 
-            FPM.OperateMode = 0;
+            FPM.UpdateMode = false;
 
             var operationWindow = new Operate();
             operationWindow.ShowDialog();
@@ -178,12 +108,12 @@ namespace FlashpointInstaller
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            FPM.OperateMode = 1;
+            FPM.UpdateMode = true;
 
             var downloadWindow = new Operate();
             downloadWindow.ShowDialog();
 
-            FPM.SyncManager(true);
+            FPM.SyncManager();
         }
 
         private async void RemoveButton_Click(object sender, EventArgs e)

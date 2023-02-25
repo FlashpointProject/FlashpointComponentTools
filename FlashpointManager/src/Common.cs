@@ -184,11 +184,8 @@ namespace FlashpointInstaller
                 ? Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint")
                 : Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ".."));
 
-            // Flag to control how operation window will function
-            // 0 is for adding/removing components
-            // 1 is for updating components
-            public static int OperateMode { get; set; } = 0;
-
+            // Controls whether components are being updated instead of added or removed
+            public static bool UpdateMode { get; set; } = false;
             // Controls whether the update tab is selected at launch
             public static bool OpenUpdateTab { get; set; } = false;
             // Controls which component (if any) will be automatically downloaded at launch
@@ -266,13 +263,9 @@ namespace FlashpointInstaller
 
                     listNode.Text = component.Title;
                     listNode.Name = component.ID;
+                    listNode.Tag  = component;
 
-                    if (component.Required)
-                    {
-                        listNode.ForeColor = Color.FromArgb(255, 96, 96, 96);
-                    }
-
-                    listNode.Tag = component;
+                    if (component.Required) listNode.ForeColor = Color.FromArgb(255, 96, 96, 96);
                 }
                 else if (child.Name == "category")
                 {
@@ -280,26 +273,17 @@ namespace FlashpointInstaller
 
                     listNode.Text = category.Title;
                     listNode.Name = category.ID;
+                    listNode.Tag  = category;
 
-                    if (category.Required)
-                    {
-                        listNode.ForeColor = Color.FromArgb(255, 96, 96, 96);
-                    }
-
-                    listNode.Tag = category;
+                    if (category.Required) listNode.ForeColor = Color.FromArgb(255, 96, 96, 96);
                 }
 
                 parent.Add(listNode);
-
-                // Initialize checkbox
-                // (the Checked attribute needs to be explicitly set or else the checkbox won't appear)
-                listNode.Checked = false;
-
                 return listNode;
             }
 
-            // Refreshes tracker objects with up-to-date information
-            public static void SyncManager(bool updateLists = false)
+            // Refreshes component lists and tracker objects with up-to-date information
+            public static void SyncManager()
             {
                 ComponentTracker.Downloaded.Clear();
                 ComponentTracker.ToUpdate.Clear();
@@ -309,20 +293,86 @@ namespace FlashpointInstaller
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
                         var component = node.Tag as Component;
-                        string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
-                        if (File.Exists(infoPath))
+                        if (File.Exists(Path.Combine(SourcePath, "Components", $"{component.ID}.txt")))
                         {
                             ComponentTracker.Downloaded.Add(component);
-                            if (updateLists) node.Checked = true;
+                            node.Checked = true;
+                        }
+                        else
+                        {
+                            node.Checked = false;
                         }
                     }
                 });
 
-                if (updateLists)
+                Main.UpdateList.Items.Clear();
+                Main.UpdateButton.Text = "Install updates";
+
+                long totalSizeChange = 0;
+
+                void AddToQueue(Component component, long oldSize)
                 {
-                    Main.UpdateList.Items.Clear();
-                    Main.UpdateButton.Text = "Install updates";
+                    long sizeChange = component.Size - oldSize;
+                    totalSizeChange += sizeChange;
+
+                    string displayedSize = GetFormattedBytes(sizeChange);
+                    if (displayedSize[0] != '-') displayedSize = "+" + displayedSize;
+
+                    var item = new ListViewItem();
+                    item.Text = component.Title;
+                    item.SubItems.Add(component.Description);
+                    item.SubItems.Add(component.LastUpdated);
+                    item.SubItems.Add(displayedSize);
+                    Main.UpdateList.Items.Add(item);
+
+                    ComponentTracker.ToUpdate.Add(component);
+                }
+
+                IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
+                {
+                    if (node.Name != "component") return;
+
+                    var component = new Component(node);
+
+                    bool update = false;
+                    long oldSize = 0;
+
+                    if (ComponentTracker.Downloaded.Any(item => item.ID == component.ID))
+                    {
+                        string infoFile = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
+                        string[] componentData = File.ReadLines(infoFile).First().Split(' ');
+
+                        update = componentData[0] != component.Hash;
+                        oldSize = long.Parse(componentData[1]);
+                    }
+                    else if (component.ID.StartsWith("required"))
+                    {
+                        update = true;
+                    }
+
+                    if (update)
+                    {
+                        AddToQueue(component, oldSize);
+
+                        foreach (string dependID in component.Depends)
+                        {
+                            if (!ComponentTracker.Downloaded.Any(item => item.ID == dependID))
+                            {
+                                var query = Main.ComponentList.Nodes.Find(dependID, true);
+                                if (query.Length > 0) AddToQueue(query[0].Tag as Component, 0);
+                            }
+                        }
+                    }
+                });
+
+                if (ComponentTracker.ToUpdate.Count > 0)
+                {
+                    Main.UpdateButton.Enabled = true;
+                    Main.UpdateButton.Text += $" ({GetFormattedBytes(totalSizeChange)})";
+                }
+                else
+                {
                     Main.UpdateButton.Enabled = false;
                 }
 
@@ -339,11 +389,11 @@ namespace FlashpointInstaller
 
                     string folder = Path.GetDirectoryName(file);
 
-                    while (folder != SourcePath)
+                    while (folder != Directory.GetParent(SourcePath).ToString())
                     {
                         if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
                         {
-                            Directory.Delete(folder, false);
+                            Directory.Delete(folder);
                         }
                         else break;
 
@@ -383,14 +433,14 @@ namespace FlashpointInstaller
             }
 
             // Checks if any dependencies were not marked for download by the user, and marks them accordingly
-            public static bool CheckDependencies(TreeView sourceTree)
+            public static bool CheckDependencies()
             {
                 List<string> requiredDepends = new List<string>();
                 List<string> persistDepends  = new List<string>();
                 List<string> missingDepends  = new List<string>();
 
                 // First, fill out a list of dependencies
-                IterateList(sourceTree.Nodes, node =>
+                IterateList(Main.ComponentList.Nodes, node =>
                 {
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
@@ -409,7 +459,7 @@ namespace FlashpointInstaller
                 });
 
                 // Then make sure they're all marked for installation 
-                IterateList(sourceTree.Nodes, node =>
+                IterateList(Main.ComponentList.Nodes, node =>
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
