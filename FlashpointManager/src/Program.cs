@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -18,9 +19,9 @@ namespace FlashpointInstaller
         [STAThread]
         static void Main(string[] args)
         {
-            // Run app from temp folder if it isn't already
-            // This allows the executable to be deleted when updating the component or uninstalling Flashpoint
-            if (!Debugger.IsAttached)
+            // Run app from temp folder as long as /notemp argument isn't passed
+            // This allows the executable to be deleted when updating its component or uninstalling Flashpoint
+            if (!args.Any(v => v.ToLower() == "/notemp") && !Debugger.IsAttached)
             {
                 string realPath = AppDomain.CurrentDomain.BaseDirectory;
                 string realFile = AppDomain.CurrentDomain.FriendlyName;
@@ -88,14 +89,18 @@ namespace FlashpointInstaller
             if (args.Length > 0)
             {
                 // Open update tab on startup if /update argument is passed
-                if (args[0].ToLower() == "/update")
+                if (args.Any(v => v.ToLower() == "/update"))
                 {
                     FPM.OpenUpdateTab = true;
                 }
-                // Automatically download component if /download argument is passed
-                else if (args.Length > 1 && args[0].ToLower() == "/download")
+                else
                 {
-                    FPM.AutoDownload = args[1].ToLower();
+                    // Automatically download component if /download argument is passed
+                    int index = args.ToList().FindIndex(v => v.ToLower() == "/download");
+                    if (index >= 0 && index < args.Length - 1)
+                    {
+                        FPM.AutoDownload = args[index + 1].ToLower();
+                    }
                 }
             }
 
