@@ -37,7 +37,6 @@
             this.ChangeButton = new System.Windows.Forms.Button();
             this.DescriptionBox = new System.Windows.Forms.GroupBox();
             this.Description = new System.Windows.Forms.Label();
-            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.UpdateTab = new System.Windows.Forms.TabPage();
             this.UpdateButton = new System.Windows.Forms.Button();
             this.UpdateList = new System.Windows.Forms.ListView();
@@ -48,6 +47,7 @@
             this.RemoveTab = new System.Windows.Forms.TabPage();
             this.RemoveDescription = new System.Windows.Forms.Label();
             this.RemoveButton = new System.Windows.Forms.Button();
+            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
@@ -64,7 +64,7 @@
             this.TabControl.Location = new System.Drawing.Point(13, 10);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(600, 246);
+            this.TabControl.Size = new System.Drawing.Size(600, 240);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.TabControl.TabIndex = 5;
             // 
@@ -78,7 +78,7 @@
             this.ManageTab.Location = new System.Drawing.Point(4, 24);
             this.ManageTab.Name = "ManageTab";
             this.ManageTab.Padding = new System.Windows.Forms.Padding(3);
-            this.ManageTab.Size = new System.Drawing.Size(592, 218);
+            this.ManageTab.Size = new System.Drawing.Size(592, 212);
             this.ManageTab.TabIndex = 1;
             this.ManageTab.Text = "Add/Remove Components";
             this.ManageTab.UseVisualStyleBackColor = true;
@@ -102,7 +102,7 @@
             // ChangeButton
             // 
             this.ChangeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.ChangeButton.Location = new System.Drawing.Point(8, 182);
+            this.ChangeButton.Location = new System.Drawing.Point(8, 176);
             this.ChangeButton.Name = "ChangeButton";
             this.ChangeButton.Size = new System.Drawing.Size(574, 26);
             this.ChangeButton.TabIndex = 16;
@@ -113,7 +113,7 @@
             // DescriptionBox
             // 
             this.DescriptionBox.Controls.Add(this.Description);
-            this.DescriptionBox.Location = new System.Drawing.Point(410, 85);
+            this.DescriptionBox.Location = new System.Drawing.Point(410, 80);
             this.DescriptionBox.Name = "DescriptionBox";
             this.DescriptionBox.Padding = new System.Windows.Forms.Padding(10, 8, 10, 10);
             this.DescriptionBox.Size = new System.Drawing.Size(171, 85);
@@ -130,18 +130,6 @@
             this.Description.Size = new System.Drawing.Size(151, 54);
             this.Description.TabIndex = 0;
             // 
-            // ComponentList
-            // 
-            this.ComponentList.Indent = 20;
-            this.ComponentList.Location = new System.Drawing.Point(9, 12);
-            this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(391, 157);
-            this.ComponentList.TabIndex = 13;
-            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
-            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
-            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
-            // 
             // UpdateTab
             // 
             this.UpdateTab.Controls.Add(this.UpdateButton);
@@ -149,7 +137,7 @@
             this.UpdateTab.Location = new System.Drawing.Point(4, 24);
             this.UpdateTab.Name = "UpdateTab";
             this.UpdateTab.Padding = new System.Windows.Forms.Padding(3);
-            this.UpdateTab.Size = new System.Drawing.Size(592, 218);
+            this.UpdateTab.Size = new System.Drawing.Size(592, 212);
             this.UpdateTab.TabIndex = 3;
             this.UpdateTab.Text = "Update Components";
             this.UpdateTab.UseVisualStyleBackColor = true;
@@ -158,7 +146,7 @@
             // 
             this.UpdateButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.UpdateButton.Enabled = false;
-            this.UpdateButton.Location = new System.Drawing.Point(8, 182);
+            this.UpdateButton.Location = new System.Drawing.Point(8, 176);
             this.UpdateButton.Name = "UpdateButton";
             this.UpdateButton.Size = new System.Drawing.Size(574, 26);
             this.UpdateButton.TabIndex = 17;
@@ -180,7 +168,7 @@
             this.UpdateList.Location = new System.Drawing.Point(9, 12);
             this.UpdateList.MultiSelect = false;
             this.UpdateList.Name = "UpdateList";
-            this.UpdateList.Size = new System.Drawing.Size(572, 157);
+            this.UpdateList.Size = new System.Drawing.Size(572, 152);
             this.UpdateList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.UpdateList.TabIndex = 2;
             this.UpdateList.UseCompatibleStateImageBehavior = false;
@@ -213,14 +201,14 @@
             this.RemoveTab.Location = new System.Drawing.Point(4, 24);
             this.RemoveTab.Name = "RemoveTab";
             this.RemoveTab.Padding = new System.Windows.Forms.Padding(3);
-            this.RemoveTab.Size = new System.Drawing.Size(592, 218);
+            this.RemoveTab.Size = new System.Drawing.Size(592, 212);
             this.RemoveTab.TabIndex = 2;
             this.RemoveTab.Text = "Uninstall Flashpoint";
             this.RemoveTab.UseVisualStyleBackColor = true;
             // 
             // RemoveDescription
             // 
-            this.RemoveDescription.Location = new System.Drawing.Point(8, 60);
+            this.RemoveDescription.Location = new System.Drawing.Point(8, 50);
             this.RemoveDescription.Name = "RemoveDescription";
             this.RemoveDescription.Size = new System.Drawing.Size(574, 40);
             this.RemoveDescription.TabIndex = 20;
@@ -230,7 +218,7 @@
             // RemoveButton
             // 
             this.RemoveButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.RemoveButton.Location = new System.Drawing.Point(195, 119);
+            this.RemoveButton.Location = new System.Drawing.Point(195, 113);
             this.RemoveButton.Name = "RemoveButton";
             this.RemoveButton.Size = new System.Drawing.Size(200, 26);
             this.RemoveButton.TabIndex = 17;
@@ -238,11 +226,23 @@
             this.RemoveButton.UseVisualStyleBackColor = true;
             this.RemoveButton.Click += new System.EventHandler(this.RemoveButton_Click);
             // 
+            // ComponentList
+            // 
+            this.ComponentList.Indent = 20;
+            this.ComponentList.Location = new System.Drawing.Point(9, 12);
+            this.ComponentList.Name = "ComponentList";
+            this.ComponentList.Size = new System.Drawing.Size(391, 152);
+            this.ComponentList.TabIndex = 13;
+            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
+            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 267);
+            this.ClientSize = new System.Drawing.Size(624, 261);
             this.Controls.Add(this.TabControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
