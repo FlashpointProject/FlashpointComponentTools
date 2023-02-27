@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -100,7 +99,7 @@ namespace FlashpointInstaller
 
             FPM.UpdateMode = false;
 
-            var operationWindow = new Operate();
+            var operationWindow = new Operate() { TopMost = FPM.AutoDownload != "" };
             operationWindow.ShowDialog();
 
             FPM.SyncManager();

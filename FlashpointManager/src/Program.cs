@@ -105,7 +105,7 @@ namespace FlashpointInstaller
             }
 
             // Display the application window
-            Application.Run(new Main() { Opacity = FPM.AutoDownload.Length > 0 ? 0 : 1 });
+            Application.Run(new Main() { Opacity = FPM.AutoDownload == "" ? 1 : 0 });
         }
     }
 }

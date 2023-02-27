@@ -49,7 +49,7 @@
             this.ProgressLabel.TabIndex = 2;
             this.ProgressLabel.Text = "Preparing...";
             // 
-            // Operation
+            // Operate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -60,7 +60,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Operation";
+            this.Name = "Operate";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Modifying Flashpoint...";
