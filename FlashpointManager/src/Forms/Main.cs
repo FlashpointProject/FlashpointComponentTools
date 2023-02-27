@@ -43,6 +43,8 @@ namespace FlashpointInstaller
                 if (query.Length > 0 && !query[0].Checked)
                 {
                     query[0].Checked = true;
+                    FPM.CheckDependencies(false);
+
                     ChangeButton_Click(this, new EventArgs());
                 }
 

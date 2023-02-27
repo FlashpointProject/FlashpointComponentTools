@@ -433,7 +433,7 @@ namespace FlashpointInstaller
             }
 
             // Checks if any dependencies were not marked for download by the user, and marks them accordingly
-            public static bool CheckDependencies()
+            public static bool CheckDependencies(bool alertDepends = true)
             {
                 List<string> requiredDepends = new List<string>();
                 List<string> persistDepends  = new List<string>();
@@ -481,23 +481,26 @@ namespace FlashpointInstaller
                     }
                 });
 
-                if (persistDepends.Count > 0)
+                if (alertDepends)
                 {
-                    MessageBox.Show(
-                        "The following components cannot be removed because one or more components depend on them:\n\n" +
-                        string.Join(", ", persistDepends), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
+                    if (persistDepends.Count > 0)
+                    {
+                        MessageBox.Show(
+                            "The following components cannot be removed because one or more components depend on them:\n\n" +
+                            string.Join(", ", persistDepends), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                        );
 
-                    return false;
-                }
+                        return false;
+                    }
 
-                if (missingDepends.Count > 0)
-                {
-                    MessageBox.Show(
-                        "The following dependencies will also be installed:\n\n" +
-                        string.Join(", ", missingDepends) + "\n\nClick the OK button to proceed.",
-                        "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information
-                    );
+                    if (missingDepends.Count > 0)
+                    {
+                        MessageBox.Show(
+                            "The following dependencies will also be installed:\n\n" +
+                            string.Join(", ", missingDepends) + "\n\nClick the OK button to proceed.",
+                            "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information
+                        );
+                    }
                 }
 
                 return true;
