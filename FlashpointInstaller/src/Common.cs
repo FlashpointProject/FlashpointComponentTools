@@ -122,7 +122,7 @@ namespace FlashpointInstaller
 
                 Title = GetAttribute(node, "title", true);
                 Description = GetAttribute(node, "description", true);
-                Required = ID.StartsWith("core");
+                Required = ID.Split('-').FirstOrDefault() == "core";
             }
 
             protected static string GetAttribute(XmlNode node, string attribute, bool throwError)

@@ -144,7 +144,7 @@ namespace FlashpointInstaller
 
                 Title = GetAttribute(node, "title", true);
                 Description = GetAttribute(node, "description", true);
-                Required = ID.StartsWith("core");
+                Required = ID.Split('-').FirstOrDefault() == "core";
             }
 
             protected static string GetAttribute(XmlNode node, string attribute, bool throwError)
@@ -346,7 +346,7 @@ namespace FlashpointInstaller
                         update = componentData[0] != component.Hash;
                         oldSize = long.Parse(componentData[1]);
                     }
-                    else if (component.ID.StartsWith("core"))
+                    else if (component.Required)
                     {
                         update = true;
                     }
