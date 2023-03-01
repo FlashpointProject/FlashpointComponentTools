@@ -255,7 +255,7 @@ namespace FlashpointInstaller
             {
                 while (cancelStatus != 2) { }
 
-                if (Directory.Exists(FPM.DestinationPath)) Directory.Delete(FPM.DestinationPath, true);
+                try { Directory.Delete(FPM.DestinationPath, true); } catch { }
             });
 
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
