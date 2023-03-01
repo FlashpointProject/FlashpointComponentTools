@@ -346,7 +346,7 @@ namespace FlashpointInstaller
                         update = componentData[0] != component.Hash;
                         oldSize = long.Parse(componentData[1]);
                     }
-                    else if (component.ID.StartsWith("required"))
+                    else if (component.ID.StartsWith("core"))
                     {
                         update = true;
                     }
@@ -383,24 +383,20 @@ namespace FlashpointInstaller
             // Deletes a file as well as any directories made empty by its deletion
             public static void DeleteFileAndDirectories(string file)
             {
-                try
+                try { File.Delete(file); } catch { }
+
+                string folder = Path.GetDirectoryName(file);
+
+                while (folder != Directory.GetParent(SourcePath).ToString())
                 {
-                    if (File.Exists(file)) File.Delete(file);
-
-                    string folder = Path.GetDirectoryName(file);
-
-                    while (folder != Directory.GetParent(SourcePath).ToString())
+                    if (Directory.Exists(folder) && !Directory.EnumerateFiles(folder).Any())
                     {
-                        if (Directory.Exists(folder) && !Directory.EnumerateFileSystemEntries(folder).Any())
-                        {
-                            Directory.Delete(folder);
-                        }
-                        else break;
-
-                        folder = Directory.GetParent(folder).ToString();
+                        try { Directory.Delete(folder, true); } catch { }
                     }
+                    else break;
+
+                    folder = Directory.GetParent(folder).ToString();
                 }
-                catch { }
             }
 
             // Checks if specified Flashpoint source path is valid

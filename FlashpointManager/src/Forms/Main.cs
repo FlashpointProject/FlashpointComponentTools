@@ -103,18 +103,16 @@ namespace FlashpointInstaller
 
             var operationWindow = new Operate() { TopMost = FPM.AutoDownload != "" };
             operationWindow.ShowDialog();
-
-            FPM.SyncManager();
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
+            FPM.CheckDependencies();
+
             FPM.UpdateMode = true;
 
             var downloadWindow = new Operate();
             downloadWindow.ShowDialog();
-
-            FPM.SyncManager();
         }
 
         private async void RemoveButton_Click(object sender, EventArgs e)
@@ -122,7 +120,7 @@ namespace FlashpointInstaller
             TabControl.Enabled = false;
 
             await Task.Run(() => {
-                foreach (string file in Directory.GetFiles(FPM.SourcePath, "*", SearchOption.AllDirectories))
+                foreach (string file in Directory.EnumerateFileSystemEntries(FPM.SourcePath, "*", SearchOption.AllDirectories))
                 {
                     try { FPM.DeleteFileAndDirectories(file); } catch { }
                 }

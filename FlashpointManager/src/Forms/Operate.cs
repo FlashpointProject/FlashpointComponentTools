@@ -30,6 +30,8 @@ namespace FlashpointInstaller
         long byteProgress = 0;
         long byteTotal = 0;
 
+        int cancelStatus = 0;
+
         public Operate() => InitializeComponent();
 
         private async void Operation_Load(object sender, EventArgs e)
@@ -37,6 +39,7 @@ namespace FlashpointInstaller
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
 
             downloader.DownloadProgressChanged += OnDownloadProgressChanged;
+            downloader.DownloadFileCompleted   += OnDownloadFileCompleted;
 
             if (!FPM.UpdateMode)
             {
@@ -72,6 +75,21 @@ namespace FlashpointInstaller
 
             byteTotal = removedComponents.Concat(addedComponents).Sum(item => item.Size);
 
+            foreach (var component in addedComponents)
+            {
+                workingComponent = component;
+                stream = await downloader.DownloadFileTaskAsync(component.URL);
+
+                if (cancelStatus != 0) return;
+
+                await Task.Run(ExtractComponents);
+
+                byteProgress += component.Size;
+            }
+
+            if (cancelStatus != 0) return;
+            CancelButton.Enabled = false;
+
             foreach (var component in removedComponents)
             {
                 workingComponent = component;
@@ -81,23 +99,33 @@ namespace FlashpointInstaller
                 byteProgress += component.Size;
             }
 
+            ProgressLabel.Text = "[100%] Finishing up...";
+
             foreach (var component in addedComponents)
             {
                 workingComponent = component;
-                stream = await downloader.DownloadFileTaskAsync(component.URL);
 
-                await Task.Run(ExtractComponents);
-
-                byteProgress += component.Size;
+                await Task.Run(ApplyComponents);
             }
+
+            await Task.Run(DeleteTempDirectory);
 
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
 
+            if (FPM.AutoDownload == "") FPM.SyncManager();
+
+            cancelStatus = 2;
             Close();
         }
 
         private void OnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (cancelStatus != 0)
+            {
+                downloader.CancelAsync();
+                return;
+            }
+
             double currentProgress = (double)e.ReceivedBytesSize / e.TotalBytesToReceive;
             long currentSize = workingComponent.Size;
             double totalProgress = (byteProgress + (currentProgress / 2 * currentSize)) / byteTotal;
@@ -122,6 +150,11 @@ namespace FlashpointInstaller
             });
         }
 
+        private void OnDownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            if (e.Cancelled) cancelStatus = 2;
+        }
+
         private void ExtractComponents()
         {
             using (archive = ZipArchive.Open(stream))
@@ -131,8 +164,8 @@ namespace FlashpointInstaller
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
 
-                    string destPath = Path.Combine(FPM.SourcePath, workingComponent.Path.Replace('/', '\\'));
-                    string infoPath = Path.Combine(FPM.SourcePath, "Components");
+                    string destPath = Path.Combine(FPM.SourcePath, "Temp", workingComponent.Path.Replace('/', '\\'));
+                    string infoPath = Path.Combine(FPM.SourcePath, "Temp", "Components");
                     string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
 
                     Directory.CreateDirectory(infoPath);
@@ -144,7 +177,7 @@ namespace FlashpointInstaller
                         writer.WriteLine(string.Join(" ", header));
                     }
 
-                    while (reader.MoveToNextEntry())
+                    while (cancelStatus == 0 && reader.MoveToNextEntry())
                     {
                         if (reader.Entry.IsDirectory) continue;
 
@@ -184,6 +217,12 @@ namespace FlashpointInstaller
                             );
                         });
                     }
+
+                    if (cancelStatus != 0)
+                    {
+                        reader.Cancel();
+                        cancelStatus = 2;
+                    }
                 }
             }
         }
@@ -191,15 +230,15 @@ namespace FlashpointInstaller
         private void RemoveComponents()
         {
             string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{workingComponent.ID}.txt");
-            string[] infoText = File.ReadAllLines(infoFile);
+            string[] infoText = File.ReadLines(infoFile).Skip(1).ToArray();
 
             long removedFiles = 0;
             long totalFiles = infoText.Length - 1;
             long totalSize = workingComponent.Size;
 
-            for (int i = 1; i < infoText.Length; i++)
+            foreach (string file in infoText)
             {
-                string filePath = Path.Combine(FPM.SourcePath, infoText[i]);
+                string filePath = Path.Combine(FPM.SourcePath, file);
                 double removeProgress = (double)removedFiles / totalFiles;
                 double totalProgress = (byteProgress + (removeProgress * totalSize)) / byteTotal;
 
@@ -213,9 +252,11 @@ namespace FlashpointInstaller
 
                 ProgressLabel.Invoke((MethodInvoker)delegate
                 {
-                    ProgressLabel.Text =
-                        $"[{(int)((double)totalProgress * 100)}%] Removing component \"{workingComponent.Title}\"... " +
-                        $"{removedFiles} of {totalFiles} files";
+                    string text = FPM.ComponentTracker.ToUpdate.Exists(c => c.ID == workingComponent.ID)
+                        ? $"Removing old version of component \"{workingComponent.Title}\"..."
+                        : $"Removing component \"{workingComponent.Title}\"...";
+
+                    ProgressLabel.Text = $"[{(int)((double)totalProgress * 100)}%] {text} {removedFiles} of {totalFiles} files";
                 });
 
                 FPM.Main.Invoke((MethodInvoker)delegate
@@ -227,6 +268,67 @@ namespace FlashpointInstaller
             }
 
             FPM.DeleteFileAndDirectories(infoFile);
+        }
+
+        private void ApplyComponents()
+        {
+            string tempPath = Path.Combine(FPM.SourcePath, "Temp");
+            string tempInfoFile = Path.Combine(tempPath, "Components", $"{workingComponent.ID}.txt");
+            string[] infoText = File.ReadLines(tempInfoFile).Skip(1).ToArray();
+
+            foreach (string file in infoText)
+            {
+                string tempFile = Path.Combine(FPM.SourcePath, "Temp", file);
+                string destFile = Path.Combine(FPM.SourcePath, file);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(destFile));
+                try { File.Move(tempFile, destFile); } catch { }
+            }
+
+            string destInfoFile = Path.Combine(FPM.SourcePath, "Components", $"{workingComponent.ID}.txt");
+            try { File.Move(tempInfoFile, destInfoFile); } catch { }
+        }
+
+        public static void DeleteTempDirectory()
+        {
+            string tempPath = Path.Combine(FPM.SourcePath, "Temp");
+
+            if (Directory.Exists(tempPath))
+            {
+                foreach (string tempFile in Directory.EnumerateFiles(tempPath))
+                {
+                    try { File.Delete(tempFile); } catch { }
+                }
+
+                try { Directory.Delete(tempPath, true); } catch { }
+            }
+        }
+
+        private async void CancelButton_Click(object sender, EventArgs e)
+        {
+            cancelStatus = 1;
+
+            CancelButton.Enabled = false;
+            ProgressLabel.Invoke((MethodInvoker)delegate
+            {
+                ProgressLabel.Text = "Cancelling...";
+            });
+
+            await Task.Run(() =>
+            {
+                while (cancelStatus != 2) { }
+
+                DeleteTempDirectory();
+            });
+
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
+
+            Close();
+        }
+
+        private void Operation_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (cancelStatus != 2) e.Cancel = true;
         }
     }
 }
