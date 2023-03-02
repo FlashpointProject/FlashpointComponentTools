@@ -394,18 +394,16 @@ namespace FlashpointInstaller
             // Formats bytes as a human-readable string
             public static string GetFormattedBytes(long bytes)
             {
-                if (Math.Abs(bytes) >= 1000000000)
+                string[] units = new[] { " bytes", "KB", "MB", "GB" };
+                int i = units.Length;
+
+                while (--i >= 0)
                 {
-                    return (Math.Truncate((double)bytes / 100000000) / 10).ToString("N1") + "GB";
+                    double unitSize = Math.Pow(1024, i);
+                    if (bytes >= unitSize) return (Math.Floor(bytes / unitSize * 10) / 10).ToString("N1") + units[i];
                 }
-                else if (Math.Abs(bytes) >= 1000000)
-                {
-                    return (Math.Truncate((double)bytes / 100000) / 10).ToString("N1") + "MB";
-                }
-                else
-                {
-                    return (Math.Truncate((double)bytes / 100) / 10).ToString("N1") + "KB";
-                }
+
+                return "0 bytes";
             }
         }
     }
