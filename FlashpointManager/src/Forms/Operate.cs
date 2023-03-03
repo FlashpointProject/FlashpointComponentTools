@@ -78,7 +78,7 @@ namespace FlashpointInstaller
             foreach (var component in addedComponents)
             {
                 workingComponent = component;
-                stream = await downloader.DownloadFileTaskAsync(component.URL);
+                if (component.Size > 0) stream = await downloader.DownloadFileTaskAsync(component.URL);
 
                 if (cancelStatus != 0) return;
 
@@ -157,6 +157,22 @@ namespace FlashpointInstaller
 
         private void ExtractComponents()
         {
+            string rootPath = Path.Combine(FPM.SourcePath, "Temp");
+            string infoPath = Path.Combine(rootPath, "Components");
+            string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
+
+            Directory.CreateDirectory(infoPath);
+
+            using (TextWriter writer = File.CreateText(infoFile))
+            {
+                string[] header = new List<string>
+                    { workingComponent.Hash, $"{workingComponent.Size}" }.Concat(workingComponent.Depends).ToArray();
+
+                writer.WriteLine(string.Join(" ", header));
+            }
+
+            if (workingComponent.Size == 0) return;
+
             using (archive = ZipArchive.Open(stream))
             {
                 using (reader = archive.ExtractAllEntries())
@@ -164,18 +180,7 @@ namespace FlashpointInstaller
                     long extractedSize = 0;
                     long totalSize = archive.TotalUncompressSize;
 
-                    string destPath = Path.Combine(FPM.SourcePath, "Temp", workingComponent.Path.Replace('/', '\\'));
-                    string infoPath = Path.Combine(FPM.SourcePath, "Temp", "Components");
-                    string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
-
-                    Directory.CreateDirectory(infoPath);
-
-                    using (TextWriter writer = File.CreateText(infoFile))
-                    {
-                        string[] header = new[] { workingComponent.Hash, workingComponent.Size.ToString() }.ToArray();
-
-                        writer.WriteLine(string.Join(" ", header));
-                    }
+                    string destPath = Path.Combine(rootPath, workingComponent.Path.Replace('/', '\\'));
 
                     while (cancelStatus == 0 && reader.MoveToNextEntry())
                     {
