@@ -62,13 +62,10 @@ namespace FlashpointInstaller
 
                 // Size
 
-                long size;
+                long size = 0;
+                string stringSize = GetAttribute(node, "install-size", false);
 
-                if (long.TryParse(GetAttribute(node, "install-size", true), out size))
-                {
-                    Size = size;
-                }
-                else
+                if (stringSize != "" && !long.TryParse(stringSize, out size))
                 {
                     MessageBox.Show(
                         "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
@@ -78,6 +75,8 @@ namespace FlashpointInstaller
 
                     Environment.Exit(1);
                 }
+
+                Size = size;
 
                 // Path
 
