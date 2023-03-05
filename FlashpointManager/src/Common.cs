@@ -21,6 +21,9 @@ namespace FlashpointInstaller
             public string Path { get; set; }
             public string[] Depends { get; set; } = new string[] { };
 
+            public string InfoFile { get => System.IO.Path.Combine(FPM.SourcePath, "Components", $"{ID}.txt"); }
+            public bool Downloaded { get => File.Exists(InfoFile); }
+
             public Component(XmlNode node) : base(node)
             {
                 // URL
@@ -293,7 +296,7 @@ namespace FlashpointInstaller
                     {
                         var component = node.Tag as Component;
 
-                        if (File.Exists(Path.Combine(SourcePath, "Components", $"{component.ID}.txt")))
+                        if (component.Downloaded)
                         {
                             ComponentTracker.Downloaded.Add(component);
                             node.Checked = true;
@@ -339,8 +342,7 @@ namespace FlashpointInstaller
 
                     if (ComponentTracker.Downloaded.Any(item => item.ID == component.ID))
                     {
-                        string infoFile = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
-                        string[] componentData = File.ReadLines(infoFile).First().Split(' ');
+                        string[] componentData = File.ReadLines(component.InfoFile).First().Split(' ');
 
                         update = componentData[0] != component.Hash;
                         oldSize = long.Parse(componentData[1]);
@@ -407,10 +409,7 @@ namespace FlashpointInstaller
                 {
                     if (isFlashpoint || node.Name != "component") return;
 
-                    var component = new Component(node);
-                    string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
-
-                    if (File.Exists(infoPath))
+                    if (new Component(node).Downloaded)
                     {
                         isFlashpoint = true;
                     }
@@ -440,15 +439,14 @@ namespace FlashpointInstaller
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
                         var component = node.Tag as Component;
-                        string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
-
-                        if (File.Exists(infoPath))
+                        
+                        if (component.Downloaded)
                         {
-                            requiredDepends.AddRange(File.ReadLines(infoPath).First().Split(' ').Skip(2).ToArray());
+                            requiredDepends.AddRange(File.ReadLines(component.InfoFile).First().Split(' ').Skip(2).ToArray());
                         }
                         else
                         {
-                            requiredDepends.AddRange((node.Tag as Component).Depends);
+                            requiredDepends.AddRange(component.Depends);
                         }
                     }
                 });
@@ -511,10 +509,9 @@ namespace FlashpointInstaller
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
                         var component = node.Tag as Component;
-                        string infoPath = Path.Combine(SourcePath, "Components", $"{component.ID}.txt");
 
-                        size += File.Exists(infoPath)
-                            ? long.Parse(File.ReadLines(infoPath).First().Split(' ')[1])
+                        size += component.Downloaded
+                            ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
                             : component.Size;
                     }
                 });

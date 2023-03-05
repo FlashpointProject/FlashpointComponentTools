@@ -234,8 +234,7 @@ namespace FlashpointInstaller
 
         private void RemoveComponents()
         {
-            string infoFile = Path.Combine(FPM.SourcePath, "Components", $"{workingComponent.ID}.txt");
-            string[] infoText = File.ReadLines(infoFile).Skip(1).ToArray();
+            string[] infoText = File.ReadLines(workingComponent.InfoFile).Skip(1).ToArray();
 
             long removedFiles = 0;
             long totalFiles = infoText.Length - 1;
@@ -272,7 +271,7 @@ namespace FlashpointInstaller
                 });
             }
 
-            FPM.DeleteFileAndDirectories(infoFile);
+            FPM.DeleteFileAndDirectories(workingComponent.InfoFile);
         }
 
         private void ApplyComponents()
@@ -290,8 +289,7 @@ namespace FlashpointInstaller
                 try { File.Move(tempFile, destFile); } catch { }
             }
 
-            string destInfoFile = Path.Combine(FPM.SourcePath, "Components", $"{workingComponent.ID}.txt");
-            try { File.Move(tempInfoFile, destInfoFile); } catch { }
+            try { File.Move(tempInfoFile, workingComponent.InfoFile); } catch { }
         }
 
         public static void DeleteTempDirectory()
