@@ -73,7 +73,7 @@ namespace FlashpointInstaller
                 }
             }
 
-            byteTotal = removedComponents.Concat(addedComponents).Sum(item => item.Size);
+            byteTotal = removedComponents.Concat(addedComponents).Sum(c => c.Size);
 
             foreach (var component in addedComponents)
             {

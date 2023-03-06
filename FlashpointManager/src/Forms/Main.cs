@@ -74,7 +74,7 @@ namespace FlashpointInstaller
 
                 var component = node.Tag as Component;
 
-                size += component.Downloaded
+                size += FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID)
                     ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
                     : component.Size;
             });
@@ -122,8 +122,6 @@ namespace FlashpointInstaller
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            FPM.CheckDependencies();
-
             FPM.UpdateMode = true;
 
             var downloadWindow = new Operate();

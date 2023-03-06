@@ -297,10 +297,48 @@ namespace FlashpointInstaller
 
                 DownloadedSize = ComponentTracker.Downloaded.Sum(c => long.Parse(File.ReadLines(c.InfoFile).First().Split(' ')[1]));
 
+                IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
+                {
+                    if (node.Name != "component") return;
+
+                    var component = new Component(node);
+                    bool update = false;
+
+                    if (ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
+                    {
+                        string localHash = File.ReadLines(component.InfoFile).First().Split(' ')[0];
+                        update = localHash != component.Hash;
+                    }
+                    else if (component.Required)
+                    {
+                        update = true;
+                    }
+
+                    if (update)
+                    {
+                        ComponentTracker.Outdated.Add(component);
+
+                        foreach (string dependID in component.Depends)
+                        {
+                            if (!ComponentTracker.Downloaded.Exists(c => c.ID == dependID))
+                            {
+                                var query = Main.ComponentList.Nodes.Find(dependID, true);
+                                if (query.Length > 0) ComponentTracker.Outdated.Add(query[0].Tag as Component);
+                            }
+                        }
+                    }
+                });
+
+                ComponentTracker.Outdated = ComponentTracker.Outdated.Distinct().ToList();
+
                 long totalSizeChange = 0;
 
-                void AddToQueue(Component component, long oldSize)
+                foreach (var component in ComponentTracker.Outdated)
                 {
+                    long oldSize = ComponentTracker.Downloaded.Exists(c => c.ID == component.ID)
+                        ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
+                        : 0;
+
                     long sizeChange = component.Size - oldSize;
                     totalSizeChange += sizeChange;
 
@@ -314,44 +352,7 @@ namespace FlashpointInstaller
                     item.SubItems.Add(displayedSize);
 
                     Main.UpdateList.Items.Add(item);
-                    ComponentTracker.Outdated.Add(component);
                 }
-
-                IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
-                {
-                    if (node.Name != "component") return;
-
-                    var component = new Component(node);
-
-                    bool update = false;
-                    long oldSize = 0;
-
-                    if (ComponentTracker.Downloaded.Any(item => item.ID == component.ID))
-                    {
-                        string[] componentData = File.ReadLines(component.InfoFile).First().Split(' ');
-
-                        update = componentData[0] != component.Hash;
-                        oldSize = long.Parse(componentData[1]);
-                    }
-                    else if (component.Required)
-                    {
-                        update = true;
-                    }
-
-                    if (update)
-                    {
-                        AddToQueue(component, oldSize);
-
-                        foreach (string dependID in component.Depends)
-                        {
-                            if (!ComponentTracker.Downloaded.Any(item => item.ID == dependID))
-                            {
-                                var query = Main.ComponentList.Nodes.Find(dependID, true);
-                                if (query.Length > 0) AddToQueue(query[0].Tag as Component, 0);
-                            }
-                        }
-                    }
-                });
 
                 Main.ChangeButton.Text = $"Apply changes";
                 Main.ChangeButton.Enabled = false;
@@ -428,7 +429,7 @@ namespace FlashpointInstaller
                     {
                         var component = node.Tag as Component;
                         
-                        if (component.Downloaded)
+                        if (ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
                         {
                             requiredDepends.AddRange(File.ReadLines(component.InfoFile).First().Split(' ').Skip(2).ToArray());
                         }
@@ -450,7 +451,7 @@ namespace FlashpointInstaller
                         {
                             node.Checked = true;
 
-                            if (ComponentTracker.Downloaded.Any(depend => depend.ID == component.ID))
+                            if (ComponentTracker.Downloaded.Exists(depend => depend.ID == component.ID))
                             {
                                 persistDepends.Add(component.Title);
                             }
