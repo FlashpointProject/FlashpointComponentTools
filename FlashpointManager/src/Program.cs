@@ -96,16 +96,21 @@ namespace FlashpointInstaller
                 else
                 {
                     // Automatically download component if /download argument is passed
-                    int index = args.ToList().FindIndex(v => v.ToLower() == "/download");
-                    if (index >= 0 && index < args.Length - 1)
+                    var argsList = args.ToList();
+                    int first = argsList.FindIndex(v => v.ToLower() == "/download");
+
+                    if (first > -1 && first < argsList.Count - 1)
                     {
-                        FPM.AutoDownload = args[index + 1].ToLower();
+                        int last = argsList.FindIndex(first + 1, v => v.StartsWith("/"));
+                        if (last == -1) last = argsList.Count;
+
+                        FPM.AutoDownload.AddRange(argsList.Skip(first + 1).Take(last - first - 1));
                     }
                 }
             }
 
             // Display the application window
-            Application.Run(new Main() { Opacity = FPM.AutoDownload == "" ? 1 : 0 });
+            Application.Run(new Main() { Opacity = FPM.AutoDownload.Count == 0 ? 1 : 0 });
         }
     }
 }

@@ -190,8 +190,8 @@ namespace FlashpointInstaller
             public static bool UpdateMode { get; set; } = false;
             // Controls whether the update tab is selected at launch
             public static bool OpenUpdateTab { get; set; } = false;
-            // Controls which component (if any) will be automatically downloaded at launch
-            public static string AutoDownload { get; set; } = "";
+            // Controls components that will be automatically downloaded at launch
+            public static List<string> AutoDownload { get; set; } = new List<string>();
 
             // Total size of every downloaded component; managed by SyncManager() function
             public static long DownloadedSize { get; set; } = 0;

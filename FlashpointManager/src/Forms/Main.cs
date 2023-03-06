@@ -37,17 +37,16 @@ namespace FlashpointInstaller
 
             FPM.SyncManager();
 
-            if (FPM.AutoDownload.Length > 0)
+            if (FPM.AutoDownload.Count > 0)
             {
-                var query = ComponentList.Nodes.Find(FPM.AutoDownload, true);
-
-                if (query.Length > 0 && !query[0].Checked)
+                foreach (string id in FPM.AutoDownload)
                 {
-                    query[0].Checked = true;
-                    FPM.CheckDependencies(false);
-
-                    ChangeButton_Click(this, new EventArgs());
+                    var query = ComponentList.Nodes.Find(id, true);
+                    if (query.Length > 0) query[0].Checked = true;
                 }
+
+                FPM.CheckDependencies(false);
+                ChangeButton_Click(this, new EventArgs());
 
                 Environment.Exit(0);
             }
@@ -116,7 +115,7 @@ namespace FlashpointInstaller
 
             FPM.UpdateMode = false;
 
-            var operationWindow = new Operate() { TopMost = FPM.AutoDownload != "" };
+            var operationWindow = new Operate() { TopMost = FPM.AutoDownload.Count > 0 };
             operationWindow.ShowDialog();
         }
 

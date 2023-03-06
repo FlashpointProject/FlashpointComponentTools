@@ -112,7 +112,7 @@ namespace FlashpointInstaller
 
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
 
-            if (FPM.AutoDownload == "") FPM.SyncManager();
+            if (FPM.AutoDownload.Count == 0) FPM.SyncManager();
 
             cancelStatus = 2;
             Close();
