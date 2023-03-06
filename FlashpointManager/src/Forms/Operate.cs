@@ -237,7 +237,7 @@ namespace FlashpointInstaller
             string[] infoText = File.ReadLines(workingComponent.InfoFile).Skip(1).ToArray();
 
             long removedFiles = 0;
-            long totalFiles = infoText.Length - 1;
+            long totalFiles = infoText.Length;
             long totalSize = workingComponent.Size;
 
             foreach (string file in infoText)
