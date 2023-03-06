@@ -193,30 +193,16 @@ namespace FlashpointInstaller
             // Controls which component (if any) will be automatically downloaded at launch
             public static string AutoDownload { get; set; } = "";
 
-            // Object for tracking numerous file size sums
-            public static class SizeTracker
-            {
-                // Tracks total size of components available locally
-                public static long Downloaded { get; set; }
-                // Tracks size difference from checking/unchecking components in the manager tab
-                private static long toChange;
-                public static long ToChange
-                {
-                    get => toChange;
-                    set {
-                        toChange = value;
-                        Main.ChangeButton.Text = $"Apply changes ({GetFormattedBytes(toChange - Downloaded)})";
-                    }
-                }
-            }
+            // Total size of every downloaded component; managed by SyncManager() function
+            public static long DownloadedSize { get; set; } = 0;
 
-            // Object for tracking information about certain groups of components
+            // Object providing easy access to certain groups of components; managed by SyncManager() function
             public static class ComponentTracker
             {
-                // Information about components that are available locally
+                // Returns all downloaded components
                 public static List<Component> Downloaded { get; set; } = new List<Component>();
-                // Information about components that are to be updated or added through the updater
-                public static List<Component> ToUpdate   { get; set; } = new List<Component>();
+                // Returns all outdated components
+                public static List<Component> Outdated   { get; set; } = new List<Component>();
             }
 
             // Performs an operation on every node in the specified TreeNodeCollection
@@ -288,7 +274,8 @@ namespace FlashpointInstaller
             public static void SyncManager()
             {
                 ComponentTracker.Downloaded.Clear();
-                ComponentTracker.ToUpdate.Clear();
+                ComponentTracker.Outdated.Clear();
+                Main.UpdateList.Items.Clear();
 
                 IterateList(Main.ComponentList.Nodes, node =>
                 {
@@ -308,8 +295,7 @@ namespace FlashpointInstaller
                     }
                 });
 
-                Main.UpdateList.Items.Clear();
-                Main.UpdateButton.Text = "Install updates";
+                DownloadedSize = ComponentTracker.Downloaded.Sum(c => long.Parse(File.ReadLines(c.InfoFile).First().Split(' ')[1]));
 
                 long totalSizeChange = 0;
 
@@ -326,9 +312,9 @@ namespace FlashpointInstaller
                     item.SubItems.Add(component.Description);
                     item.SubItems.Add(component.LastUpdated);
                     item.SubItems.Add(displayedSize);
-                    Main.UpdateList.Items.Add(item);
 
-                    ComponentTracker.ToUpdate.Add(component);
+                    Main.UpdateList.Items.Add(item);
+                    ComponentTracker.Outdated.Add(component);
                 }
 
                 IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
@@ -367,18 +353,20 @@ namespace FlashpointInstaller
                     }
                 });
 
-                if (ComponentTracker.ToUpdate.Count > 0)
+                Main.ChangeButton.Text = $"Apply changes";
+                Main.ChangeButton.Enabled = false;
+
+                Main.UpdateButton.Text = "Install updates";
+
+                if (ComponentTracker.Outdated.Count > 0)
                 {
-                    Main.UpdateButton.Enabled = true;
                     Main.UpdateButton.Text += $" ({GetFormattedBytes(totalSizeChange)})";
+                    Main.UpdateButton.Enabled = true;
                 }
                 else
                 {
                     Main.UpdateButton.Enabled = false;
                 }
-
-                SizeTracker.Downloaded = GetTotalSize(Main.ComponentList);
-                SizeTracker.ToChange = SizeTracker.Downloaded;
             }
 
             // Deletes a file as well as any directories made empty by its deletion
@@ -497,26 +485,6 @@ namespace FlashpointInstaller
                 }
 
                 return true;
-            }
-
-            // Gets total size in bytes of all checked components in the specified TreeView
-            public static long GetTotalSize(TreeView sourceTree)
-            {
-                long size = 0;
-
-                IterateList(sourceTree.Nodes, node =>
-                {
-                    if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
-                    {
-                        var component = node.Tag as Component;
-
-                        size += component.Downloaded
-                            ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
-                            : component.Size;
-                    }
-                });
-
-                return size;
             }
 
             // Formats bytes as a human-readable string

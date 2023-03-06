@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -65,7 +66,21 @@ namespace FlashpointInstaller
 
         public void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.SizeTracker.ToChange = FPM.GetTotalSize(ComponentList);
+            long size = 0;
+
+            FPM.IterateList(ComponentList.Nodes, node =>
+            {
+                if (!node.Checked || !node.Tag.GetType().ToString().EndsWith("Component")) return;
+
+                var component = node.Tag as Component;
+
+                size += component.Downloaded
+                    ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
+                    : component.Size;
+            });
+
+            ChangeButton.Text = $"Apply changes ({FPM.GetFormattedBytes(size - FPM.DownloadedSize)})";
+            ChangeButton.Enabled = true;
         }
 
         private void ComponentList_BeforeSelect(object sender, TreeViewCancelEventArgs e)

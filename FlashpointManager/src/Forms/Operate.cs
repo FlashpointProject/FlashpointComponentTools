@@ -62,7 +62,7 @@ namespace FlashpointInstaller
             }
             else
             {
-                foreach (var component in FPM.ComponentTracker.ToUpdate)
+                foreach (var component in FPM.ComponentTracker.Outdated)
                 {
                     if (FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
                     {
@@ -256,7 +256,7 @@ namespace FlashpointInstaller
 
                 ProgressLabel.Invoke((MethodInvoker)delegate
                 {
-                    string text = FPM.ComponentTracker.ToUpdate.Exists(c => c.ID == workingComponent.ID)
+                    string text = FPM.ComponentTracker.Outdated.Exists(c => c.ID == workingComponent.ID)
                         ? $"Removing old version of component \"{workingComponent.Title}\"..."
                         : $"Removing component \"{workingComponent.Title}\"...";
 
