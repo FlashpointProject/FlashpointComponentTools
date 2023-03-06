@@ -418,9 +418,21 @@ namespace FlashpointInstaller
             // Checks if any dependencies were not marked for download by the user, and marks them accordingly
             public static bool CheckDependencies(bool alertDepends = true)
             {
-                List<string> requiredDepends = new List<string>();
-                List<string> persistDepends  = new List<string>();
-                List<string> missingDepends  = new List<string>();
+                List<string>   requiredDepends = new List<string>();
+                List<string>   persistDepends  = new List<string>();
+                List<TreeNode> missingDepends  = new List<TreeNode>();
+
+                void AddDependencies(string[] depends)
+                {
+                    requiredDepends.AddRange(depends);
+
+                    foreach (string depend in depends)
+                    {
+                        var query = Main.ComponentList.Nodes.Find(depend, true);
+                        
+                        if (query.Length > 0) AddDependencies((query[0].Tag as Component).Depends);
+                    }
+                }
 
                 // First, fill out a list of dependencies
                 IterateList(Main.ComponentList.Nodes, node =>
@@ -428,19 +440,15 @@ namespace FlashpointInstaller
                     if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                     {
                         var component = node.Tag as Component;
-                        
-                        if (ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
-                        {
-                            requiredDepends.AddRange(File.ReadLines(component.InfoFile).First().Split(' ').Skip(2).ToArray());
-                        }
-                        else
-                        {
-                            requiredDepends.AddRange(component.Depends);
-                        }
+
+                        AddDependencies(ComponentTracker.Downloaded.Exists(c => c.ID == component.ID)
+                            ? File.ReadLines(component.InfoFile).First().Split(' ').Skip(2).ToArray()
+                            : component.Depends
+                        );
                     }
                 });
 
-                // Then make sure they're all marked for installation 
+                // Then make sure they're all marked accordingly 
                 IterateList(Main.ComponentList.Nodes, node =>
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
@@ -449,15 +457,13 @@ namespace FlashpointInstaller
 
                         if (requiredDepends.Any(depend => depend == component.ID) && !node.Checked)
                         {
-                            node.Checked = true;
-
                             if (ComponentTracker.Downloaded.Exists(depend => depend.ID == component.ID))
                             {
                                 persistDepends.Add(component.Title);
                             }
                             else
                             {
-                                missingDepends.Add(component.Title);
+                                missingDepends.Add(node);
                             }
                         }
                     }
@@ -477,11 +483,23 @@ namespace FlashpointInstaller
 
                     if (missingDepends.Count > 0)
                     {
-                        MessageBox.Show(
+                        long missingSize = missingDepends.Select(n => (n.Tag as Component).Size).Sum();
+
+                        var result = MessageBox.Show(
                             "The following dependencies will also be installed:\n\n" +
-                            string.Join(", ", missingDepends) + "\n\nClick the OK button to proceed.",
-                            "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information
+                            string.Join(", ", missingDepends.Select(n => (n.Tag as Component).Title)) + "\n\n" +
+                            $"This adds an additional {GetFormattedBytes(missingSize)} to your download. Is this OK?",
+                            "Notice", MessageBoxButtons.YesNo, MessageBoxIcon.Information
                         );
+
+                        if (result == DialogResult.Yes)
+                        {
+                            missingDepends.ForEach(d => d.Checked = true);
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
 

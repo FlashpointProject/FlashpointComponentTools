@@ -95,7 +95,7 @@ namespace FlashpointInstaller
                 }
                 else
                 {
-                    // Automatically download component if /download argument is passed
+                    // Automatically download components if /download argument is passed
                     var argsList = args.ToList();
                     int first = argsList.FindIndex(v => v.ToLower() == "/download");
 
