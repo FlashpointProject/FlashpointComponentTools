@@ -73,7 +73,9 @@ namespace FlashpointInstaller
                 }
             }
 
-            byteTotal = removedComponents.Concat(addedComponents).Sum(c => c.Size);
+            byteTotal = FPM.UpdateMode
+                ? addedComponents.Sum(c => c.Size)
+                : addedComponents.Concat(removedComponents).Sum(c => c.Size);
 
             foreach (var component in addedComponents)
             {
@@ -242,12 +244,11 @@ namespace FlashpointInstaller
 
             foreach (string file in infoText)
             {
-                string filePath = Path.Combine(FPM.SourcePath, file);
-                double removeProgress = (double)removedFiles / totalFiles;
-                double totalProgress = (byteProgress + (removeProgress * totalSize)) / byteTotal;
-
-                FPM.DeleteFileAndDirectories(filePath);
+                FPM.DeleteFileAndDirectories(Path.Combine(FPM.SourcePath, file));
                 removedFiles++;
+
+                double removeProgress = (double)removedFiles / totalFiles;
+                double totalProgress = FPM.UpdateMode ? 1 : (byteProgress + (removeProgress * totalSize)) / byteTotal;
 
                 ProgressMeasure.Invoke((MethodInvoker)delegate
                 {

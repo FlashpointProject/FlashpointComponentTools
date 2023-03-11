@@ -271,7 +271,7 @@ namespace FlashpointInstaller
             }
 
             // Refreshes component lists and tracker objects with up-to-date information
-            public static void SyncManager()
+            public static void SyncManager(bool init = false)
             {
                 ComponentTracker.Downloaded.Clear();
                 ComponentTracker.Outdated.Clear();
@@ -286,12 +286,16 @@ namespace FlashpointInstaller
                         if (component.Downloaded)
                         {
                             ComponentTracker.Downloaded.Add(component);
-                            node.Checked = true;
+                            if (!node.Checked) node.Checked = true;
                         }
-                        else
+                        else if (node.Checked)
                         {
                             node.Checked = false;
                         }
+                    }
+                    else if (init)
+                    {
+                        node.Checked = node.Checked;
                     }
                 });
 

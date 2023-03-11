@@ -35,7 +35,7 @@ namespace FlashpointInstaller
                 }
             }
 
-            FPM.SyncManager();
+            FPM.SyncManager(true);
 
             if (FPM.AutoDownload.Count > 0)
             {
