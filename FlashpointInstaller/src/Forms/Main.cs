@@ -106,9 +106,7 @@ namespace FlashpointInstaller
 
         private void DownloadButton_Click(object sender, EventArgs e)
         {
-            if (!FPM.VerifyDestinationPath(DestinationPath.Text)) return;
-
-            FPM.CheckDependencies();
+            if (!FPM.VerifyDestinationPath(DestinationPath.Text) || !FPM.CheckDependencies()) return;
 
             if (!FPM.RedistInstalled)
             {
