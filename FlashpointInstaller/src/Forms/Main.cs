@@ -53,7 +53,16 @@ namespace FlashpointInstaller
 
         private void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            FPM.SizeTracker.ToDownload = FPM.GetTotalSize(ComponentList);
+            long size = 0;
+
+            FPM.IterateList(ComponentList.Nodes, node =>
+            {
+                if (!node.Checked || !node.Tag.GetType().ToString().EndsWith("Component")) return;
+
+                size += (node.Tag as Component).Size;
+            });
+
+            InstallButton.Text = $"Install Flashpoint ({FPM.GetFormattedBytes(size)})";
         }
 
         private void ComponentList_BeforeSelect(object _, TreeViewCancelEventArgs e)
@@ -99,12 +108,12 @@ namespace FlashpointInstaller
         {
             if (e.KeyChar == (char)Keys.Return)
             {
-                DownloadButton_Click(this, e);
+                InstallButton_Click(this, e);
                 e.Handled = true;
             }
         }
 
-        private void DownloadButton_Click(object sender, EventArgs e)
+        private void InstallButton_Click(object sender, EventArgs e)
         {
             if (!FPM.VerifyDestinationPath(DestinationPath.Text) || !FPM.CheckDependencies()) return;
 

@@ -45,11 +45,12 @@ namespace FlashpointInstaller
             {
                 if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
                 {
-                    markedComponents.Add(node.Tag as Component);
+                    var component = node.Tag as Component;
+
+                    markedComponents.Add(component);
+                    byteTotal += component.Size;
                 }
             });
-
-            byteTotal = FPM.SizeTracker.ToDownload;
 
             foreach (var component in markedComponents)
             {

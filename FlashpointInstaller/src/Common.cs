@@ -160,23 +160,6 @@ namespace FlashpointInstaller
                 get => Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\X86") != null;
             }
 
-            // Object for tracking numerous file size sums
-            public static class SizeTracker
-            {
-                private static long toDownload;
-
-                // Tracks total size of the pending Flashpoint download
-                public static long ToDownload
-                {
-                    get => toDownload;
-                    set
-                    {
-                        toDownload = value;
-                        Main.InstallButton.Text = $"Install Flashpoint ({GetFormattedBytes(toDownload)})";
-                    }
-                }
-            }
-
             // Performs an operation on every node in the specified TreeNodeCollection
             public static void IterateList(TreeNodeCollection parent, Action<TreeNode> action)
             {
@@ -382,22 +365,6 @@ namespace FlashpointInstaller
                 }
 
                 return true;
-            }
-
-            // Gets total size in bytes of all checked components in the specified TreeView
-            public static long GetTotalSize(TreeView sourceTree)
-            {
-                long size = 0;
-
-                IterateList(sourceTree.Nodes, node =>
-                {
-                    if (node.Checked && node.Tag.GetType().ToString().EndsWith("Component"))
-                    {
-                        size += (node.Tag as Component).Size;
-                    }
-                });
-
-                return size;
             }
 
             // Formats bytes as a human-readable string

@@ -111,7 +111,7 @@
             this.InstallButton.TabIndex = 2;
             this.InstallButton.Text = "Install Flashpoint";
             this.InstallButton.UseVisualStyleBackColor = true;
-            this.InstallButton.Click += new System.EventHandler(this.DownloadButton_Click);
+            this.InstallButton.Click += new System.EventHandler(this.InstallButton_Click);
             // 
             // Link
             // 
