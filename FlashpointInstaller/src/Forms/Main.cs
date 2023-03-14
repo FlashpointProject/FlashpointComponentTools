@@ -34,7 +34,7 @@ namespace FlashpointInstaller
                 Environment.Exit(1);
             }
 
-            DestinationPath.Text = FPM.DestinationPath;
+            DestinationPath.Text = Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint");
         }
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -89,18 +89,24 @@ namespace FlashpointInstaller
             
             if (pathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                FPM.DestinationPath = Path.Combine(pathDialog.FileName, "Flashpoint");
+                string path = Path.Combine(pathDialog.FileName, "Flashpoint");
+
+                if (FPM.VerifyDestinationPath(path)) DestinationPath.Text = path;
             }
         }
 
         private void DestinationPath_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char)Keys.Return) DownloadButton_Click(this, e);
+            if (e.KeyChar == (char)Keys.Return)
+            {
+                DownloadButton_Click(this, e);
+                e.Handled = true;
+            }
         }
 
         private void DownloadButton_Click(object sender, EventArgs e)
         {
-            if (!FPM.VerifyDestinationPath(FPM.DestinationPath)) return;
+            if (!FPM.VerifyDestinationPath(DestinationPath.Text)) return;
 
             FPM.CheckDependencies();
 

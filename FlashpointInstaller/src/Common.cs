@@ -160,21 +160,6 @@ namespace FlashpointInstaller
                 get => Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\X86") != null;
             }
 
-            // Pointer to destination path textbox
-            private static string destinationPath = Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint");
-            public static string DestinationPath
-            {
-                get { return destinationPath; }
-                set
-                {
-                    if (VerifyDestinationPath(value))
-                    {
-                        destinationPath = value;
-                        Main.DestinationPath.Text = destinationPath;
-                    }
-                }
-            }
-
             // Object for tracking numerous file size sums
             public static class SizeTracker
             {

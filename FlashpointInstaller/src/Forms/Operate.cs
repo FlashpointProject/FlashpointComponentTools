@@ -136,8 +136,8 @@ namespace FlashpointInstaller
 
         private void ExtractComponents()
         {
-            string rootPath = FPM.DestinationPath;
-            string infoPath = Path.Combine(rootPath, "Components");
+            string rootPath = FPM.Main.DestinationPath.Text;
+            string infoPath = Path.Combine(FPM.Main.DestinationPath.Text, "Components");
             string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
 
             Directory.CreateDirectory(infoPath);
@@ -231,8 +231,8 @@ namespace FlashpointInstaller
                 foreach (string path in shortcutPaths)
                 {
                     var shortcut = new IWshRuntimeLibrary.WshShell().CreateShortcut(Path.Combine(path, "Flashpoint.lnk"));
-                    shortcut.TargetPath = Path.Combine(FPM.DestinationPath, "Launcher", "Flashpoint.exe");
-                    shortcut.WorkingDirectory = Path.Combine(FPM.DestinationPath, "Launcher");
+                    shortcut.TargetPath = Path.Combine(FPM.Main.DestinationPath.Text, "Launcher", "Flashpoint.exe");
+                    shortcut.WorkingDirectory = Path.Combine(FPM.Main.DestinationPath.Text, "Launcher");
                     shortcut.Description = "Shortcut to Flashpoint";
                     shortcut.Save();
                 }
@@ -259,14 +259,14 @@ namespace FlashpointInstaller
             {
                 while (cancelStatus != 2) { }
 
-                if (Directory.Exists(FPM.DestinationPath))
+                if (Directory.Exists(FPM.Main.DestinationPath.Text))
                 {
-                    foreach (string file in Directory.EnumerateFiles(FPM.DestinationPath))
+                    foreach (string file in Directory.EnumerateFiles(FPM.Main.DestinationPath.Text))
                     {
                         try { File.Delete(file); } catch { }
                     }
 
-                    try { Directory.Delete(FPM.DestinationPath, true); } catch { }
+                    try { Directory.Delete(FPM.Main.DestinationPath.Text, true); } catch { }
                 }
             });
 
