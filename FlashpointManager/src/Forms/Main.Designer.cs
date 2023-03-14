@@ -37,6 +37,7 @@
             this.ChangeButton = new System.Windows.Forms.Button();
             this.DescriptionBox = new System.Windows.Forms.GroupBox();
             this.Description = new System.Windows.Forms.Label();
+            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.UpdateTab = new System.Windows.Forms.TabPage();
             this.UpdateButton = new System.Windows.Forms.Button();
             this.UpdateList = new System.Windows.Forms.ListView();
@@ -47,7 +48,6 @@
             this.RemoveTab = new System.Windows.Forms.TabPage();
             this.RemoveDescription = new System.Windows.Forms.Label();
             this.RemoveButton = new System.Windows.Forms.Button();
-            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
@@ -129,6 +129,18 @@
             this.Description.Name = "Description";
             this.Description.Size = new System.Drawing.Size(151, 54);
             this.Description.TabIndex = 0;
+            // 
+            // ComponentList
+            // 
+            this.ComponentList.Indent = 20;
+            this.ComponentList.Location = new System.Drawing.Point(9, 12);
+            this.ComponentList.Name = "ComponentList";
+            this.ComponentList.Size = new System.Drawing.Size(391, 152);
+            this.ComponentList.TabIndex = 13;
+            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
+            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
             // 
             // UpdateTab
             // 
@@ -226,18 +238,6 @@
             this.RemoveButton.UseVisualStyleBackColor = true;
             this.RemoveButton.Click += new System.EventHandler(this.RemoveButton_Click);
             // 
-            // ComponentList
-            // 
-            this.ComponentList.Indent = 20;
-            this.ComponentList.Location = new System.Drawing.Point(9, 12);
-            this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(391, 152);
-            this.ComponentList.TabIndex = 13;
-            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
-            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
-            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -250,6 +250,7 @@
             this.Name = "Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Flashpoint Manager";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.Load += new System.EventHandler(this.Main_Load);
             this.TabControl.ResumeLayout(false);
             this.ManageTab.ResumeLayout(false);

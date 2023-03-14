@@ -93,19 +93,23 @@ namespace FlashpointInstaller
                 {
                     FPM.OpenUpdateTab = true;
                 }
-                else
+
+                // Open launcher on close if /launcher argument is passed
+                if (args.Any(v => v.ToLower() == "/launcher"))
                 {
-                    // Automatically download components if /download argument is passed
-                    var argsList = args.ToList();
-                    int first = argsList.FindIndex(v => v.ToLower() == "/download");
+                    FPM.OpenLauncherOnClose = true;
+                }
+                
+                // Automatically download components if /download argument is passed
+                var argsList = args.ToList();
+                int first = argsList.FindIndex(v => v.ToLower() == "/download");
 
-                    if (first > -1 && first < argsList.Count - 1)
-                    {
-                        int last = argsList.FindIndex(first + 1, v => v.StartsWith("/"));
-                        if (last == -1) last = argsList.Count;
+                if (first > -1 && first < argsList.Count - 1)
+                {
+                    int last = argsList.FindIndex(first + 1, v => v.StartsWith("/"));
+                    if (last == -1) last = argsList.Count;
 
-                        FPM.AutoDownload.AddRange(argsList.Skip(first + 1).Take(last - first - 1));
-                    }
+                    FPM.AutoDownload.AddRange(argsList.Skip(first + 1).Take(last - first - 1));
                 }
             }
 

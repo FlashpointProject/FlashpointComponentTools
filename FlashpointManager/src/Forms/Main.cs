@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +49,7 @@ namespace FlashpointInstaller
                 FPM.CheckDependencies(false);
                 ChangeButton_Click(this, new EventArgs());
 
-                Environment.Exit(0);
+                Close();
             }
 
             if (FPM.OpenUpdateTab) TabControl.SelectTab(1);
@@ -155,6 +156,18 @@ namespace FlashpointInstaller
             );
 
             Close();
+        }
+
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (FPM.OpenLauncherOnClose)
+            {
+                new Process() { StartInfo = {
+                    UseShellExecute = true,
+                    FileName = "Flashpoint.exe",
+                    WorkingDirectory = Path.Combine(FPM.SourcePath, "Launcher")
+                }}.Start();
+            }
         }
     }
 }
