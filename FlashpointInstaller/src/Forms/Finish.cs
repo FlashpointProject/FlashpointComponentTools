@@ -15,11 +15,11 @@ namespace FlashpointInstaller
         {
             if (RunOnClose.Checked)
             {
-                var flashpointProcess = new Process();
-                flashpointProcess.StartInfo.UseShellExecute = true;
-                flashpointProcess.StartInfo.FileName = "Flashpoint.exe";
-                flashpointProcess.StartInfo.WorkingDirectory = Path.Combine(FPM.Main.DestinationPath.Text, "Launcher");
-                flashpointProcess.Start();
+                new Process() { StartInfo = {
+                    UseShellExecute = true,
+                    FileName = "Flashpoint.exe",
+                    WorkingDirectory = Path.Combine(FPM.Main.DestinationPath.Text, "Launcher")
+                }}.Start();
             }
 
             Environment.Exit(0);
