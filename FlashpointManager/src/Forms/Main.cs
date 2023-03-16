@@ -47,7 +47,7 @@ namespace FlashpointInstaller
                 }
 
                 FPM.CheckDependencies(false);
-                ChangeButton_Click(this, new EventArgs());
+                new Operate() { TopMost = true }.ShowDialog();
 
                 Close();
             }
@@ -116,7 +116,7 @@ namespace FlashpointInstaller
 
             FPM.UpdateMode = false;
 
-            var operationWindow = new Operate() { TopMost = FPM.AutoDownload.Count > 0 };
+            var operationWindow = new Operate();
             operationWindow.ShowDialog();
         }
 

@@ -475,37 +475,41 @@ namespace FlashpointInstaller
                     }
                 });
 
-                if (alertDepends)
+                if (persistDepends.Count > 0)
                 {
-                    if (persistDepends.Count > 0)
+                    if (alertDepends)
                     {
                         MessageBox.Show(
                             "The following components cannot be removed because one or more components depend on them:\n\n" +
                             string.Join(", ", persistDepends), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
                         );
-
-                        return false;
                     }
 
-                    if (missingDepends.Count > 0)
-                    {
-                        long missingSize = missingDepends.Select(n => (n.Tag as Component).Size).Sum();
+                    return false;
+                }
 
-                        var result = MessageBox.Show(
+                if (missingDepends.Count > 0)
+                {
+                    long missingSize = missingDepends.Select(n => (n.Tag as Component).Size).Sum();
+                    var result = DialogResult.Yes;
+                    
+                    if (alertDepends)
+                    {
+                        result = MessageBox.Show(
                             "The following dependencies will also be installed:\n\n" +
                             string.Join(", ", missingDepends.Select(n => (n.Tag as Component).Title)) + "\n\n" +
-                            $"This adds an additional {GetFormattedBytes(missingSize)} to your download. Is this OK?",
+                            $"This will add {GetFormattedBytes(missingSize)} to your download. Is this OK?",
                             "Notice", MessageBoxButtons.YesNo, MessageBoxIcon.Information
                         );
+                    }
 
-                        if (result == DialogResult.Yes)
-                        {
-                            missingDepends.ForEach(d => d.Checked = true);
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                    if (result == DialogResult.Yes)
+                    {
+                        missingDepends.ForEach(d => d.Checked = true);
+                    }
+                    else
+                    {
+                        return false;
                     }
                 }
 
