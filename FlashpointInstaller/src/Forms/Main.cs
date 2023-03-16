@@ -128,8 +128,7 @@ namespace FlashpointInstaller
                 if (redistDialog == DialogResult.Cancel) return;
             }
 
-            var operationWindow = new Operate();
-            operationWindow.ShowDialog();
+            new Operate().ShowDialog();
         }
     }
 }

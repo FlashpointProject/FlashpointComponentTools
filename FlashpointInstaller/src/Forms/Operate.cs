@@ -242,8 +242,7 @@ namespace FlashpointInstaller
             Hide();
             FPM.Main.Hide();
 
-            var finishWindow = new Finish();
-            finishWindow.ShowDialog();
+            new Finish().ShowDialog();
         }
 
         private async void CancelButton_Click(object sender, EventArgs e)

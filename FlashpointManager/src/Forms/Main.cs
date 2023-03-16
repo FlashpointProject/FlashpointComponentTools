@@ -47,6 +47,7 @@ namespace FlashpointInstaller
                 }
 
                 FPM.CheckDependencies(false);
+
                 new Operate() { TopMost = true }.ShowDialog();
 
                 Close();
@@ -116,16 +117,14 @@ namespace FlashpointInstaller
 
             FPM.UpdateMode = false;
 
-            var operationWindow = new Operate();
-            operationWindow.ShowDialog();
+            new Operate().ShowDialog();
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
             FPM.UpdateMode = true;
 
-            var downloadWindow = new Operate();
-            downloadWindow.ShowDialog();
+            new Operate().ShowDialog();
         }
 
         private async void RemoveButton_Click(object sender, EventArgs e)
