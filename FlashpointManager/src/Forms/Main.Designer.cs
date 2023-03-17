@@ -45,21 +45,21 @@
             this.ComponentDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ComponentUpdated = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ComponentSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.RemoveTab = new System.Windows.Forms.TabPage();
-            this.RemoveDescription = new System.Windows.Forms.Label();
-            this.RemoveButton = new System.Windows.Forms.Button();
+            this.UninstallTab = new System.Windows.Forms.TabPage();
+            this.UninstallDescription = new System.Windows.Forms.Label();
+            this.UninstallButton = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
             this.UpdateTab.SuspendLayout();
-            this.RemoveTab.SuspendLayout();
+            this.UninstallTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
             // 
             this.TabControl.Controls.Add(this.ManageTab);
             this.TabControl.Controls.Add(this.UpdateTab);
-            this.TabControl.Controls.Add(this.RemoveTab);
+            this.TabControl.Controls.Add(this.UninstallTab);
             this.TabControl.ItemSize = new System.Drawing.Size(150, 20);
             this.TabControl.Location = new System.Drawing.Point(13, 10);
             this.TabControl.Name = "TabControl";
@@ -206,37 +206,37 @@
             this.ComponentSize.Text = "Size";
             this.ComponentSize.Width = 65;
             // 
-            // RemoveTab
+            // UninstallTab
             // 
-            this.RemoveTab.Controls.Add(this.RemoveDescription);
-            this.RemoveTab.Controls.Add(this.RemoveButton);
-            this.RemoveTab.Location = new System.Drawing.Point(4, 24);
-            this.RemoveTab.Name = "RemoveTab";
-            this.RemoveTab.Padding = new System.Windows.Forms.Padding(3);
-            this.RemoveTab.Size = new System.Drawing.Size(592, 212);
-            this.RemoveTab.TabIndex = 2;
-            this.RemoveTab.Text = "Uninstall Flashpoint";
-            this.RemoveTab.UseVisualStyleBackColor = true;
+            this.UninstallTab.Controls.Add(this.UninstallDescription);
+            this.UninstallTab.Controls.Add(this.UninstallButton);
+            this.UninstallTab.Location = new System.Drawing.Point(4, 24);
+            this.UninstallTab.Name = "UninstallTab";
+            this.UninstallTab.Padding = new System.Windows.Forms.Padding(3);
+            this.UninstallTab.Size = new System.Drawing.Size(592, 212);
+            this.UninstallTab.TabIndex = 2;
+            this.UninstallTab.Text = "Uninstall Flashpoint";
+            this.UninstallTab.UseVisualStyleBackColor = true;
             // 
-            // RemoveDescription
+            // UninstallDescription
             // 
-            this.RemoveDescription.Location = new System.Drawing.Point(8, 50);
-            this.RemoveDescription.Name = "RemoveDescription";
-            this.RemoveDescription.Size = new System.Drawing.Size(574, 40);
-            this.RemoveDescription.TabIndex = 20;
-            this.RemoveDescription.Text = resources.GetString("RemoveDescription.Text");
-            this.RemoveDescription.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.UninstallDescription.Location = new System.Drawing.Point(8, 50);
+            this.UninstallDescription.Name = "UninstallDescription";
+            this.UninstallDescription.Size = new System.Drawing.Size(574, 40);
+            this.UninstallDescription.TabIndex = 20;
+            this.UninstallDescription.Text = resources.GetString("UninstallDescription.Text");
+            this.UninstallDescription.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // RemoveButton
+            // UninstallButton
             // 
-            this.RemoveButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.RemoveButton.Location = new System.Drawing.Point(195, 113);
-            this.RemoveButton.Name = "RemoveButton";
-            this.RemoveButton.Size = new System.Drawing.Size(200, 26);
-            this.RemoveButton.TabIndex = 17;
-            this.RemoveButton.Text = "Uninstall Flashpoint";
-            this.RemoveButton.UseVisualStyleBackColor = true;
-            this.RemoveButton.Click += new System.EventHandler(this.RemoveButton_Click);
+            this.UninstallButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.UninstallButton.Location = new System.Drawing.Point(195, 113);
+            this.UninstallButton.Name = "UninstallButton";
+            this.UninstallButton.Size = new System.Drawing.Size(200, 26);
+            this.UninstallButton.TabIndex = 17;
+            this.UninstallButton.Text = "Uninstall Flashpoint";
+            this.UninstallButton.UseVisualStyleBackColor = true;
+            this.UninstallButton.Click += new System.EventHandler(this.UninstallButton_Click);
             // 
             // Main
             // 
@@ -256,7 +256,7 @@
             this.ManageTab.ResumeLayout(false);
             this.DescriptionBox.ResumeLayout(false);
             this.UpdateTab.ResumeLayout(false);
-            this.RemoveTab.ResumeLayout(false);
+            this.UninstallTab.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -264,14 +264,14 @@
         #endregion
         private System.Windows.Forms.TabControl TabControl;
         private System.Windows.Forms.TabPage ManageTab;
-        private System.Windows.Forms.TabPage RemoveTab;
+        private System.Windows.Forms.TabPage UninstallTab;
         public RikTheVeggie.TriStateTreeView ComponentList;
         private System.Windows.Forms.GroupBox DescriptionBox;
         private System.Windows.Forms.Label Description;
         private System.Windows.Forms.Label Message;
         public System.Windows.Forms.Button ChangeButton;
-        private System.Windows.Forms.Label RemoveDescription;
-        public System.Windows.Forms.Button RemoveButton;
+        private System.Windows.Forms.Label UninstallDescription;
+        public System.Windows.Forms.Button UninstallButton;
         public System.Windows.Forms.Label Message2;
         private System.Windows.Forms.TabPage UpdateTab;
         private System.Windows.Forms.ColumnHeader ComponentTitle;

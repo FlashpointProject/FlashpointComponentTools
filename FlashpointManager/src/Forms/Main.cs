@@ -127,7 +127,7 @@ namespace FlashpointInstaller
             new Operate().ShowDialog();
         }
 
-        private async void RemoveButton_Click(object sender, EventArgs e)
+        private async void UninstallButton_Click(object sender, EventArgs e)
         {
             TabControl.Enabled = false;
 
@@ -153,6 +153,15 @@ namespace FlashpointInstaller
                 "Flashpoint has been uninstalled from your system.",
                 "Uninstallation Complete", MessageBoxButtons.OK, MessageBoxIcon.Information
             );
+
+            new Process() { StartInfo = {
+                FileName = "cmd.exe",
+                Arguments = "/k timeout /nobreak /t 1 >nul & " +
+                    $"rmdir /Q \"{Path.GetFullPath(Path.Combine(FPM.SourcePath, "Manager"))}\" & " +
+                    $"rmdir /Q \"{Path.GetFullPath(FPM.SourcePath)}\" & exit",
+                WorkingDirectory = Path.GetFullPath(Path.Combine(FPM.SourcePath, "..")),
+                WindowStyle = ProcessWindowStyle.Hidden
+            }}.Start();
 
             Close();
         }
