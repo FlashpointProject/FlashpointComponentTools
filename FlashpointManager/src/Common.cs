@@ -308,19 +308,19 @@ namespace FlashpointInstaller
                     if (node.Name != "component") return;
 
                     var component = new Component(node);
-                    bool update = false;
 
-                    if (ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
+                    bool outdated = false;
+                    bool downloaded = ComponentTracker.Downloaded.Exists(c => c.ID == component.ID);
+
+                    if (downloaded)
                     {
                         string localHash = File.ReadLines(component.InfoFile).First().Split(' ')[0];
-                        update = localHash != component.Hash;
+                        outdated = localHash != component.Hash && component.ID != "core-database";
                     }
-                    else if (component.Required)
-                    {
-                        update = true;
-                    }
+                    
+                    if (!downloaded && component.Required) outdated = true;
 
-                    if (update)
+                    if (outdated)
                     {
                         ComponentTracker.Outdated.Add(component);
 
