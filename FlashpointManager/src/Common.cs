@@ -385,7 +385,7 @@ namespace FlashpointInstaller
 
                 while (folder != Directory.GetParent(SourcePath).ToString())
                 {
-                    if (Directory.Exists(folder) && !Directory.EnumerateFiles(folder).Any())
+                    if (Directory.Exists(folder) && !Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories).Any())
                     {
                         try { Directory.Delete(folder, true); } catch { }
                     }
