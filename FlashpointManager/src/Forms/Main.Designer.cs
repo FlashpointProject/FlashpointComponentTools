@@ -66,7 +66,7 @@
             this.TabControl.SelectedIndex = 0;
             this.TabControl.Size = new System.Drawing.Size(600, 240);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            this.TabControl.TabIndex = 5;
+            this.TabControl.TabIndex = 0;
             // 
             // ManageTab
             // 
@@ -88,7 +88,7 @@
             this.Message.Location = new System.Drawing.Point(410, 12);
             this.Message.Name = "Message";
             this.Message.Size = new System.Drawing.Size(171, 30);
-            this.Message.TabIndex = 20;
+            this.Message.TabIndex = 1;
             this.Message.Text = "Choose components to add or remove from your Flashpoint copy.";
             // 
             // Message2
@@ -96,7 +96,7 @@
             this.Message2.Location = new System.Drawing.Point(410, 44);
             this.Message2.Name = "Message2";
             this.Message2.Size = new System.Drawing.Size(171, 30);
-            this.Message2.TabIndex = 21;
+            this.Message2.TabIndex = 2;
             this.Message2.Text = "Click on a component or category to learn more about it.";
             // 
             // ChangeButton
@@ -105,8 +105,8 @@
             this.ChangeButton.Location = new System.Drawing.Point(8, 176);
             this.ChangeButton.Name = "ChangeButton";
             this.ChangeButton.Size = new System.Drawing.Size(574, 26);
-            this.ChangeButton.TabIndex = 16;
-            this.ChangeButton.Text = "Apply changes";
+            this.ChangeButton.TabIndex = 4;
+            this.ChangeButton.Text = "&Apply changes";
             this.ChangeButton.UseVisualStyleBackColor = true;
             this.ChangeButton.Click += new System.EventHandler(this.ChangeButton_Click);
             // 
@@ -117,7 +117,7 @@
             this.DescriptionBox.Name = "DescriptionBox";
             this.DescriptionBox.Padding = new System.Windows.Forms.Padding(10, 8, 10, 10);
             this.DescriptionBox.Size = new System.Drawing.Size(171, 85);
-            this.DescriptionBox.TabIndex = 14;
+            this.DescriptionBox.TabIndex = 3;
             this.DescriptionBox.TabStop = false;
             this.DescriptionBox.Text = "Component Description";
             this.DescriptionBox.Visible = false;
@@ -136,7 +136,7 @@
             this.ComponentList.Location = new System.Drawing.Point(9, 12);
             this.ComponentList.Name = "ComponentList";
             this.ComponentList.Size = new System.Drawing.Size(391, 152);
-            this.ComponentList.TabIndex = 13;
+            this.ComponentList.TabIndex = 0;
             this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
             this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
             this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
@@ -161,8 +161,8 @@
             this.UpdateButton.Location = new System.Drawing.Point(8, 176);
             this.UpdateButton.Name = "UpdateButton";
             this.UpdateButton.Size = new System.Drawing.Size(574, 26);
-            this.UpdateButton.TabIndex = 17;
-            this.UpdateButton.Text = "Install updates";
+            this.UpdateButton.TabIndex = 1;
+            this.UpdateButton.Text = "&Install updates";
             this.UpdateButton.UseVisualStyleBackColor = true;
             this.UpdateButton.Click += new System.EventHandler(this.UpdateButton_Click);
             // 
@@ -182,7 +182,7 @@
             this.UpdateList.Name = "UpdateList";
             this.UpdateList.Size = new System.Drawing.Size(572, 152);
             this.UpdateList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.UpdateList.TabIndex = 2;
+            this.UpdateList.TabIndex = 0;
             this.UpdateList.UseCompatibleStateImageBehavior = false;
             this.UpdateList.View = System.Windows.Forms.View.Details;
             // 
@@ -223,7 +223,7 @@
             this.UninstallDescription.Location = new System.Drawing.Point(8, 50);
             this.UninstallDescription.Name = "UninstallDescription";
             this.UninstallDescription.Size = new System.Drawing.Size(574, 40);
-            this.UninstallDescription.TabIndex = 20;
+            this.UninstallDescription.TabIndex = 0;
             this.UninstallDescription.Text = resources.GetString("UninstallDescription.Text");
             this.UninstallDescription.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -233,8 +233,8 @@
             this.UninstallButton.Location = new System.Drawing.Point(195, 113);
             this.UninstallButton.Name = "UninstallButton";
             this.UninstallButton.Size = new System.Drawing.Size(200, 26);
-            this.UninstallButton.TabIndex = 17;
-            this.UninstallButton.Text = "Uninstall Flashpoint";
+            this.UninstallButton.TabIndex = 1;
+            this.UninstallButton.Text = "&Uninstall Flashpoint";
             this.UninstallButton.UseVisualStyleBackColor = true;
             this.UninstallButton.Click += new System.EventHandler(this.UninstallButton_Click);
             // 

@@ -68,7 +68,7 @@
             this.About.Location = new System.Drawing.Point(18, 192);
             this.About.Name = "About";
             this.About.Size = new System.Drawing.Size(94, 13);
-            this.About.TabIndex = 1;
+            this.About.TabIndex = 0;
             this.About.Text = "Flashpoint Installer";
             // 
             // DestinationPathBox
@@ -79,7 +79,7 @@
             this.DestinationPathBox.Location = new System.Drawing.Point(12, 384);
             this.DestinationPathBox.Name = "DestinationPathBox";
             this.DestinationPathBox.Size = new System.Drawing.Size(600, 49);
-            this.DestinationPathBox.TabIndex = 2;
+            this.DestinationPathBox.TabIndex = 6;
             this.DestinationPathBox.TabStop = false;
             this.DestinationPathBox.Text = "Destination Folder";
             // 
@@ -89,7 +89,7 @@
             this.DestinationPath.Location = new System.Drawing.Point(9, 18);
             this.DestinationPath.Name = "DestinationPath";
             this.DestinationPath.Size = new System.Drawing.Size(503, 20);
-            this.DestinationPath.TabIndex = 1;
+            this.DestinationPath.TabIndex = 0;
             this.DestinationPath.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DestinationPath_KeyPress);
             // 
             // DestinationPathBrowse
@@ -97,8 +97,8 @@
             this.DestinationPathBrowse.Location = new System.Drawing.Point(519, 17);
             this.DestinationPathBrowse.Name = "DestinationPathBrowse";
             this.DestinationPathBrowse.Size = new System.Drawing.Size(73, 22);
-            this.DestinationPathBrowse.TabIndex = 0;
-            this.DestinationPathBrowse.Text = "Browse";
+            this.DestinationPathBrowse.TabIndex = 1;
+            this.DestinationPathBrowse.Text = "&Browse";
             this.DestinationPathBrowse.UseVisualStyleBackColor = true;
             this.DestinationPathBrowse.Click += new System.EventHandler(this.DestinationPathBrowse_Click);
             // 
@@ -108,8 +108,8 @@
             this.InstallButton.Location = new System.Drawing.Point(300, 443);
             this.InstallButton.Name = "InstallButton";
             this.InstallButton.Size = new System.Drawing.Size(313, 26);
-            this.InstallButton.TabIndex = 2;
-            this.InstallButton.Text = "Install Flashpoint";
+            this.InstallButton.TabIndex = 8;
+            this.InstallButton.Text = "&Install Flashpoint";
             this.InstallButton.UseVisualStyleBackColor = true;
             this.InstallButton.Click += new System.EventHandler(this.InstallButton_Click);
             // 
@@ -120,7 +120,7 @@
             this.Link.Location = new System.Drawing.Point(441, 192);
             this.Link.Name = "Link";
             this.Link.Size = new System.Drawing.Size(171, 13);
-            this.Link.TabIndex = 4;
+            this.Link.TabIndex = 1;
             this.Link.TabStop = true;
             this.Link.Text = "https://bluemaxima.org/flashpoint/";
             this.Link.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -132,7 +132,7 @@
             this.Message2.Location = new System.Drawing.Point(415, 257);
             this.Message2.Name = "Message2";
             this.Message2.Size = new System.Drawing.Size(197, 30);
-            this.Message2.TabIndex = 13;
+            this.Message2.TabIndex = 4;
             this.Message2.Text = "Click on a component or category to learn more about it.";
             // 
             // DescriptionBox
@@ -143,7 +143,7 @@
             this.DescriptionBox.Name = "DescriptionBox";
             this.DescriptionBox.Padding = new System.Windows.Forms.Padding(10, 8, 10, 10);
             this.DescriptionBox.Size = new System.Drawing.Size(197, 72);
-            this.DescriptionBox.TabIndex = 12;
+            this.DescriptionBox.TabIndex = 5;
             this.DescriptionBox.TabStop = false;
             this.DescriptionBox.Text = "Component Description";
             this.DescriptionBox.Visible = false;
@@ -170,7 +170,7 @@
             this.ShortcutTable.RowCount = 1;
             this.ShortcutTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.ShortcutTable.Size = new System.Drawing.Size(274, 26);
-            this.ShortcutTable.TabIndex = 11;
+            this.ShortcutTable.TabIndex = 7;
             // 
             // ShortcutStartMenu
             // 
@@ -182,7 +182,7 @@
             this.ShortcutStartMenu.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
             this.ShortcutStartMenu.Size = new System.Drawing.Size(78, 20);
             this.ShortcutStartMenu.TabIndex = 2;
-            this.ShortcutStartMenu.Text = "Start Menu";
+            this.ShortcutStartMenu.Text = "&Start Menu";
             this.ShortcutStartMenu.UseVisualStyleBackColor = true;
             // 
             // ShortcutDesktop
@@ -195,7 +195,7 @@
             this.ShortcutDesktop.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
             this.ShortcutDesktop.Size = new System.Drawing.Size(66, 20);
             this.ShortcutDesktop.TabIndex = 1;
-            this.ShortcutDesktop.Text = "Desktop";
+            this.ShortcutDesktop.Text = "&Desktop";
             this.ShortcutDesktop.UseVisualStyleBackColor = true;
             // 
             // ShortcutLabel
@@ -216,7 +216,7 @@
             this.Message.Location = new System.Drawing.Point(415, 225);
             this.Message.Name = "Message";
             this.Message.Size = new System.Drawing.Size(197, 30);
-            this.Message.TabIndex = 6;
+            this.Message.TabIndex = 3;
             this.Message.Text = "Choose components to include in your Flashpoint installation.";
             // 
             // ComponentList
@@ -226,7 +226,7 @@
             this.ComponentList.Location = new System.Drawing.Point(21, 220);
             this.ComponentList.Name = "ComponentList";
             this.ComponentList.Size = new System.Drawing.Size(384, 156);
-            this.ComponentList.TabIndex = 5;
+            this.ComponentList.TabIndex = 2;
             this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
             this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
             this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);

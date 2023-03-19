@@ -51,7 +51,7 @@
             this.RunOnClose.Name = "RunOnClose";
             this.RunOnClose.Size = new System.Drawing.Size(113, 17);
             this.RunOnClose.TabIndex = 1;
-            this.RunOnClose.Text = "Launch Flashpoint";
+            this.RunOnClose.Text = "&Launch Flashpoint";
             this.RunOnClose.UseVisualStyleBackColor = true;
             // 
             // CloseButton
@@ -60,7 +60,7 @@
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new System.Drawing.Size(75, 22);
             this.CloseButton.TabIndex = 2;
-            this.CloseButton.Text = "Close";
+            this.CloseButton.Text = "&Close";
             this.CloseButton.UseVisualStyleBackColor = true;
             this.CloseButton.Click += new System.EventHandler(this.FinishDownload_Exit);
             // 

@@ -38,8 +38,8 @@
             this.CancelButton.Location = new System.Drawing.Point(410, 41);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelButton.TabIndex = 0;
-            this.CancelButton.Text = "Cancel";
+            this.CancelButton.TabIndex = 2;
+            this.CancelButton.Text = "&Cancel";
             this.CancelButton.UseVisualStyleBackColor = true;
             this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
@@ -49,7 +49,7 @@
             this.ProgressMeasure.Maximum = 1000;
             this.ProgressMeasure.Name = "ProgressMeasure";
             this.ProgressMeasure.Size = new System.Drawing.Size(472, 23);
-            this.ProgressMeasure.TabIndex = 1;
+            this.ProgressMeasure.TabIndex = 0;
             // 
             // ProgressLabel
             // 
@@ -57,7 +57,7 @@
             this.ProgressLabel.Location = new System.Drawing.Point(9, 46);
             this.ProgressLabel.Name = "ProgressLabel";
             this.ProgressLabel.Size = new System.Drawing.Size(61, 13);
-            this.ProgressLabel.TabIndex = 2;
+            this.ProgressLabel.TabIndex = 1;
             this.ProgressLabel.Text = "Preparing...";
             // 
             // Operate
