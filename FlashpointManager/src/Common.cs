@@ -180,7 +180,7 @@ namespace FlashpointInstaller
             // Name of configuration file
             public static string ConfigFile { get; set; } = "fpm.cfg";
             // Internet location of component list XML
-            public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/development/components.xml";
+            public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/stable/components.xml";
             // Path to the local Flashpoint copy
             public static string SourcePath { get; set; } = Debugger.IsAttached
                 ? Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint")

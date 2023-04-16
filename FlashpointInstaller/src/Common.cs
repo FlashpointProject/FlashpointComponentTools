@@ -150,7 +150,7 @@ namespace FlashpointInstaller
             // Pointer to main form
             public static Main Main { get => (Main)Application.OpenForms["Main"]; }
             // Internet location of component list XML
-            public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/development/components.xml";
+            public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/stable/components.xml";
             // The parsed component list XML
             public static XmlDocument XmlTree { get; set; }
 
