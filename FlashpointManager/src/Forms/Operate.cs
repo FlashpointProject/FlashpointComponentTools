@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Downloader;
 using FlashpointInstaller.Common;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using SharpCompress.Archives.Zip;
@@ -21,7 +21,7 @@ namespace FlashpointInstaller
         List<Component> addedComponents   = new List<Component>();
         List<Component> removedComponents = new List<Component>();
 
-        DownloadService downloader = new DownloadService();
+        WebClient client = new WebClient();
 
         Stream stream;
         ZipArchive archive;
@@ -38,8 +38,7 @@ namespace FlashpointInstaller
         {
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
 
-            downloader.DownloadProgressChanged += OnDownloadProgressChanged;
-            downloader.DownloadFileCompleted   += OnDownloadFileCompleted;
+            client.DownloadProgressChanged += OnDownloadProgressChanged;
 
             if (!FPM.UpdateMode)
             {
@@ -80,9 +79,20 @@ namespace FlashpointInstaller
             foreach (var component in addedComponents)
             {
                 workingComponent = component;
-                if (component.Size > 0) stream = await downloader.DownloadFileTaskAsync(component.URL);
 
-                if (cancelStatus != 0) return;
+                if (component.Size > 0)
+                {
+                    try
+                    {
+                        stream = new MemoryStream(await client.DownloadDataTaskAsync(new Uri(component.URL)));
+                    }
+                    catch (WebException ex) when (ex.Status == WebExceptionStatus.RequestCanceled)
+                    {
+                        client.Dispose();
+                        cancelStatus = 2;
+                        return;
+                    }
+                }
 
                 await Task.Run(ExtractComponents);
 
@@ -124,11 +134,11 @@ namespace FlashpointInstaller
         {
             if (cancelStatus != 0)
             {
-                downloader.CancelAsync();
+                client.CancelAsync();
                 return;
             }
 
-            double currentProgress = (double)e.ReceivedBytesSize / e.TotalBytesToReceive;
+            double currentProgress = (double)e.BytesReceived / e.TotalBytesToReceive;
             long currentSize = workingComponent.Size;
             double totalProgress = (byteProgress + (currentProgress / 2 * currentSize)) / byteTotal;
 
@@ -141,7 +151,7 @@ namespace FlashpointInstaller
             {
                 ProgressLabel.Text =
                     $"[{(int)((double)totalProgress * 100)}%] Downloading component \"{workingComponent.Title}\"... " +
-                    $"{FPM.GetFormattedBytes(e.ReceivedBytesSize)} of {FPM.GetFormattedBytes(e.TotalBytesToReceive)}";
+                    $"{FPM.GetFormattedBytes(e.BytesReceived)} of {FPM.GetFormattedBytes(e.TotalBytesToReceive)}";
             });
 
             FPM.Main.Invoke((MethodInvoker)delegate
@@ -150,11 +160,6 @@ namespace FlashpointInstaller
                     (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
                 );
             });
-        }
-
-        private void OnDownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            if (e.Cancelled) cancelStatus = 2;
         }
 
         private void ExtractComponents()
