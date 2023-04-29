@@ -270,6 +270,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Common.cs" />
+    <Compile Include="src\Forms\CheckFiles.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="src\Forms\CheckFiles.Designer.cs">
+      <DependentUpon>CheckFiles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="src\Forms\Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="src\Forms\Operate.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -287,6 +296,9 @@
     <Compile Include="src\TriStateTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <EmbeddedResource Include="src\Forms\CheckFiles.resx">
+      <DependentUpon>CheckFiles.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="src\Forms\Operate.resx">
       <DependentUpon>Operate.cs</DependentUpon>
     </EmbeddedResource>

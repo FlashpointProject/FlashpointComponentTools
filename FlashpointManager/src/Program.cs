@@ -6,9 +6,9 @@ using System.Net;
 using System.Windows.Forms;
 using System.Xml;
 
-using FlashpointInstaller.Common;
+using FlashpointManager.Common;
 
-namespace FlashpointInstaller
+namespace FlashpointManager
 {
     internal static class Program
     {
@@ -52,21 +52,21 @@ namespace FlashpointInstaller
             {
                 var configReader = File.ReadAllLines(FPM.ConfigFile);
                 FPM.SourcePath = configReader[0];
-                FPM.ListURL    = configReader[1];
+                FPM.RepoXml    = configReader[1];
             }
             catch
             {
                 using (var configWriter = File.CreateText(FPM.ConfigFile))
                 {
                     configWriter.WriteLine(FPM.SourcePath);
-                    configWriter.WriteLine(FPM.ListURL);
+                    configWriter.WriteLine(FPM.RepoXml);
                 }
             }
 
             // Download and parse component list
             try
             {
-                var listStream = new MemoryStream(new WebClient().DownloadData(FPM.ListURL)) { Position = 0 };
+                var listStream = new MemoryStream(new WebClient().DownloadData(FPM.RepoXml)) { Position = 0 };
 
                 FPM.XmlTree = new XmlDocument();
                 FPM.XmlTree.Load(listStream);

@@ -6,13 +6,13 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using FlashpointInstaller.Common;
+using FlashpointManager.Common;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Readers;
 
-namespace FlashpointInstaller
+namespace FlashpointManager
 {
     public partial class Operate : Form
     {
@@ -40,7 +40,7 @@ namespace FlashpointInstaller
 
             client.DownloadProgressChanged += OnDownloadProgressChanged;
 
-            if (!FPM.UpdateMode)
+            if (FPM.OperateMode == 0)
             {
                 FPM.IterateList(FPM.Main.ComponentList.Nodes, node =>
                 {
@@ -59,7 +59,7 @@ namespace FlashpointInstaller
                     }
                 });
             }
-            else
+            else if (FPM.OperateMode == 1)
             {
                 foreach (var component in FPM.ComponentTracker.Outdated)
                 {
@@ -71,8 +71,16 @@ namespace FlashpointInstaller
                     addedComponents.Add(component);
                 }
             }
+            else
+            {
+                foreach (var component in FPM.ComponentTracker.Broken)
+                {
+                    removedComponents.Add(component);
+                    addedComponents.Add(component);
+                }
+            }
 
-            byteTotal = FPM.UpdateMode
+            byteTotal = FPM.OperateMode != 0
                 ? addedComponents.Sum(c => c.Size)
                 : addedComponents.Concat(removedComponents).Sum(c => c.Size);
 
@@ -253,7 +261,7 @@ namespace FlashpointInstaller
                 removedFiles++;
 
                 double removeProgress = (double)removedFiles / totalFiles;
-                double totalProgress = FPM.UpdateMode ? 1 : (byteProgress + (removeProgress * totalSize)) / byteTotal;
+                double totalProgress = FPM.OperateMode != 0 ? 1 : (byteProgress + (removeProgress * totalSize)) / byteTotal;
 
                 ProgressMeasure.Invoke((MethodInvoker)delegate
                 {

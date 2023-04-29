@@ -1,4 +1,4 @@
-﻿namespace FlashpointInstaller
+﻿namespace FlashpointManager
 {
     partial class Main
     {
@@ -43,23 +43,32 @@
             this.UpdateList = new System.Windows.Forms.ListView();
             this.ComponentTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ComponentDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ComponentUpdated = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ComponentDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ComponentSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.UninstallTab = new System.Windows.Forms.TabPage();
-            this.UninstallDescription = new System.Windows.Forms.Label();
+            this.SettingsTab = new System.Windows.Forms.TabPage();
+            this.SaveButton = new System.Windows.Forms.Button();
+            this.BrowseButton = new System.Windows.Forms.Button();
+            this.LocationBox = new System.Windows.Forms.TextBox();
+            this.LocationLabel = new System.Windows.Forms.Label();
+            this.CheckFilesButton = new System.Windows.Forms.Button();
+            this.StableRepo = new System.Windows.Forms.RadioButton();
+            this.RepositoryBox = new System.Windows.Forms.TextBox();
+            this.DevRepo = new System.Windows.Forms.RadioButton();
+            this.RepositoryLabel = new System.Windows.Forms.Label();
+            this.CustomRepo = new System.Windows.Forms.RadioButton();
             this.UninstallButton = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
             this.UpdateTab.SuspendLayout();
-            this.UninstallTab.SuspendLayout();
+            this.SettingsTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
             // 
             this.TabControl.Controls.Add(this.ManageTab);
             this.TabControl.Controls.Add(this.UpdateTab);
-            this.TabControl.Controls.Add(this.UninstallTab);
+            this.TabControl.Controls.Add(this.SettingsTab);
             this.TabControl.ItemSize = new System.Drawing.Size(150, 20);
             this.TabControl.Location = new System.Drawing.Point(13, 10);
             this.TabControl.Name = "TabControl";
@@ -171,7 +180,7 @@
             this.UpdateList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ComponentTitle,
             this.ComponentDescription,
-            this.ComponentUpdated,
+            this.ComponentDate,
             this.ComponentSize});
             this.UpdateList.FullRowSelect = true;
             this.UpdateList.GridLines = true;
@@ -194,46 +203,145 @@
             // ComponentDescription
             // 
             this.ComponentDescription.Text = "Description";
-            this.ComponentDescription.Width = 272;
+            this.ComponentDescription.Width = 267;
             // 
-            // ComponentUpdated
+            // ComponentDate
             // 
-            this.ComponentUpdated.Text = "Last Updated";
-            this.ComponentUpdated.Width = 90;
+            this.ComponentDate.Text = "Date";
+            this.ComponentDate.Width = 80;
             // 
             // ComponentSize
             // 
             this.ComponentSize.Text = "Size";
-            this.ComponentSize.Width = 65;
+            this.ComponentSize.Width = 80;
             // 
-            // UninstallTab
+            // SettingsTab
             // 
-            this.UninstallTab.Controls.Add(this.UninstallDescription);
-            this.UninstallTab.Controls.Add(this.UninstallButton);
-            this.UninstallTab.Location = new System.Drawing.Point(4, 24);
-            this.UninstallTab.Name = "UninstallTab";
-            this.UninstallTab.Padding = new System.Windows.Forms.Padding(3);
-            this.UninstallTab.Size = new System.Drawing.Size(592, 212);
-            this.UninstallTab.TabIndex = 2;
-            this.UninstallTab.Text = "Uninstall Flashpoint";
-            this.UninstallTab.UseVisualStyleBackColor = true;
+            this.SettingsTab.Controls.Add(this.SaveButton);
+            this.SettingsTab.Controls.Add(this.BrowseButton);
+            this.SettingsTab.Controls.Add(this.LocationBox);
+            this.SettingsTab.Controls.Add(this.LocationLabel);
+            this.SettingsTab.Controls.Add(this.CheckFilesButton);
+            this.SettingsTab.Controls.Add(this.StableRepo);
+            this.SettingsTab.Controls.Add(this.RepositoryBox);
+            this.SettingsTab.Controls.Add(this.DevRepo);
+            this.SettingsTab.Controls.Add(this.RepositoryLabel);
+            this.SettingsTab.Controls.Add(this.CustomRepo);
+            this.SettingsTab.Controls.Add(this.UninstallButton);
+            this.SettingsTab.Location = new System.Drawing.Point(4, 24);
+            this.SettingsTab.Name = "SettingsTab";
+            this.SettingsTab.Padding = new System.Windows.Forms.Padding(3);
+            this.SettingsTab.Size = new System.Drawing.Size(592, 212);
+            this.SettingsTab.TabIndex = 2;
+            this.SettingsTab.Text = "Settings";
+            this.SettingsTab.UseVisualStyleBackColor = true;
             // 
-            // UninstallDescription
+            // SaveButton
             // 
-            this.UninstallDescription.Location = new System.Drawing.Point(8, 50);
-            this.UninstallDescription.Name = "UninstallDescription";
-            this.UninstallDescription.Size = new System.Drawing.Size(574, 40);
-            this.UninstallDescription.TabIndex = 0;
-            this.UninstallDescription.Text = resources.GetString("UninstallDescription.Text");
-            this.UninstallDescription.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.SaveButton.Location = new System.Drawing.Point(49, 176);
+            this.SaveButton.Name = "SaveButton";
+            this.SaveButton.Size = new System.Drawing.Size(160, 26);
+            this.SaveButton.TabIndex = 8;
+            this.SaveButton.Text = "Save and &restart";
+            this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
+            // 
+            // BrowseButton
+            // 
+            this.BrowseButton.Location = new System.Drawing.Point(466, 43);
+            this.BrowseButton.Name = "BrowseButton";
+            this.BrowseButton.Size = new System.Drawing.Size(75, 22);
+            this.BrowseButton.TabIndex = 2;
+            this.BrowseButton.Text = "&Browse";
+            this.BrowseButton.UseVisualStyleBackColor = true;
+            this.BrowseButton.Click += new System.EventHandler(this.BrowseButton_Click);
+            // 
+            // LocationBox
+            // 
+            this.LocationBox.Location = new System.Drawing.Point(160, 44);
+            this.LocationBox.Name = "LocationBox";
+            this.LocationBox.Size = new System.Drawing.Size(300, 20);
+            this.LocationBox.TabIndex = 1;
+            // 
+            // LocationLabel
+            // 
+            this.LocationLabel.AutoSize = true;
+            this.LocationLabel.Location = new System.Drawing.Point(52, 47);
+            this.LocationLabel.Name = "LocationLabel";
+            this.LocationLabel.Size = new System.Drawing.Size(102, 13);
+            this.LocationLabel.TabIndex = 0;
+            this.LocationLabel.Text = "Flashpoint Location:";
+            // 
+            // CheckFilesButton
+            // 
+            this.CheckFilesButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.CheckFilesButton.Location = new System.Drawing.Point(215, 176);
+            this.CheckFilesButton.Name = "CheckFilesButton";
+            this.CheckFilesButton.Size = new System.Drawing.Size(160, 26);
+            this.CheckFilesButton.TabIndex = 9;
+            this.CheckFilesButton.Text = "Check for &missing files";
+            this.CheckFilesButton.UseVisualStyleBackColor = true;
+            this.CheckFilesButton.Click += new System.EventHandler(this.CheckFilesButton_Click);
+            // 
+            // StableRepo
+            // 
+            this.StableRepo.AutoSize = true;
+            this.StableRepo.Location = new System.Drawing.Point(203, 122);
+            this.StableRepo.Name = "StableRepo";
+            this.StableRepo.Size = new System.Drawing.Size(55, 17);
+            this.StableRepo.TabIndex = 5;
+            this.StableRepo.TabStop = true;
+            this.StableRepo.Text = "&Stable";
+            this.StableRepo.UseVisualStyleBackColor = true;
+            this.StableRepo.CheckedChanged += new System.EventHandler(this.ComponentRepo_CheckedChanged);
+            // 
+            // RepositoryBox
+            // 
+            this.RepositoryBox.Location = new System.Drawing.Point(160, 96);
+            this.RepositoryBox.Name = "RepositoryBox";
+            this.RepositoryBox.Size = new System.Drawing.Size(300, 20);
+            this.RepositoryBox.TabIndex = 4;
+            // 
+            // DevRepo
+            // 
+            this.DevRepo.AutoSize = true;
+            this.DevRepo.Location = new System.Drawing.Point(264, 122);
+            this.DevRepo.Name = "DevRepo";
+            this.DevRepo.Size = new System.Drawing.Size(88, 17);
+            this.DevRepo.TabIndex = 6;
+            this.DevRepo.TabStop = true;
+            this.DevRepo.Text = "&Development";
+            this.DevRepo.UseVisualStyleBackColor = true;
+            this.DevRepo.CheckedChanged += new System.EventHandler(this.ComponentRepo_CheckedChanged);
+            // 
+            // RepositoryLabel
+            // 
+            this.RepositoryLabel.AutoSize = true;
+            this.RepositoryLabel.Location = new System.Drawing.Point(52, 99);
+            this.RepositoryLabel.Name = "RepositoryLabel";
+            this.RepositoryLabel.Size = new System.Drawing.Size(101, 13);
+            this.RepositoryLabel.TabIndex = 3;
+            this.RepositoryLabel.Text = "Component Source:";
+            // 
+            // CustomRepo
+            // 
+            this.CustomRepo.AutoSize = true;
+            this.CustomRepo.Location = new System.Drawing.Point(358, 122);
+            this.CustomRepo.Name = "CustomRepo";
+            this.CustomRepo.Size = new System.Drawing.Size(60, 17);
+            this.CustomRepo.TabIndex = 7;
+            this.CustomRepo.TabStop = true;
+            this.CustomRepo.Text = "&Custom";
+            this.CustomRepo.UseVisualStyleBackColor = true;
+            this.CustomRepo.CheckedChanged += new System.EventHandler(this.ComponentRepo_CheckedChanged);
             // 
             // UninstallButton
             // 
             this.UninstallButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.UninstallButton.Location = new System.Drawing.Point(195, 113);
+            this.UninstallButton.Location = new System.Drawing.Point(381, 176);
             this.UninstallButton.Name = "UninstallButton";
-            this.UninstallButton.Size = new System.Drawing.Size(200, 26);
-            this.UninstallButton.TabIndex = 1;
+            this.UninstallButton.Size = new System.Drawing.Size(160, 26);
+            this.UninstallButton.TabIndex = 10;
             this.UninstallButton.Text = "&Uninstall Flashpoint";
             this.UninstallButton.UseVisualStyleBackColor = true;
             this.UninstallButton.Click += new System.EventHandler(this.UninstallButton_Click);
@@ -256,7 +364,8 @@
             this.ManageTab.ResumeLayout(false);
             this.DescriptionBox.ResumeLayout(false);
             this.UpdateTab.ResumeLayout(false);
-            this.UninstallTab.ResumeLayout(false);
+            this.SettingsTab.ResumeLayout(false);
+            this.SettingsTab.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -264,22 +373,31 @@
         #endregion
         private System.Windows.Forms.TabControl TabControl;
         private System.Windows.Forms.TabPage ManageTab;
-        private System.Windows.Forms.TabPage UninstallTab;
+        private System.Windows.Forms.TabPage SettingsTab;
         public RikTheVeggie.TriStateTreeView ComponentList;
         private System.Windows.Forms.GroupBox DescriptionBox;
         private System.Windows.Forms.Label Description;
         private System.Windows.Forms.Label Message;
         public System.Windows.Forms.Button ChangeButton;
-        private System.Windows.Forms.Label UninstallDescription;
         public System.Windows.Forms.Button UninstallButton;
         public System.Windows.Forms.Label Message2;
         private System.Windows.Forms.TabPage UpdateTab;
         private System.Windows.Forms.ColumnHeader ComponentTitle;
         private System.Windows.Forms.ColumnHeader ComponentDescription;
-        private System.Windows.Forms.ColumnHeader ComponentUpdated;
+        private System.Windows.Forms.ColumnHeader ComponentDate;
         private System.Windows.Forms.ColumnHeader ComponentSize;
         public System.Windows.Forms.Button UpdateButton;
         public System.Windows.Forms.ListView UpdateList;
+        private System.Windows.Forms.Label RepositoryLabel;
+        private System.Windows.Forms.Button BrowseButton;
+        private System.Windows.Forms.Label LocationLabel;
+        public System.Windows.Forms.Button CheckFilesButton;
+        private System.Windows.Forms.Button SaveButton;
+        public System.Windows.Forms.TextBox RepositoryBox;
+        public System.Windows.Forms.TextBox LocationBox;
+        public System.Windows.Forms.RadioButton StableRepo;
+        public System.Windows.Forms.RadioButton DevRepo;
+        public System.Windows.Forms.RadioButton CustomRepo;
     }
 }
 

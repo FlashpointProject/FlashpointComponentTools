@@ -2,13 +2,12 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 
-using FlashpointInstaller.Common;
+using FlashpointManager.Common;
 
-namespace FlashpointInstaller
+namespace FlashpointManager
 {
     public partial class Main : Form
     {
@@ -115,55 +114,16 @@ namespace FlashpointInstaller
         {
             if (!FPM.CheckDependencies()) return;
 
-            FPM.UpdateMode = false;
+            FPM.OperateMode = 0;
 
             new Operate().ShowDialog();
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            FPM.UpdateMode = true;
+            FPM.OperateMode = 1;
 
             new Operate().ShowDialog();
-        }
-
-        private async void UninstallButton_Click(object sender, EventArgs e)
-        {
-            TabControl.Enabled = false;
-
-            await Task.Run(() => {
-                foreach (string file in Directory.EnumerateFileSystemEntries(FPM.SourcePath, "*", SearchOption.AllDirectories))
-                {
-                    try { FPM.DeleteFileAndDirectories(file); } catch { }
-                }
-
-                var shortcutPaths = new string[]
-                {
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Flashpoint.lnk"),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),   "Flashpoint.lnk")
-                };
-
-                foreach (string path in shortcutPaths)
-                {
-                    try { File.Delete(path); } catch { }
-                }
-            });
-
-            MessageBox.Show(
-                "Flashpoint has been uninstalled from your system.",
-                "Uninstallation Complete", MessageBoxButtons.OK, MessageBoxIcon.Information
-            );
-
-            new Process() { StartInfo = {
-                FileName = "cmd.exe",
-                Arguments = "/k timeout /nobreak /t 1 >nul & " +
-                    $"rmdir /Q \"{Path.GetFullPath(Path.Combine(FPM.SourcePath, "Manager"))}\" & " +
-                    $"rmdir /Q \"{Path.GetFullPath(FPM.SourcePath)}\" & exit",
-                WorkingDirectory = Path.GetFullPath(Path.Combine(FPM.SourcePath, "..")),
-                WindowStyle = ProcessWindowStyle.Hidden
-            }}.Start();
-
-            Close();
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)

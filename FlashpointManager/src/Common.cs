@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace FlashpointInstaller
+namespace FlashpointManager
 {
     namespace Common
     {
@@ -179,15 +178,21 @@ namespace FlashpointInstaller
 
             // Name of configuration file
             public static string ConfigFile { get; set; } = "fpm.cfg";
-            // Internet location of component list XML
-            public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/stable/components.xml";
+            // Internet locations of component list XMLs
+            public static class RepoXmlTemplates
+            {
+                public const string Stable = "https://nexus-dev.unstable.life/repository/stable/components.xml";
+                public const string Development = "https://nexus-dev.unstable.life/repository/development/components.xml";
+            }
+            public static string RepoXml { get; set; } = RepoXmlTemplates.Stable;
             // Path to the local Flashpoint copy
-            public static string SourcePath { get; set; } = Debugger.IsAttached
-                ? Path.Combine(Path.GetPathRoot(AppDomain.CurrentDomain.BaseDirectory), "Flashpoint")
-                : Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ".."));
+            public static string SourcePath { get; set; } = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ".."));
 
-            // Controls whether components are being updated instead of added or removed
-            public static bool UpdateMode { get; set; } = false;
+            // Controls which components the operate tab adds and removes
+            // 0 = Download/remove selected components
+            // 1 = Reinstall outdated components
+            // 2 = Reinstall broken components
+            public static int OperateMode { get; set; } = 0;
             // Controls whether the update tab is selected at launch
             public static bool OpenUpdateTab { get; set; } = false;
             // Controls whether the launcher should be opened upon the manager closing
@@ -205,6 +210,8 @@ namespace FlashpointInstaller
                 public static List<Component> Downloaded { get; set; } = new List<Component>();
                 // Returns all outdated components
                 public static List<Component> Outdated   { get; set; } = new List<Component>();
+                // Returns all components with missing files
+                public static List<Component> Broken     { get; set; } = new List<Component>();
             }
 
             // Performs an operation on every node in the specified TreeNodeCollection
@@ -309,16 +316,18 @@ namespace FlashpointInstaller
 
                     var component = new Component(node);
 
-                    bool outdated = false;
                     bool downloaded = ComponentTracker.Downloaded.Exists(c => c.ID == component.ID);
+                    bool outdated = false;
 
                     if (downloaded)
                     {
                         string localHash = File.ReadLines(component.InfoFile).First().Split(' ')[0];
                         outdated = localHash != component.Hash && component.ID != "core-database";
                     }
-                    
-                    if (!downloaded && component.Required) outdated = true;
+                    else if (component.Required)
+                    {
+                        outdated = true;
+                    }
 
                     if (outdated)
                     {
@@ -373,6 +382,21 @@ namespace FlashpointInstaller
                 else
                 {
                     Main.UpdateButton.Enabled = false;
+                }
+
+                Main.LocationBox.Text = SourcePath;
+
+                switch (RepoXml)
+                {
+                    case RepoXmlTemplates.Stable:
+                        Main.StableRepo.Checked = true;
+                        break;
+                    case RepoXmlTemplates.Development:
+                        Main.DevRepo.Checked = true;
+                        break;
+                    default:
+                        Main.CustomRepo.Checked = true;
+                        break;
                 }
             }
 

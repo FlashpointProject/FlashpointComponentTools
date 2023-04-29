@@ -1,4 +1,4 @@
-﻿namespace FlashpointInstaller
+﻿namespace FlashpointManager
 {
     partial class Operate
     {
@@ -74,7 +74,7 @@
             this.MinimizeBox = false;
             this.Name = "Operate";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Modifying Flashpoint...";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Operation_FormClosing);
             this.Load += new System.EventHandler(this.Operation_Load);
