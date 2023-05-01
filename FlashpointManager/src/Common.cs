@@ -206,12 +206,14 @@ namespace FlashpointManager
             // Object providing easy access to certain groups of components; managed by SyncManager() function
             public static class ComponentTracker
             {
-                // Returns all downloaded components
+                // Contains all downloaded components
                 public static List<Component> Downloaded { get; set; } = new List<Component>();
-                // Returns all outdated components
+                // Contains all outdated components
                 public static List<Component> Outdated   { get; set; } = new List<Component>();
-                // Returns all components with missing files
+                // Contains all components with missing files
                 public static List<Component> Broken     { get; set; } = new List<Component>();
+                // Contains all components that no longer exist in the live component repository
+                public static List<Component> Deprecated { get; set; } = new List<Component>();
             }
 
             // Performs an operation on every node in the specified TreeNodeCollection
@@ -284,6 +286,7 @@ namespace FlashpointManager
             {
                 ComponentTracker.Downloaded.Clear();
                 ComponentTracker.Outdated.Clear();
+                ComponentTracker.Deprecated.Clear();
                 Main.UpdateList.Items.Clear();
 
                 IterateList(Main.ComponentList.Nodes, node =>
@@ -310,11 +313,15 @@ namespace FlashpointManager
 
                 DownloadedSize = ComponentTracker.Downloaded.Sum(c => long.Parse(File.ReadLines(c.InfoFile).First().Split(' ')[1]));
 
+                var componentList = new List<string>();
+
                 IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
                 {
                     if (node.Name != "component") return;
 
                     var component = new Component(node);
+
+                    componentList.Add(component.ID);
 
                     bool downloaded = ComponentTracker.Downloaded.Exists(c => c.ID == component.ID);
                     bool outdated = false;
@@ -323,6 +330,8 @@ namespace FlashpointManager
                     {
                         string localHash = File.ReadLines(component.InfoFile).First().Split(' ')[0];
                         outdated = localHash != component.Hash && component.ID != "core-database";
+
+                        if (outdated) MessageBox.Show(localHash + " " + component.Hash);
                     }
                     else if (component.Required)
                     {
@@ -345,6 +354,32 @@ namespace FlashpointManager
                 });
 
                 ComponentTracker.Outdated = ComponentTracker.Outdated.Distinct().ToList();
+
+                foreach (string filePath in Directory.EnumerateFiles(Path.Combine(SourcePath, "Components")))
+                {
+                    if (!filePath.EndsWith(".txt")) continue;
+
+                    string id = Path.GetFileName(filePath).Split('.')[0];
+
+                    if (componentList.Contains(id)) continue;
+
+                    string[] header = File.ReadLines(filePath).First().Split(' ');
+
+                    long size = 0;
+
+                    if (header.Length >= 2 && long.TryParse(header[1], out size))
+                    {
+                        var component = new Component(XmlTree.SelectSingleNode("//component"))
+                        {
+                            Title = id,
+                            ID    = id,
+                            Size  = size,
+                            Hash  = header[0]
+                        };
+
+                        ComponentTracker.Deprecated.Add(component);
+                    }
+                }
 
                 long totalSizeChange = 0;
 
@@ -369,12 +404,25 @@ namespace FlashpointManager
                     Main.UpdateList.Items.Add(item);
                 }
 
+                foreach (var component in ComponentTracker.Deprecated)
+                {
+                    totalSizeChange -= component.Size;
+
+                    var item = new ListViewItem();
+                    item.Text = component.Title;
+                    item.SubItems.Add("This component is deprecated and can be deleted.");
+                    item.SubItems.Add("");
+                    item.SubItems.Add(GetFormattedBytes(-component.Size));
+
+                    Main.UpdateList.Items.Add(item);
+                }
+
                 Main.ChangeButton.Text = $"Apply changes";
                 Main.ChangeButton.Enabled = false;
 
                 Main.UpdateButton.Text = "Install updates";
 
-                if (ComponentTracker.Outdated.Count > 0)
+                if (ComponentTracker.Outdated.Count > 0 || ComponentTracker.Deprecated.Count > 0)
                 {
                     Main.UpdateButton.Text += $" ({GetFormattedBytes(totalSizeChange)})";
                     Main.UpdateButton.Enabled = true;

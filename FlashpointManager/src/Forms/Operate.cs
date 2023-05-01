@@ -70,6 +70,8 @@ namespace FlashpointManager
 
                     addedComponents.Add(component);
                 }
+
+                removedComponents.AddRange(FPM.ComponentTracker.Deprecated);
             }
             else
             {
