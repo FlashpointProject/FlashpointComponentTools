@@ -330,8 +330,6 @@ namespace FlashpointManager
                     {
                         string localHash = File.ReadLines(component.InfoFile).First().Split(' ')[0];
                         outdated = localHash != component.Hash && component.ID != "core-database";
-
-                        if (outdated) MessageBox.Show(localHash + " " + component.Hash);
                     }
                     else if (component.Required)
                     {
@@ -468,7 +466,7 @@ namespace FlashpointManager
             }
 
             // Checks if specified Flashpoint source path is valid
-            public static void VerifySourcePath()
+            public static bool VerifySourcePath()
             {
                 bool isFlashpoint = false;
 
@@ -482,15 +480,28 @@ namespace FlashpointManager
                     }
                 });
 
-                if (!isFlashpoint)
+                return isFlashpoint;
+            }
+
+            // Writes new values to the configuration file
+            public static bool WriteConfig(string path, string source)
+            {
+                try
+                {
+                    File.WriteAllLines("fpm.cfg", new[] { path, source });
+                }
+                catch
                 {
                     MessageBox.Show(
-                        "The Flashpoint directory specified in fpm.cfg is invalid!",
+                        "Could not write to configuration file (fpm.cfg)." +
+                        "Make sure it is not being used by another program.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
                     );
 
-                    Environment.Exit(1);
+                    return false;
                 }
+
+                return true;
             }
 
             // Checks if any dependencies were not marked for download by the user, and marks them accordingly

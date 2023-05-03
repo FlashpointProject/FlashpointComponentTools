@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Xml;
 
 using FlashpointManager.Common;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace FlashpointManager
 {
@@ -63,26 +64,70 @@ namespace FlashpointManager
                 }
             }
 
+            bool updateConfig = false;
+
             // Download and parse component list
-            try
+            while (true)
             {
-                var listStream = new MemoryStream(new WebClient().DownloadData(FPM.RepoXml)) { Position = 0 };
+                MemoryStream listStream = null;
+
+                try
+                {
+                    listStream = new MemoryStream(new WebClient().DownloadData(FPM.RepoXml)) { Position = 0 };
+                }
+                catch
+                {
+                    bool suggestReset = FPM.RepoXml != FPM.RepoXmlTemplates.Stable;
+
+                    var errorDialog = MessageBox.Show(
+                        "The component list could not be downloaded!\n\n" +
+                        "Verify that your internet connection is working. " + (suggestReset ?
+                        "If it is, the component source may be misconfigured. Click OK to switch to the default component source."
+                        : ""), "Error", suggestReset ? MessageBoxButtons.OKCancel : MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
+
+                    if (suggestReset && errorDialog == DialogResult.OK)
+                    {
+                        FPM.RepoXml = FPM.RepoXmlTemplates.Stable;
+                        updateConfig = true;
+
+                        continue;
+                    }
+
+                    Environment.Exit(1);
+                }
 
                 FPM.XmlTree = new XmlDocument();
                 FPM.XmlTree.Load(listStream);
-            }
-            catch
-            {
-                MessageBox.Show(
-                    "The component list could not be downloaded! Do you have an internet connection?",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                );
 
-                Environment.Exit(1);
+                break;
             }
 
             // Verify that the configured Flashpoint path is valid
-            FPM.VerifySourcePath();
+            while (!FPM.VerifySourcePath())
+            {
+                MessageBox.Show(
+                    "The Flashpoint directory specified in fpm.cfg is invalid!\n\n" + 
+                    "Please choose a valid directory.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                );
+
+                var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
+
+                if (pathDialog.ShowDialog() == CommonFileDialogResult.Cancel)
+                {
+                    Environment.Exit(1);
+                }
+
+                FPM.SourcePath = pathDialog.FileName;
+                updateConfig = true;
+            }
+
+            // Write new values to configuration file if needed
+            if (updateConfig && !FPM.WriteConfig(FPM.SourcePath, FPM.RepoXml))
+            {
+                Environment.Exit(1);
+            }
 
             if (args.Length > 0)
             {

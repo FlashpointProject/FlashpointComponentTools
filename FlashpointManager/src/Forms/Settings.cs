@@ -46,20 +46,7 @@ namespace FlashpointManager
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            try
-            {
-                File.WriteAllLines("fpm.cfg", new[] { LocationBox.Text, RepositoryBox.Text });
-            }
-            catch
-            {
-                MessageBox.Show(
-                    "Could not write to configuration file (fpm.cfg)." +
-                    "Make sure it is not being used by another program.",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                );
-
-                return;
-            }
+            if (!FPM.WriteConfig(LocationBox.Text, RepositoryBox.Text)) return;
 
             Application.Restart();
         }
