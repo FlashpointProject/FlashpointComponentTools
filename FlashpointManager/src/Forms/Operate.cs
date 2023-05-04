@@ -130,8 +130,6 @@ namespace FlashpointManager
                 await Task.Run(ApplyComponents);
             }
 
-            await Task.Run(DeleteTempDirectory);
-
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
 
             if (FPM.AutoDownload.Count == 0) FPM.SyncManager();
@@ -292,6 +290,23 @@ namespace FlashpointManager
 
         private void ApplyComponents()
         {
+            void MoveDelete(string source, string dest)
+            {
+                try
+                {
+                    File.Move(source, dest);
+                    FPM.DeleteFileAndDirectories(source);
+                }
+                catch
+                {
+                    MessageBox.Show(
+                        "Failed to move the following file:\n" + source + "\n\n" +
+                        "You will have to move it manually from the Temp folder.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
+                }
+            }
+
             string tempPath = Path.Combine(FPM.SourcePath, "Temp");
             string tempInfoFile = Path.Combine(tempPath, "Components", workingComponent.ID);
             string[] infoText = File.ReadLines(tempInfoFile).Skip(1).ToArray();
@@ -302,25 +317,11 @@ namespace FlashpointManager
                 string destFile = Path.Combine(FPM.SourcePath, file);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(destFile));
-                try { File.Move(tempFile, destFile); } catch { }
+
+                MoveDelete(tempFile, destFile);
             }
 
-            try { File.Move(tempInfoFile, workingComponent.InfoFile); } catch { }
-        }
-
-        public static void DeleteTempDirectory()
-        {
-            string tempPath = Path.Combine(FPM.SourcePath, "Temp");
-
-            if (Directory.Exists(tempPath))
-            {
-                foreach (string tempFile in Directory.EnumerateFiles(tempPath))
-                {
-                    try { File.Delete(tempFile); } catch { }
-                }
-
-                try { Directory.Delete(tempPath, true); } catch { }
-            }
+            MoveDelete(tempInfoFile, workingComponent.InfoFile);
         }
 
         private async void CancelButton_Click(object sender, EventArgs e)
@@ -337,7 +338,17 @@ namespace FlashpointManager
             {
                 while (cancelStatus != 2) { }
 
-                DeleteTempDirectory();
+                string tempPath = Path.Combine(FPM.SourcePath, "Temp");
+
+                if (Directory.Exists(tempPath))
+                {
+                    foreach (string tempFile in Directory.EnumerateFiles(tempPath))
+                    {
+                        try { File.Delete(tempFile); } catch { }
+                    }
+
+                    try { Directory.Delete(tempPath, true); } catch { }
+                }
             });
 
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);

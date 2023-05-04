@@ -449,7 +449,24 @@ namespace FlashpointManager
             // Deletes a file as well as any directories made empty by its deletion
             public static void DeleteFileAndDirectories(string file)
             {
-                try { File.Delete(file); } catch { }
+                file = Path.GetFullPath(file);
+
+                if (!Path.GetFullPath(file).StartsWith(Path.GetFullPath(SourcePath))) return;
+
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception e) when (!(e is DirectoryNotFoundException))
+                {
+                    MessageBox.Show(
+                        "Failed to delete the following file:\n" + file + "\n\n" +
+                        "Make sure it is not open or being used by another program.",
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                    );
+
+                    return;
+                }
 
                 string folder = Path.GetDirectoryName(file);
 
