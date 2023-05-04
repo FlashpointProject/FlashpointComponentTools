@@ -20,7 +20,7 @@ namespace FlashpointManager
             public string Path { get; set; }
             public string[] Depends { get; set; } = new string[] { };
 
-            public string InfoFile { get => System.IO.Path.Combine(FPM.SourcePath, "Components", $"{ID}.txt"); }
+            public string InfoFile { get => System.IO.Path.Combine(FPM.SourcePath, "Components", ID); }
             public bool Downloaded { get => File.Exists(InfoFile); }
 
             public Component(XmlNode node) : base(node)
@@ -355,7 +355,7 @@ namespace FlashpointManager
 
                 foreach (string filePath in Directory.EnumerateFiles(Path.Combine(SourcePath, "Components")))
                 {
-                    if (!filePath.EndsWith(".txt")) continue;
+                    if (Path.HasExtension(filePath)) continue;
 
                     string id = Path.GetFileName(filePath).Split('.')[0];
 

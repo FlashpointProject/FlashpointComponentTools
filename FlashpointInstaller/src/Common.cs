@@ -247,7 +247,7 @@ namespace FlashpointInstaller
                 {
                     if (alreadyExists || node.Name != "component") return;
 
-                    if (File.Exists(Path.Combine(path, "Components", $"{new Component(node).ID}.txt")))
+                    if (File.Exists(Path.Combine(path, "Components", new Component(node).ID)))
                     {
                         alreadyExists = true;
                     }

@@ -176,7 +176,7 @@ namespace FlashpointManager
         {
             string rootPath = Path.Combine(FPM.SourcePath, "Temp");
             string infoPath = Path.Combine(rootPath, "Components");
-            string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
+            string infoFile = Path.Combine(infoPath, workingComponent.ID);
 
             Directory.CreateDirectory(infoPath);
 
@@ -293,7 +293,7 @@ namespace FlashpointManager
         private void ApplyComponents()
         {
             string tempPath = Path.Combine(FPM.SourcePath, "Temp");
-            string tempInfoFile = Path.Combine(tempPath, "Components", $"{workingComponent.ID}.txt");
+            string tempInfoFile = Path.Combine(tempPath, "Components", workingComponent.ID);
             string[] infoText = File.ReadLines(tempInfoFile).Skip(1).ToArray();
 
             foreach (string file in infoText)

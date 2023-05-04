@@ -29,7 +29,8 @@ namespace FlashpointInstaller
             catch
             {
                 MessageBox.Show(
-                    "The component list could not be downloaded! Do you have an internet connection?",
+                    "The component list could not be downloaded!\n\n" +
+                    "Verify that your internet connection is working.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
                 );
 

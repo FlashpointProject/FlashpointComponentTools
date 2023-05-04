@@ -145,7 +145,7 @@ namespace FlashpointInstaller
         {
             string rootPath = FPM.Main.DestinationPath.Text;
             string infoPath = Path.Combine(FPM.Main.DestinationPath.Text, "Components");
-            string infoFile = Path.Combine(infoPath, $"{workingComponent.ID}.txt");
+            string infoFile = Path.Combine(infoPath, workingComponent.ID);
 
             Directory.CreateDirectory(infoPath);
 
