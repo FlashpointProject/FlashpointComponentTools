@@ -64,8 +64,6 @@ namespace FlashpointManager
                 }
             }
 
-            bool updateConfig = false;
-
             // Download and parse component list
             while (true)
             {
@@ -144,13 +142,11 @@ namespace FlashpointManager
                 }
 
                 FPM.SourcePath = pathDialog.FileName;
-                updateConfig = true;
-            }
 
-            // Write new values to configuration file if needed
-            if (updateConfig && !FPM.WriteConfig(FPM.SourcePath, FPM.RepoXml))
-            {
-                Environment.Exit(1);
+                if (!FPM.WriteConfig(FPM.SourcePath, FPM.RepoXml))
+                {
+                    Environment.Exit(1);
+                }
             }
 
             if (args.Length > 0)

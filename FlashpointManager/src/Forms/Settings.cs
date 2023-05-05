@@ -24,7 +24,7 @@ namespace FlashpointManager
                 {
                     if (isFlashpoint || node.Name != "component") return;
 
-                    if (File.Exists(Path.Combine(pathDialog.FileName, "Components", new Component(node).ID + ".txt")))
+                    if (File.Exists(Path.Combine(pathDialog.FileName, "Components", new Component(node).ID)))
                     {
                         isFlashpoint = true;
                     }
