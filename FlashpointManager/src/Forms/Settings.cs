@@ -36,10 +36,7 @@ namespace FlashpointManager
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "The specified Flashpoint directory is invalid!",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
+                    FPM.GenericError("The specified Flashpoint directory is invalid!");
                 }
             }
         }
@@ -51,22 +48,7 @@ namespace FlashpointManager
             Application.Restart();
         }
 
-        private void CheckFilesButton_Click(object sender, EventArgs e)
-        {
-            if (FPM.ComponentTracker.Outdated.Count == 0)
-            {
-                new CheckFiles().ShowDialog();
-            }
-            else
-            {
-                MessageBox.Show(
-                    "Flashpoint must be up-to-date to check for missing files!",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                );
-
-                TabControl.SelectTab(1);
-            }
-        }
+        private void CheckFilesButton_Click(object sender, EventArgs e) => new CheckFiles().ShowDialog();
 
         private void ComponentRepo_CheckedChanged(object sender, EventArgs e)
         {

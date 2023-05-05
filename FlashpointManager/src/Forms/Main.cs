@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -17,6 +18,12 @@ namespace FlashpointManager
         {
             Text += $" v{Application.ProductVersion}";
 
+            if (FPM.OfflineMode)
+            {
+                TabControl.TabPages.RemoveAt(1);
+                OfflineIndicator.Visible = true;
+            }
+
             using (XmlNodeList rootElements = FPM.XmlTree.GetElementsByTagName("list"))
             {
                 if (rootElements.Count > 0)
@@ -25,17 +32,12 @@ namespace FlashpointManager
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
-                        "Description: Root element was not found",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
-
-                    Environment.Exit(1);
+                    FPM.ParseError("Root element was not found.");
                 }
             }
 
             FPM.SyncManager(true);
+            ComponentList.BeforeCheck += ComponentList_BeforeCheck;
 
             if (FPM.AutoDownload.Count > 0)
             {
@@ -57,11 +59,10 @@ namespace FlashpointManager
 
         public void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
         {
-            bool required = e.Node.Tag.GetType().ToString().EndsWith("Component")
-                ? (e.Node.Tag as Component).Required
-                : (e.Node.Tag as Category).Required;
-
-            if (required && e.Node.Checked) e.Cancel = true;
+            if (e.Node.ForeColor == Color.FromArgb(255, 96, 96, 96))
+            {
+                e.Cancel = true;
+            }
         }
 
         public void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)

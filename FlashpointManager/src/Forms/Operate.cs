@@ -299,10 +299,9 @@ namespace FlashpointManager
                 }
                 catch
                 {
-                    MessageBox.Show(
+                    FPM.GenericError(
                         "Failed to move the following file:\n" + source + "\n\n" +
-                        "You will have to move it manually from the Temp folder.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                        "You will have to move it manually from the Temp folder."
                     );
                 }
             }

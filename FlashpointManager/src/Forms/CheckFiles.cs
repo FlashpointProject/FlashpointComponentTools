@@ -51,7 +51,19 @@ namespace FlashpointManager.src.Forms
 
             FileListLoading.Visible = false;
             FileList.Visible = true;
-            RedownloadButton.Enabled = FileList.Items.Count > 0;
+            
+            if (FPM.ComponentTracker.Outdated.Count > 0)
+            {
+                RedownloadButton.Text = "Cannot redownload components with pending updates";
+            }
+            else if (FPM.OfflineMode)
+            {
+                RedownloadButton.Text = "Cannot redownload components in offline mode";
+            }
+            else
+            {
+                RedownloadButton.Enabled = FileList.Items.Count > 0;
+            }
         }
 
         private void FileMessage_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

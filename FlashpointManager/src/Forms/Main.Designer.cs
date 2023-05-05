@@ -57,6 +57,7 @@
             this.RepositoryLabel = new System.Windows.Forms.Label();
             this.CustomRepo = new System.Windows.Forms.RadioButton();
             this.UninstallButton = new System.Windows.Forms.Button();
+            this.OfflineIndicator = new System.Windows.Forms.Label();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
@@ -147,7 +148,6 @@
             this.ComponentList.Size = new System.Drawing.Size(391, 152);
             this.ComponentList.TabIndex = 0;
             this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeCheck);
             this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
             this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
             // 
@@ -346,11 +346,23 @@
             this.UninstallButton.UseVisualStyleBackColor = true;
             this.UninstallButton.Click += new System.EventHandler(this.UninstallButton_Click);
             // 
+            // OfflineIndicator
+            // 
+            this.OfflineIndicator.AutoSize = true;
+            this.OfflineIndicator.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OfflineIndicator.Location = new System.Drawing.Point(530, 16);
+            this.OfflineIndicator.Name = "OfflineIndicator";
+            this.OfflineIndicator.Size = new System.Drawing.Size(79, 13);
+            this.OfflineIndicator.TabIndex = 1;
+            this.OfflineIndicator.Text = "Offline Mode";
+            this.OfflineIndicator.Visible = false;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 261);
+            this.Controls.Add(this.OfflineIndicator);
             this.Controls.Add(this.TabControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -367,6 +379,7 @@
             this.SettingsTab.ResumeLayout(false);
             this.SettingsTab.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -398,6 +411,7 @@
         public System.Windows.Forms.RadioButton StableRepo;
         public System.Windows.Forms.RadioButton DevRepo;
         public System.Windows.Forms.RadioButton CustomRepo;
+        private System.Windows.Forms.Label OfflineIndicator;
     }
 }
 

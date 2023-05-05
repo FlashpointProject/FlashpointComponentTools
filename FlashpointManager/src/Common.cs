@@ -35,13 +35,7 @@ namespace FlashpointManager
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
-                        "Description: Root element does not contain URL attribute",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
-
-                    Environment.Exit(1);
+                    FPM.ParseError("Root element does not contain URL attribute.");
                 }
 
                 // Hash
@@ -54,13 +48,7 @@ namespace FlashpointManager
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
-                        $"Description: Hash of component \"{Title}\" is invalid",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
-
-                    Environment.Exit(1);
+                    FPM.ParseError($"Hash of component \"{Title}\" is invalid.");
                 }
 
                 // Size
@@ -70,13 +58,7 @@ namespace FlashpointManager
 
                 if (stringSize != "" && !long.TryParse(stringSize, out size))
                 {
-                    MessageBox.Show(
-                        "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
-                        $"Description: Size of component \"{Title}\" is not a number",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
-
-                    Environment.Exit(1);
+                    FPM.ParseError($"Size of component \"{Title}\" is not a number.");
                 }
 
                 Size = size;
@@ -93,13 +75,7 @@ namespace FlashpointManager
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
-                        $"Description: Modified date of component \"{Title}\" is invalid",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
-
-                    Environment.Exit(1);
+                    FPM.ParseError($"Date modified of component \"{Title}\" is invalid.");
                 }
 
                 // Path
@@ -156,13 +132,7 @@ namespace FlashpointManager
                 }
                 else if (throwError)
                 {
-                    MessageBox.Show(
-                        "An error occurred while parsing the component list XML. Please alert Flashpoint staff ASAP!\n\n" +
-                        $"Description: Required {node.Name} attribute \"{attribute}\" was not found",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                    );
-
-                    Environment.Exit(1);
+                    FPM.ParseError($"Required {node.Name} attribute \"{attribute}\" was not found");
                 }
 
                 return "";
@@ -193,6 +163,8 @@ namespace FlashpointManager
             // 1 = Reinstall outdated components
             // 2 = Reinstall broken components
             public static int OperateMode { get; set; } = 0;
+            // Controls whether to apply accommodations for offline use
+            public static bool OfflineMode { get; set; } = false;
             // Controls whether the update tab is selected at launch
             public static bool OpenUpdateTab { get; set; } = false;
             // Controls whether the launcher should be opened upon the manager closing
@@ -300,14 +272,16 @@ namespace FlashpointManager
                             ComponentTracker.Downloaded.Add(component);
                             if (!node.Checked) node.Checked = true;
                         }
-                        else if (node.Checked)
+                        else
                         {
-                            node.Checked = false;
+                            if (OfflineMode) node.ForeColor = Color.FromArgb(255, 96, 96, 96);
+                            if (node.Checked) node.Checked = false;
                         }
                     }
-                    else if (init)
+                    else
                     {
-                        node.Checked = node.Checked;
+                        if (OfflineMode) node.ForeColor = Color.FromArgb(255, 96, 96, 96);
+                        if (init) node.Checked = node.Checked;
                     }
                 });
 
@@ -459,10 +433,9 @@ namespace FlashpointManager
                 }
                 catch (Exception e) when (!(e is DirectoryNotFoundException))
                 {
-                    MessageBox.Show(
+                    GenericError(
                         "Failed to delete the following file:\n" + file + "\n\n" +
-                        "Make sure it is not open or being used by another program.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                        "Make sure it is not open or being used by another program."
                     );
 
                     return;
@@ -509,10 +482,9 @@ namespace FlashpointManager
                 }
                 catch
                 {
-                    MessageBox.Show(
+                    GenericError(
                         "Could not write to configuration file (fpm.cfg)." +
-                        "Make sure it is not being used by another program.",
-                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                        "Make sure it is not being used by another program."
                     );
 
                     return false;
@@ -579,9 +551,9 @@ namespace FlashpointManager
                 {
                     if (alertDepends)
                     {
-                        MessageBox.Show(
+                        GenericError(
                             "The following components cannot be removed because one or more components depend on them:\n\n" +
-                            string.Join(", ", persistDepends), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                            string.Join(", ", persistDepends)
                         );
                     }
 
@@ -629,6 +601,22 @@ namespace FlashpointManager
                 }
 
                 return "0 bytes";
+            }
+
+            // Function for errors unrelated to the component list
+            public static void GenericError(string message) => MessageBox.Show(
+                message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+            );
+
+            // Function for errors related to the component list
+            public static void ParseError(string message)
+            {
+                MessageBox.Show(
+                    $"The following error occurred while parsing the component list:\n\n{message}",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
+                );
+
+                Environment.Exit(1);
             }
         }
     }
