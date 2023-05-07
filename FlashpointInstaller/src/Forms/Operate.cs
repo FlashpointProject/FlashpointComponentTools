@@ -224,7 +224,7 @@ namespace FlashpointInstaller
 
             await Task.Run(() =>
             {
-                var shortcutPaths = new List<string>();
+                var shortcutPaths = new List<string> { FPM.Main.DestinationPath.Text };
 
                 if (FPM.Main.ShortcutDesktop.Checked)
                 {
