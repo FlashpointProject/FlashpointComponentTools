@@ -48,6 +48,8 @@ namespace FlashpointManager
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             // Load config, or create if it doesn't exist
             try
             {

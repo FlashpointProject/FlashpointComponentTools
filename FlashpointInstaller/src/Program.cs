@@ -19,6 +19,8 @@ namespace FlashpointInstaller
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             try
             {
                 var listStream = new MemoryStream(new WebClient().DownloadData(FPM.ListURL)) { Position = 0 };
