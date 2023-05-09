@@ -51,6 +51,10 @@ namespace FlashpointManager
             {
                 RepositoryBox.Text = FPM.RepoXmlTemplates.Development;
             }
+            else
+            {
+                RepositoryBox.Text = FPM.RepoXml;
+            }
 
             RepositoryBox.Enabled = radio.Name == "CustomRepo";
         }
