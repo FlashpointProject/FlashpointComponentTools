@@ -129,7 +129,7 @@ namespace FlashpointManager
             }
 
             // Verify that the configured Flashpoint path is valid
-            while (!FPM.VerifySourcePath())
+            while (!FPM.VerifySourcePath(FPM.SourcePath))
             {
                 FPM.GenericError(
                     "The Flashpoint directory specified in fpm.cfg is invalid!\n\n" + 

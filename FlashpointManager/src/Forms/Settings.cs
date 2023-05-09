@@ -18,19 +18,7 @@ namespace FlashpointManager
 
             if (pathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                bool isFlashpoint = false;
-
-                FPM.IterateXML(FPM.XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
-                {
-                    if (isFlashpoint || node.Name != "component") return;
-
-                    if (File.Exists(Path.Combine(pathDialog.FileName, "Components", new Component(node).ID)))
-                    {
-                        isFlashpoint = true;
-                    }
-                });
-
-                if (isFlashpoint)
+                if (FPM.VerifySourcePath(pathDialog.FileName))
                 {
                     LocationBox.Text = pathDialog.FileName;
                 }

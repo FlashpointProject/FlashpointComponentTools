@@ -456,7 +456,7 @@ namespace FlashpointManager
             }
 
             // Checks if specified Flashpoint source path is valid
-            public static bool VerifySourcePath()
+            public static bool VerifySourcePath(string sourcePath)
             {
                 bool isFlashpoint = false;
 
@@ -464,7 +464,7 @@ namespace FlashpointManager
                 {
                     if (isFlashpoint || node.Name != "component") return;
 
-                    if (new Component(node).Downloaded)
+                    if (File.Exists(Path.Combine(sourcePath, "Components", new Component(node).ID)))
                     {
                         isFlashpoint = true;
                     }
