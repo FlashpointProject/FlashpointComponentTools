@@ -66,66 +66,53 @@ namespace FlashpointManager
                 }
             }
 
-            // Download and parse component list
-            while (true)
+            Stream listStream = null;
+
+            // Attempt to download and parse component list
+            try
             {
-                byte[] listData = new byte[] { };
+                listStream = new MemoryStream(new WebClient().DownloadData(FPM.RepoXml));
+                FPM.XmlTree.Load(listStream);
+            }
+            catch (Exception e)
+            {
+                string failedAction = e is XmlException ? "parsed" : "downloaded";
 
+                FPM.GenericError(
+                    $"The component list could not be {failedAction}! An offline backup will be used instead.\n\n" +
+                    "Verify that your internet connection is working and that your component source is not misconfigured."
+                );
+
+                FPM.OfflineMode = true;
+            }
+
+            string backupPath = Path.Combine(FPM.SourcePath, "Components", "components.bak");
+
+            // Create backup if component list was successfully downloaded and parsed; otherwise, load from backup
+            if (!FPM.OfflineMode)
+            {
                 try
                 {
-                    listData = new WebClient().DownloadData(FPM.RepoXml);
-                }
-                catch
-                {
-                    FPM.GenericError(
-                        "The component list could not be downloaded! An offline backup will be used instead.\n\n" +
-                        "Verify that your internet connection is working and that your component source is not misconfigured."
-                    );
-
-                    FPM.OfflineMode = true;
-                }
-
-                Stream listStream = null;
-                string backupPath = Path.Combine(FPM.SourcePath, "Components", "components.bak");
-
-                if (!FPM.OfflineMode)
-                {
-                    try
+                    using (var fileStream = new FileStream(backupPath, FileMode.OpenOrCreate, FileAccess.Write))
                     {
-                        listStream = File.Create(backupPath);
-                        listStream.Write(listData, 0, listData.Length);
-                    }
-                    catch
-                    {
-                        listStream = new MemoryStream(listData);
+                        listStream.Position = 0;
+                        listStream.CopyTo(fileStream);
                     }
                 }
-                else
-                {
-                    try
-                    {
-                        listStream = new FileStream(backupPath, FileMode.Open, FileAccess.Read);
-                    }
-                    catch
-                    {
-                        FPM.GenericError("Failed to load component list from offline backup!");
-                        Environment.Exit(1);
-                    }
-                }
-
-                listStream.Position = 0;
-
+                catch { }
+            }
+            else
+            {
                 try
                 {
-                    FPM.XmlTree = new XmlDocument();
+                    listStream = new FileStream(backupPath, FileMode.Open, FileAccess.Read);
                     FPM.XmlTree.Load(listStream);
                 }
                 catch
                 {
-                    FPM.ParseError("The XML markup is malformed.");
+                    FPM.GenericError("Failed to load component list from offline backup!");
+                    Environment.Exit(1);
                 }
-
-                break;
             }
 
             // Verify that the configured Flashpoint path is valid

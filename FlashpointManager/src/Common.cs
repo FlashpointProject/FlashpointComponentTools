@@ -144,7 +144,7 @@ namespace FlashpointManager
             // Pointer to main form
             public static Main Main { get => (Main)Application.OpenForms["Main"]; }
             // The parsed component list XML
-            public static XmlDocument XmlTree { get; set; }
+            public static XmlDocument XmlTree { get; } = new XmlDocument();
 
             // Name of configuration file
             public static string ConfigFile { get; set; } = "fpm.cfg";
