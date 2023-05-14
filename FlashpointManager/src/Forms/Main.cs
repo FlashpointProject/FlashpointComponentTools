@@ -49,7 +49,10 @@ namespace FlashpointManager
 
                 FPM.CheckDependencies(false);
 
-                new Operate() { TopMost = true }.ShowDialog();
+                new Operate() {
+                    StartPosition = FormStartPosition.CenterScreen,
+                    TopMost = true
+                }.ShowDialog();
 
                 Close();
             }
