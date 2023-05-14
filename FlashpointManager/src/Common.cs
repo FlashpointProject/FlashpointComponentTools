@@ -262,7 +262,7 @@ namespace FlashpointManager
             }
 
             // Refreshes component lists and tracker objects with up-to-date information
-            public static void SyncManager(bool init = false)
+            public static void SyncManager()
             {
                 ComponentTracker.Downloaded.Clear();
                 ComponentTracker.Outdated.Clear();
@@ -289,7 +289,7 @@ namespace FlashpointManager
                     else
                     {
                         if (OfflineMode) node.ForeColor = Color.FromArgb(255, 96, 96, 96);
-                        if (init) node.Checked = node.Checked;
+                        if (!Ready) node.Checked = node.Checked;
                     }
                 });
 

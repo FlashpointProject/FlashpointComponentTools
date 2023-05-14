@@ -36,7 +36,7 @@ namespace FlashpointManager
                 }
             }
 
-            FPM.SyncManager(true);
+            FPM.SyncManager();
             ComponentList.BeforeCheck += ComponentList_BeforeCheck;
 
             if (FPM.AutoDownload.Count > 0)
