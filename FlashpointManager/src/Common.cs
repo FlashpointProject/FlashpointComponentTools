@@ -23,6 +23,9 @@ namespace FlashpointManager
             public string InfoFile { get => System.IO.Path.Combine(FPM.SourcePath, "Components", ID); }
             public bool Downloaded { get => File.Exists(InfoFile); }
 
+            // This is used to get around edge cases where check events trigger despite the checkbox value not changing
+            public bool Checked { get; set; } = false;
+
             public Component(XmlNode node) : base(node)
             {
                 // URL
@@ -146,6 +149,9 @@ namespace FlashpointManager
             // The parsed component list XML
             public static XmlDocument XmlTree { get; } = new XmlDocument();
 
+            // Tracks if the manager has been initialized yet
+            public static bool Ready { get; set; } = false;
+
             // Name of configuration file
             public static string ConfigFile { get; set; } = "fpm.cfg";
             // Internet locations of component list XMLs
@@ -174,6 +180,8 @@ namespace FlashpointManager
 
             // Total size of every downloaded component; managed by SyncManager() function
             public static long DownloadedSize { get; set; } = 0;
+            // Projected size difference based on changed values of checkboxes
+            public static long ModifiedSize { get; set; } = 0;
 
             // Object providing easy access to certain groups of components; managed by SyncManager() function
             public static class ComponentTracker
@@ -286,6 +294,7 @@ namespace FlashpointManager
                 });
 
                 DownloadedSize = ComponentTracker.Downloaded.Sum(c => long.Parse(File.ReadLines(c.InfoFile).First().Split(' ')[1]));
+                ModifiedSize = 0;
 
                 var componentList = new List<string>();
 
@@ -418,6 +427,8 @@ namespace FlashpointManager
                         Main.CustomRepo.Checked = true;
                         break;
                 }
+
+                Ready = true;
             }
 
             // Deletes a file as well as any directories made empty by its deletion

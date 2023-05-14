@@ -67,20 +67,20 @@ namespace FlashpointManager
 
         public void ComponentList_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            long size = 0;
+            if (!e.Node.Tag.GetType().ToString().EndsWith("Component")) return;
 
-            FPM.IterateList(ComponentList.Nodes, node =>
-            {
-                if (!node.Checked || !node.Tag.GetType().ToString().EndsWith("Component")) return;
+            var component = e.Node.Tag as Component;
 
-                var component = node.Tag as Component;
+            if (component.Checked == e.Node.Checked) return;
+            component.Checked = e.Node.Checked;
 
-                size += FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID)
-                    ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
-                    : component.Size;
-            });
+            if (!FPM.Ready) return;
+            
+            FPM.ModifiedSize += (e.Node.Checked ? 1 : -1) * (FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID)
+                ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
+                : component.Size);
 
-            ChangeButton.Text = $"Apply changes ({FPM.GetFormattedBytes(size - FPM.DownloadedSize)})";
+            ChangeButton.Text = $"Apply changes ({FPM.GetFormattedBytes(FPM.ModifiedSize)})";
             ChangeButton.Enabled = true;
         }
 
