@@ -62,7 +62,7 @@ namespace FlashpointManager
 
         public void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.ForeColor == Color.FromArgb(255, 96, 96, 96))
+            if (e.Node.ForeColor == Color.FromArgb(255, 96, 96, 96) && e.Node.Checked)
             {
                 e.Cancel = true;
             }
