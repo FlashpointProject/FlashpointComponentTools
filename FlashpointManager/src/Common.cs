@@ -325,7 +325,8 @@ namespace FlashpointManager
 
                         foreach (string dependID in component.Depends)
                         {
-                            if (!ComponentTracker.Downloaded.Exists(c => c.ID == dependID))
+                            if (!(ComponentTracker.Downloaded.Exists(c => c.ID == dependID)
+                               || ComponentTracker.Outdated.Exists(c => c.ID == dependID)))
                             {
                                 var query = Main.ComponentList.Nodes.Find(dependID, true);
                                 if (query.Length > 0) ComponentTracker.Outdated.Add(query[0].Tag as Component);
