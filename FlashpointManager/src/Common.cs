@@ -443,14 +443,17 @@ namespace FlashpointManager
                 {
                     File.Delete(file);
                 }
-                catch (Exception e) when (!(e is DirectoryNotFoundException))
+                catch (Exception e)
                 {
-                    GenericError(
-                        "Failed to delete the following file:\n" + file + "\n\n" +
-                        "Make sure it is not open or being used by another program."
-                    );
+                    if (!(e is DirectoryNotFoundException))
+                    {
+                        GenericError(
+                            "Failed to delete the following file:\n" + file + "\n\n" +
+                            "Make sure it is not open or being used by another program."
+                        );
 
-                    return;
+                        return;
+                    }
                 }
 
                 string folder = Path.GetDirectoryName(file);
