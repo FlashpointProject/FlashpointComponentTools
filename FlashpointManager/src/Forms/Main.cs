@@ -118,14 +118,14 @@ namespace FlashpointManager
         {
             if (!FPM.CheckDependencies()) return;
 
-            FPM.OperateMode = 0;
+            FPM.OperationMode = OperateMode.Modify;
 
             new Operate().ShowDialog();
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            FPM.OperateMode = 1;
+            FPM.OperationMode = OperateMode.Update;
 
             new Operate().ShowDialog();
         }

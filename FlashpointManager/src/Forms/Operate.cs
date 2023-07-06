@@ -40,7 +40,7 @@ namespace FlashpointManager
 
             client.DownloadProgressChanged += OnDownloadProgressChanged;
 
-            if (FPM.OperateMode == 0)
+            if (FPM.OperationMode == OperateMode.Modify)
             {
                 FPM.IterateList(FPM.Main.ComponentList.Nodes, node =>
                 {
@@ -59,7 +59,7 @@ namespace FlashpointManager
                     }
                 });
             }
-            else if (FPM.OperateMode == 1)
+            else if (FPM.OperationMode == OperateMode.Update)
             {
                 foreach (var component in FPM.ComponentTracker.Outdated)
                 {
@@ -82,7 +82,7 @@ namespace FlashpointManager
                 }
             }
 
-            byteTotal = FPM.OperateMode != 0
+            byteTotal = FPM.OperationMode != OperateMode.Modify
                 ? addedComponents.Sum(c => c.Size)
                 : addedComponents.Concat(removedComponents).Sum(c => c.Size);
 
@@ -261,7 +261,7 @@ namespace FlashpointManager
                 removedFiles++;
 
                 double removeProgress = (double)removedFiles / totalFiles;
-                double totalProgress = FPM.OperateMode != 0 ? 1 : (byteProgress + (removeProgress * totalSize)) / byteTotal;
+                double totalProgress = FPM.OperationMode != OperateMode.Modify ? 1 : (byteProgress + (removeProgress * totalSize)) / byteTotal;
 
                 ProgressMeasure.Invoke((MethodInvoker)delegate
                 {

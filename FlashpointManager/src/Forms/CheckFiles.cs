@@ -78,7 +78,7 @@ namespace FlashpointManager.src.Forms
 
         private void RedownloadButton_Click(object sender, EventArgs e)
         {
-            FPM.OperateMode = 2;
+            FPM.OperationMode = OperateMode.Repair;
 
             new Operate().ShowDialog();
 

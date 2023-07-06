@@ -141,6 +141,12 @@ namespace FlashpointManager
                 return "";
             }
         }
+        
+        public enum OperateMode {
+            Modify,
+            Update,
+            Repair
+        }
 
         public static class FPM
         {
@@ -165,10 +171,7 @@ namespace FlashpointManager
             public static string SourcePath { get; set; } = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ".."));
 
             // Controls which components the operate tab adds and removes
-            // 0 = Download/remove selected components
-            // 1 = Reinstall outdated components
-            // 2 = Reinstall broken components
-            public static int OperateMode { get; set; } = 0;
+            public static OperateMode OperationMode { get; set; } = OperateMode.Modify;
             // Controls whether to apply accommodations for offline use
             public static bool OfflineMode { get; set; } = false;
             // Controls whether the update tab is selected at launch
