@@ -83,7 +83,7 @@ namespace FlashpointManager
                 ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
                 : component.Size);
 
-            ChangeButton.Text = $"Apply changes ({FPM.GetFormattedBytes(FPM.ModifiedSize)})";
+            ChangeButton.Text = $"Apply changes ({FPM.GetFormattedBytes(FPM.ModifiedSize, true)})";
             ChangeButton.Enabled = true;
         }
 
