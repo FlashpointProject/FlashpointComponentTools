@@ -96,10 +96,18 @@ namespace FlashpointManager
                     {
                         stream = new MemoryStream(await client.DownloadDataTaskAsync(new Uri(component.URL)));
                     }
-                    catch (WebException ex) when (ex.Status == WebExceptionStatus.RequestCanceled)
+                    catch (WebException ex)
                     {
-                        client.Dispose();
+                        if (ex.Status != WebExceptionStatus.RequestCanceled)
+                        {
+                            FPM.GenericError(
+                                $"The {workingComponent.Title} component failed to download.\n\n" +
+                                "If this issue persists, please let us know as soon as possible."
+                            );
+                        }
+
                         cancelStatus = 2;
+                        CancelButton.PerformClick();
                         return;
                     }
                 }
@@ -325,7 +333,7 @@ namespace FlashpointManager
 
         private async void CancelButton_Click(object sender, EventArgs e)
         {
-            cancelStatus = 1;
+            if (cancelStatus < 1) cancelStatus = 1;
 
             CancelButton.Enabled = false;
             ProgressLabel.Invoke((MethodInvoker)delegate

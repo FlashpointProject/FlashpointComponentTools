@@ -377,8 +377,7 @@ namespace FlashpointManager
                     long sizeChange = component.Size - oldSize;
                     totalSizeChange += sizeChange;
 
-                    string displayedSize = GetFormattedBytes(sizeChange);
-                    if (displayedSize[0] != '-') displayedSize = "+" + displayedSize;
+                    string displayedSize = GetFormattedBytes(sizeChange, true);
 
                     var item = new ListViewItem();
                     item.Text = component.Title;
@@ -397,7 +396,7 @@ namespace FlashpointManager
                     item.Text = component.Title;
                     item.SubItems.Add("This component is deprecated and can be deleted.");
                     item.SubItems.Add("");
-                    item.SubItems.Add(GetFormattedBytes(-component.Size));
+                    item.SubItems.Add(GetFormattedBytes(-component.Size, true));
 
                     Main.UpdateList.Items.Add(item);
                 }
@@ -409,7 +408,7 @@ namespace FlashpointManager
 
                 if (ComponentTracker.Outdated.Count > 0 || ComponentTracker.Deprecated.Count > 0)
                 {
-                    Main.UpdateButton.Text += $" ({GetFormattedBytes(totalSizeChange)})";
+                    Main.UpdateButton.Text += $" ({GetFormattedBytes(totalSizeChange, true)})";
                     Main.UpdateButton.Enabled = true;
                 }
                 else
@@ -607,18 +606,24 @@ namespace FlashpointManager
             }
 
             // Formats bytes as a human-readable string
-            public static string GetFormattedBytes(long bytes)
+            public static string GetFormattedBytes(long bytes, bool plusSign = false)
             {
                 string[] units = new[] { " bytes", "KB", "MB", "GB" };
                 int i = units.Length;
 
+                string formattedBytes = "0 bytes";
+
                 while (--i >= 0)
                 {
                     double unitSize = Math.Pow(1024, i);
-                    if (Math.Abs(bytes) >= unitSize) return (Math.Floor(bytes / unitSize * 10) / 10).ToString("N1") + units[i];
+                    if (Math.Abs(bytes) >= unitSize)
+                    {
+                        formattedBytes = (Math.Round(bytes / unitSize * 10) / 10).ToString("N1") + units[i];
+                        break;
+                    }
                 }
 
-                return "0 bytes";
+                return (plusSign && !formattedBytes.StartsWith("-") ? "+" : "") + formattedBytes;
             }
 
             // Function for errors unrelated to the component list

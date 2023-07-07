@@ -376,7 +376,7 @@ namespace FlashpointInstaller
                 while (--i >= 0)
                 {
                     double unitSize = Math.Pow(1024, i);
-                    if (bytes >= unitSize) return (Math.Floor(bytes / unitSize * 10) / 10).ToString("N1") + units[i];
+                    if (bytes >= unitSize) return (Math.Round(bytes / unitSize * 10) / 10).ToString("N1") + units[i];
                 }
 
                 return "0 bytes";
