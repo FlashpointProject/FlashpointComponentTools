@@ -27,6 +27,8 @@ namespace FlashpointInstaller
         ZipArchive archive;
         IReader reader;
 
+        List<string> extractedFiles = new List<string>();
+
         long byteProgress = 0;
         long byteTotal = 0;
 
@@ -166,6 +168,8 @@ namespace FlashpointInstaller
                 writer.WriteLine(string.Join(" ", header));
             }
 
+            extractedFiles.Add(infoFile);
+
             if (workingComponent.Size == 0) return;
 
             using (archive = ZipArchive.Open(stream))
@@ -186,6 +190,8 @@ namespace FlashpointInstaller
                         reader.WriteEntryToDirectory(destPath, new ExtractionOptions {
                             ExtractFullPath = true, Overwrite = true, PreserveFileTime = true 
                         });
+
+                        extractedFiles.Add(Path.Combine(destPath, reader.Entry.Key.Replace('/', '\\')));
 
                         using (TextWriter writer = File.AppendText(infoFile))
                         {
@@ -276,12 +282,23 @@ namespace FlashpointInstaller
 
                 if (Directory.Exists(FPM.Main.DestinationPath.Text))
                 {
-                    foreach (string file in Directory.EnumerateFiles(FPM.Main.DestinationPath.Text))
+                    foreach (string file in extractedFiles)
                     {
                         try { File.Delete(file); } catch { }
-                    }
 
-                    try { Directory.Delete(FPM.Main.DestinationPath.Text, true); } catch { }
+                        string folder = Path.GetDirectoryName(file);
+
+                        while (folder != Directory.GetParent(FPM.Main.DestinationPath.Text).ToString())
+                        {
+                            if (Directory.Exists(folder) && !Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories).Any())
+                            {
+                                try { Directory.Delete(folder, true); } catch { }
+                            }
+                            else break;
+
+                            folder = Directory.GetParent(folder).ToString();
+                        }
+                    }
                 }
             });
 
