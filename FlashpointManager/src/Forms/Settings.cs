@@ -76,7 +76,7 @@ namespace FlashpointManager
             TabControl.Enabled = false;
 
             await Task.Run(() => {
-                foreach (string file in Directory.EnumerateFileSystemEntries(FPM.SourcePath, "*", SearchOption.AllDirectories))
+                foreach (string file in Directory.EnumerateFiles(FPM.SourcePath, "*", SearchOption.AllDirectories))
                 {
                     try { FPM.DeleteFileAndDirectories(file); } catch { }
                 }
