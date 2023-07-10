@@ -59,30 +59,36 @@ namespace FlashpointInstaller
 
                 if (component.Size > 0)
                 {
-                    try
+                    while (true)
                     {
-                        stream = new MemoryStream(await client.DownloadDataTaskAsync(new Uri(component.URL)));
-                    }
-                    catch (WebException ex)
-                    {
-                        if (ex.Status != WebExceptionStatus.RequestCanceled)
+                        try
                         {
-                            MessageBox.Show(
-                                $"The {workingComponent.Title} component failed to download.\n\n" +
-                                "If this issue persists, please let us know as soon as possible.",
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
-                            );
+                            stream = new MemoryStream(await client.DownloadDataTaskAsync(new Uri(component.URL)));
+                        }
+                        catch (WebException ex)
+                        {
+                            if (ex.Status != WebExceptionStatus.RequestCanceled)
+                            {
+                                var errorResult = MessageBox.Show(
+                                    $"The {workingComponent.Title} component failed to download.\n\n" +
+                                    "Click OK to retry, or Cancel to abort the installation.",
+                                    "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error
+                                );
+
+                                if (errorResult == DialogResult.OK) continue;
+                            }
+
+                            cancelStatus = 2;
+                            CancelButton.PerformClick();
+                            return;
                         }
 
-                        cancelStatus = 2;
-                        CancelButton.PerformClick();
-                        return;
+                        await Task.Run(ExtractComponents);
+
+                        byteProgress += component.Size;
+                        break;
                     }
                 }
-
-                await Task.Run(ExtractComponents);
-
-                byteProgress += component.Size;
             }
 
             if (cancelStatus == 0)
