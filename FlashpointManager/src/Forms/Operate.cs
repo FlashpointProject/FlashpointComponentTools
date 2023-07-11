@@ -116,15 +116,13 @@ namespace FlashpointManager
                             return;
                         }
 
-                        await Task.Run(ExtractComponents);
-
-                        byteProgress += component.Size;
                         break;
                     }
-                } else {
-                    // Zero size component, still generate info file
-                    await Task.Run(ExtractComponents);
                 }
+
+                await Task.Run(ExtractComponents);
+
+                byteProgress += component.Size;
             }
 
             if (cancelStatus != 0) return;

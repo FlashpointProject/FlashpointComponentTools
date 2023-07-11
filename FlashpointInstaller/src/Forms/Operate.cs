@@ -83,12 +83,13 @@ namespace FlashpointInstaller
                             return;
                         }
 
-                        await Task.Run(ExtractComponents);
-
-                        byteProgress += component.Size;
                         break;
                     }
                 }
+
+                await Task.Run(ExtractComponents);
+
+                byteProgress += component.Size;
             }
 
             if (cancelStatus == 0)
