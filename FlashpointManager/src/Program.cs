@@ -95,6 +95,7 @@ namespace FlashpointManager
                 {
                     using (var fileStream = new FileStream(backupPath, FileMode.OpenOrCreate, FileAccess.Write))
                     {
+                        fileStream.SetLength(0);
                         listStream.Position = 0;
                         listStream.CopyTo(fileStream);
                     }
