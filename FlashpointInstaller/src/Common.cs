@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -153,6 +154,8 @@ namespace FlashpointInstaller
             public static string ListURL { get; set; } = "https://nexus-dev.unstable.life/repository/stable/components.xml";
             // The parsed component list XML
             public static XmlDocument XmlTree { get; set; }
+            // WebClient instance used to download files
+            public static _WebClient Client { get; } = new _WebClient();
 
             // Check if Visual C++ 2015 x86 redistributable is installed
             public static bool RedistInstalled
@@ -381,6 +384,17 @@ namespace FlashpointInstaller
 
                 return "0 bytes";
             }
+        }
+    }
+
+    // Modified WebClient class with shortened timeout
+    public class _WebClient : WebClient
+    {
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var request = base.GetWebRequest(address);
+            request.Timeout = 3000;
+            return request;
         }
     }
 }

@@ -21,8 +21,6 @@ namespace FlashpointManager
         List<Component> addedComponents   = new List<Component>();
         List<Component> removedComponents = new List<Component>();
 
-        WebClient client = new WebClient();
-
         Stream stream;
         ZipArchive archive;
         IReader reader;
@@ -38,7 +36,7 @@ namespace FlashpointManager
         {
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
 
-            client.DownloadProgressChanged += OnDownloadProgressChanged;
+            FPM.Client.DownloadProgressChanged += OnDownloadProgressChanged;
 
             if (FPM.OperationMode == OperateMode.Modify)
             {
@@ -96,7 +94,7 @@ namespace FlashpointManager
                     {
                         try
                         {
-                            stream = new MemoryStream(await client.DownloadDataTaskAsync(new Uri(component.URL)));
+                            stream = new MemoryStream(await FPM.Client.DownloadDataTaskAsync(new Uri(component.URL)));
                         }
                         catch (WebException ex)
                         {
@@ -158,7 +156,7 @@ namespace FlashpointManager
         {
             if (cancelStatus != 0)
             {
-                client.CancelAsync();
+                FPM.Client.CancelAsync();
                 return;
             }
 
@@ -374,6 +372,8 @@ namespace FlashpointManager
         private void Operation_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (cancelStatus != 2) e.Cancel = true;
+
+            FPM.Client.DownloadProgressChanged -= OnDownloadProgressChanged;
         }
     }
 }

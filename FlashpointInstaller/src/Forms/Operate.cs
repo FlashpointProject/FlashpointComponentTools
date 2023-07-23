@@ -21,8 +21,6 @@ namespace FlashpointInstaller
 
         List<Component> markedComponents   = new List<Component>();
 
-        WebClient client = new WebClient();
-
         Stream stream;
         ZipArchive archive;
         IReader reader;
@@ -40,7 +38,7 @@ namespace FlashpointInstaller
         {
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
 
-            client.DownloadProgressChanged += OnDownloadProgressChanged;
+            FPM.Client.DownloadProgressChanged += OnDownloadProgressChanged;
 
             FPM.IterateList(FPM.Main.ComponentList.Nodes, node =>
             {
@@ -63,7 +61,7 @@ namespace FlashpointInstaller
                     {
                         try
                         {
-                            stream = new MemoryStream(await client.DownloadDataTaskAsync(new Uri(component.URL)));
+                            stream = new MemoryStream(await FPM.Client.DownloadDataTaskAsync(new Uri(component.URL)));
                         }
                         catch (WebException ex)
                         {
@@ -103,8 +101,8 @@ namespace FlashpointInstaller
 
                     if (!File.Exists(redistPath))
                     {
-                        client.DownloadProgressChanged -= OnDownloadProgressChanged;
-                        await client.DownloadFileTaskAsync("https://aka.ms/vs/17/release/vc_redist.x86.exe", redistPath);
+                        FPM.Client.DownloadProgressChanged -= OnDownloadProgressChanged;
+                        await FPM.Client.DownloadFileTaskAsync("https://aka.ms/vs/17/release/vc_redist.x86.exe", redistPath);
                     }
 
                     await Task.Run(() =>
@@ -131,7 +129,7 @@ namespace FlashpointInstaller
         {
             if (cancelStatus != 0)
             {
-                client.CancelAsync();
+                FPM.Client.CancelAsync();
                 return;
             }
 
@@ -317,6 +315,8 @@ namespace FlashpointInstaller
         private void Operation_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (cancelStatus != 2) e.Cancel = true;
+
+            FPM.Client.DownloadProgressChanged -= OnDownloadProgressChanged;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace FlashpointInstaller
 
             try
             {
-                var listStream = new MemoryStream(new WebClient().DownloadData(FPM.ListURL)) { Position = 0 };
+                var listStream = new MemoryStream(FPM.Client.DownloadData(FPM.ListURL)) { Position = 0 };
 
                 FPM.XmlTree = new XmlDocument();
                 FPM.XmlTree.Load(listStream);

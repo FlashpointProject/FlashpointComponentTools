@@ -71,7 +71,7 @@ namespace FlashpointManager
             // Attempt to download and parse component list
             try
             {
-                listStream = new MemoryStream(new WebClient().DownloadData(FPM.RepoXml));
+                listStream = new MemoryStream(FPM.Client.DownloadData(FPM.RepoXml));
                 FPM.XmlTree.Load(listStream);
             }
             catch (Exception e)

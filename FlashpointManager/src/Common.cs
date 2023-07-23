@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -154,6 +155,8 @@ namespace FlashpointManager
             public static Main Main { get => (Main)Application.OpenForms["Main"]; }
             // The parsed component list XML
             public static XmlDocument XmlTree { get; } = new XmlDocument();
+            // WebClient instance used to download files
+            public static _WebClient Client { get; } = new _WebClient();
 
             // Tracks if the manager has been initialized yet
             public static bool Ready { get; set; } = false;
@@ -641,6 +644,17 @@ namespace FlashpointManager
 
                 Environment.Exit(1);
             }
+        }
+    }
+
+    // Modified WebClient class with shortened timeout
+    public class _WebClient : WebClient
+    {
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var request = base.GetWebRequest(address);
+            request.Timeout = 3000;
+            return request;
         }
     }
 }
