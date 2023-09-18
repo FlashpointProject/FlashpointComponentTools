@@ -117,26 +117,44 @@ namespace FlashpointManager
             }
 
             // Verify that the configured Flashpoint path is valid
-            while (!FPM.VerifySourcePath(FPM.SourcePath))
+            if (!FPM.VerifySourcePath(FPM.SourcePath))
             {
-                FPM.GenericError(
-                    "The Flashpoint directory specified in fpm.cfg is invalid!\n\n" + 
-                    "Please choose a valid directory."
-                );
+                string newPath = FPM.SourcePath;
+                string parentPath = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
 
-                var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
+                // If not, check if the parent directory is a valid Flashpoint path and use that if so
+                if (FPM.VerifySourcePath(parentPath))
+                {
+                    newPath = parentPath;
+                }
+                // If neither are valid, ask the user to choose a valid directory
+                else
+                {
+                    while (!FPM.VerifySourcePath(newPath))
+                    {
+                        FPM.GenericError(
+                            "The Flashpoint directory specified in fpm.cfg is invalid!\n\n" +
+                            "Please choose a valid directory."
+                        );
 
-                if (pathDialog.ShowDialog() == CommonFileDialogResult.Cancel)
+                        var pathDialog = new CommonOpenFileDialog() { IsFolderPicker = true };
+
+                        if (pathDialog.ShowDialog() == CommonFileDialogResult.Cancel)
+                        {
+                            Environment.Exit(1);
+                        }
+
+                        newPath = pathDialog.FileName;
+                    }
+                }
+
+                // Write the new Flashpoint path to fpm.cfg
+                if (!FPM.WriteConfig(newPath, FPM.RepoXml))
                 {
                     Environment.Exit(1);
                 }
 
-                FPM.SourcePath = pathDialog.FileName;
-
-                if (!FPM.WriteConfig(FPM.SourcePath, FPM.RepoXml))
-                {
-                    Environment.Exit(1);
-                }
+                FPM.SourcePath = newPath;
             }
 
             if (args.Length > 0)
