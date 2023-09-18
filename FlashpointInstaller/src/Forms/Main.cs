@@ -117,6 +117,17 @@ namespace FlashpointInstaller
         {
             if (!FPM.VerifyDestinationPath(DestinationPath.Text) || !FPM.CheckDependencies()) return;
 
+            if (DestinationPath.Text.Length >= 192)
+            {
+                var pathDialog = MessageBox.Show(
+                    "The specified path is extremely long. This may cause certain functionality to break.\n\n" +
+                    "Are you sure you want to continue?",
+                    "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
+                );
+
+                if (pathDialog == DialogResult.No) return;
+            }
+
             if (!FPM.RedistInstalled)
             {
                 var redistDialog = MessageBox.Show(
