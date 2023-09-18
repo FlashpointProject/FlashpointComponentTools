@@ -244,7 +244,7 @@ namespace FlashpointInstaller
             // Checks if specified Flashpoint destination path is valid
             public static bool VerifyDestinationPath(string path)
             {
-                bool alreadyExists = false;
+                bool alreadyExists = File.Exists(Path.Combine(path, "Launcher", "Flashpoint.exe"));
 
                 IterateXML(XmlTree.GetElementsByTagName("list")[0].ChildNodes, node =>
                 {
@@ -270,7 +270,7 @@ namespace FlashpointInstaller
                 if (!Path.IsPathRooted(path))
                 {
                     MessageBox.Show(
-                        $"The specified directory is not valid! Choose a different folder.",
+                        "The specified directory is not valid! Choose a different folder.",
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error
                     );
 
