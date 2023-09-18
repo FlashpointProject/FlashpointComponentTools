@@ -1,5 +1,5 @@
 # Flashpoint Component Tools
-This repository contains GUI utilities for downloading, managing, or removing a copy of [BlueMaxima's Flashpoint](https://bluemaxima.org/flashpoint) using the component system.
+This repository contains GUI utilities for downloading, managing, or removing a copy of the [Flashpoint Archive](https://flashpointarchive.org/) using the component system.
 
 A general-purpose command-line tool can be found [here](https://github.com/WumboSpasm/fpm).
 
