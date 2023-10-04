@@ -252,7 +252,14 @@ namespace FlashpointInstaller
                 }
                 if (FPM.Main.ShortcutStartMenu.Checked)
                 {
-                    shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
+                    if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.Programs)))
+                    {
+                        shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.Programs));
+                    }
+                    else
+                    {
+                        shortcutPaths.Add(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu));
+                    }
                 }
 
                 foreach (string path in shortcutPaths)
