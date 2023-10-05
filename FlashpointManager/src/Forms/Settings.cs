@@ -83,6 +83,7 @@ namespace FlashpointManager
 
                 var shortcutPaths = new string[]
                 {
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs),  "Flashpoint.lnk"),
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Flashpoint.lnk"),
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),   "Flashpoint.lnk")
                 };
