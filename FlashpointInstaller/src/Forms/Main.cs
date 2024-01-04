@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -117,12 +118,24 @@ namespace FlashpointInstaller
         {
             if (!FPM.VerifyDestinationPath(DestinationPath.Text) || !FPM.CheckDependencies()) return;
 
+            if (Directory.Exists(DestinationPath.Text) && Directory.EnumerateFileSystemEntries(DestinationPath.Text).Any())
+            {
+                var pathDialog = MessageBox.Show(
+                    "There are already files in the specified path.\n\n" +
+                    "If you uninstall Flashpoint, these files will be deleted as well.\n\n" +
+                    "Are you sure you want to continue?",
+                    "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
+                );
+
+                if (pathDialog == DialogResult.No) return;
+            }
+
             if (DestinationPath.Text.Length >= 192)
             {
                 var pathDialog = MessageBox.Show(
                     "The specified path is extremely long. This may cause certain functionality to break.\n\n" +
                     "Are you sure you want to continue?",
-                    "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
+                    "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
                 );
 
                 if (pathDialog == DialogResult.No) return;
