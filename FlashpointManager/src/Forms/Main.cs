@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -38,6 +39,7 @@ namespace FlashpointManager
 
             FPM.SyncManager();
             ComponentList.BeforeCheck += ComponentList_BeforeCheck;
+            UpdateList.ItemChecked += UpdateList_ItemChecked;
 
             if (FPM.AutoDownload.Count > 0)
             {
@@ -72,7 +74,7 @@ namespace FlashpointManager
         {
             if (!e.Node.Tag.GetType().ToString().EndsWith("Component")) return;
 
-            var component = e.Node.Tag as Component;
+            var component = e.Node.Tag as Common.Component;
 
             if (component.Checked == e.Node.Checked) return;
             component.Checked = e.Node.Checked;
@@ -91,7 +93,7 @@ namespace FlashpointManager
         {
             if (e.Node.Tag.GetType().ToString().EndsWith("Component"))
             {
-                var component = e.Node.Tag as Component;
+                var component = e.Node.Tag as Common.Component;
 
                 DescriptionBox.Text = "Component Description";
                 Description.Text = component.Description + $" ({FPM.GetFormattedBytes(component.Size)})";
@@ -103,7 +105,7 @@ namespace FlashpointManager
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
                     {
-                        categorySize += (node.Tag as Component).Size;
+                        categorySize += (node.Tag as Common.Component).Size;
                     }
                 });
 
@@ -127,6 +129,12 @@ namespace FlashpointManager
         {
             FPM.OperationMode = OperateMode.Update;
 
+            if (UpdateList.CheckedItems.Count == 0)
+            {
+                MessageBox.Show("No items are checked.", "Flashpoint Manager", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             new Operate().ShowDialog();
         }
 
@@ -140,6 +148,47 @@ namespace FlashpointManager
                     WorkingDirectory = Path.Combine(FPM.SourcePath, "Launcher")
                 }}.Start();
             }
+        }
+
+        public void UpdateList_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            if (!FPM.Ready || !UpdateList.Focused) return;
+
+            var tagData = (dynamic)e.Item.Tag;
+            var component = tagData.Component as Common.Component;
+            long sizeChange = tagData.SizeChange;
+
+            if (component != null) {
+                if (e.Item.Checked)
+                {
+                    FPM.totalSizeChange += sizeChange;
+                }
+                else if (!e.Item.Checked)
+                {
+                    FPM.totalSizeChange -= sizeChange;
+                }
+
+                component.Checked2 = e.Item.Checked;
+
+                lblTotalUpdates.Text = $"Total updates: {UpdateList.CheckedItems.Count}";
+                lblTotalUpdatesSize.Text = $"Total size: {FPM.GetFormattedBytes(FPM.totalSizeChange, true)}";
+            }
+
+            UpdateButton.Enabled = UpdateList.CheckedItems.Count > 0;
+        }
+
+        private void chkUncheckAll_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateList.Focus();
+
+            foreach (ListViewItem item in UpdateList.Items)
+            {
+                item.Checked = chkUncheckAll.Checked;
+            }
+
+            UpdateButton.Enabled = chkUncheckAll.Checked;
+
+            ChangeButton.Focus();
         }
     }
 }
