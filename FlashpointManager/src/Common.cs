@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
+using System.Net.Http;
 
 namespace FlashpointManager
 {
@@ -26,6 +30,9 @@ namespace FlashpointManager
 
             // This is used to get around edge cases where check events trigger despite the checkbox value not changing
             public bool Checked { get; set; } = false;
+
+            // this is used for determining if the component should be updated or not
+            public bool Checked2 { get; set; } = false;
 
             public Component(XmlNode node) : base(node)
             {
@@ -161,6 +168,9 @@ namespace FlashpointManager
             // Tracks if the manager has been initialized yet
             public static bool Ready { get; set; } = false;
 
+            // Tracks the total size change of all components
+            public static long totalSizeChange = 0;
+
             // Name of configuration file
             public static string ConfigFile { get; set; } = "fpm.cfg";
             // Internet locations of component list XMLs
@@ -200,6 +210,12 @@ namespace FlashpointManager
                 public static List<Component> Broken     { get; set; } = new List<Component>();
                 // Contains all components that no longer exist in the live component repository
                 public static List<Component> Deprecated { get; set; } = new List<Component>();
+
+                // Returns a list of outdated and deprecated components
+                public static List<Component> GetOutdatedAndDeprecated()
+                {
+                    return Outdated.Concat(Deprecated).ToList();
+                }
             }
 
             // Performs an operation on every node in the specified TreeNodeCollection
@@ -273,8 +289,9 @@ namespace FlashpointManager
                 ComponentTracker.Downloaded.Clear();
                 ComponentTracker.Outdated.Clear();
                 ComponentTracker.Deprecated.Clear();
+                Main.UpdateList.BeginUpdate();
                 Main.UpdateList.Items.Clear();
-
+                
                 IterateList(Main.ComponentList.Nodes, node =>
                 {
                     if (node.Tag.GetType().ToString().EndsWith("Component"))
@@ -328,6 +345,7 @@ namespace FlashpointManager
                     if (outdated)
                     {
                         ComponentTracker.Outdated.Add(component);
+                        component.Checked2 = true;
 
                         foreach (string dependID in component.Depends)
                         {
@@ -335,7 +353,11 @@ namespace FlashpointManager
                                || ComponentTracker.Outdated.Exists(c => c.ID == dependID)))
                             {
                                 var query = Main.ComponentList.Nodes.Find(dependID, true);
-                                if (query.Length > 0) ComponentTracker.Outdated.Add(query[0].Tag as Component);
+                                if (query.Length > 0)
+                                {
+                                    ComponentTracker.Outdated.Add(query[0].Tag as Component);
+                                    component.Checked2 = true;
+                                }
                             }
                         }
                     }
@@ -365,11 +387,13 @@ namespace FlashpointManager
                             Hash  = header[0]
                         };
 
+                        // by defualt we don't want want to remove depricated components
+                        component.Checked2 = false;
+
                         ComponentTracker.Deprecated.Add(component);
                     }
                 }
 
-                long totalSizeChange = 0;
 
                 foreach (var component in ComponentTracker.Outdated)
                 {
@@ -387,31 +411,37 @@ namespace FlashpointManager
                     item.SubItems.Add(component.Description);
                     item.SubItems.Add(component.LastUpdated);
                     item.SubItems.Add(displayedSize);
+                    item.Checked = component.Checked2;
+                    item.Tag = new { Component = component, SizeChange = sizeChange };
 
                     Main.UpdateList.Items.Add(item);
                 }
 
                 foreach (var component in ComponentTracker.Deprecated)
                 {
-                    totalSizeChange -= component.Size;
+                    long sizeChange = -component.Size;
+
+                    totalSizeChange -= sizeChange;
 
                     var item = new ListViewItem();
                     item.Text = component.Title;
                     item.SubItems.Add("This component is deprecated and can be deleted.");
                     item.SubItems.Add("");
                     item.SubItems.Add(GetFormattedBytes(-component.Size, true));
-
+                    item.Checked = false;
+                    item.Tag = new { Component = component, SizeChange = sizeChange };
                     Main.UpdateList.Items.Add(item);
                 }
+
 
                 Main.ChangeButton.Text = $"Apply changes";
                 Main.ChangeButton.Enabled = false;
 
-                Main.UpdateButton.Text = "Install updates";
-
                 if (ComponentTracker.Outdated.Count > 0 || ComponentTracker.Deprecated.Count > 0)
                 {
-                    Main.UpdateButton.Text += $" ({GetFormattedBytes(totalSizeChange, true)})";
+                    var componentCount = ComponentTracker.Outdated.Count + ComponentTracker.Deprecated.Count;
+                    Main.lblTotalUpdates.Text = $"Total updates: {componentCount}";
+                    Main.lblTotalUpdatesSize.Text = $"Total size: {GetFormattedBytes(totalSizeChange)}";
                     Main.UpdateButton.Enabled = true;
                 }
                 else
@@ -433,8 +463,8 @@ namespace FlashpointManager
                         Main.CustomRepo.Checked = true;
                         break;
                 }
-
                 Ready = true;
+                Main.UpdateList.EndUpdate();
             }
 
             // Deletes a file as well as any directories made empty by its deletion

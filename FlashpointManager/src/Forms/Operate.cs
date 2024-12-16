@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -30,10 +32,22 @@ namespace FlashpointManager
 
         int cancelStatus = 0;
 
-        public Operate() => InitializeComponent();
+        private CancellationTokenSource cancellationTokenSource;
+        private IProgress<double> progressReporter;
+
+        public Operate()
+        {
+            InitializeComponent();
+            cancellationTokenSource = new CancellationTokenSource();
+            progressReporter = new Progress<double>(ReportProgress);
+
+            //FPM.Client.Proxy = new WebProxy("http://127.0.0.1:8888");
+        }
 
         private async void Operation_Load(object sender, EventArgs e)
         {
+            var token = cancellationTokenSource.Token;
+
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, FPM.Main.Handle);
 
             FPM.Client.DownloadProgressChanged += OnDownloadProgressChanged;
@@ -61,6 +75,7 @@ namespace FlashpointManager
             {
                 foreach (var component in FPM.ComponentTracker.Outdated)
                 {
+                    if (!component.Checked2) continue;
                     if (FPM.ComponentTracker.Downloaded.Exists(c => c.ID == component.ID))
                     {
                         removedComponents.Add(component);
@@ -69,7 +84,7 @@ namespace FlashpointManager
                     addedComponents.Add(component);
                 }
 
-                removedComponents.AddRange(FPM.ComponentTracker.Deprecated);
+                removedComponents.AddRange(FPM.ComponentTracker.Deprecated.Where(c => c.Checked2));
             }
             else
             {
@@ -94,31 +109,42 @@ namespace FlashpointManager
                     {
                         try
                         {
-                            stream = new MemoryStream(await FPM.Client.DownloadDataTaskAsync(new Uri(component.URL)));
+                            using (var ctr = token.Register(() => FPM.Client.CancelAsync()))
+                            {
+                                stream = new MemoryStream(await FPM.Client.DownloadDataTaskAsync(component.URL));
+                            }
+                        }
+                        catch(WebException ex) when (ex.Status == WebExceptionStatus.RequestCanceled)
+                        {
+                            cancelStatus = 2;
+                            return;
+
                         }
                         catch (WebException ex)
                         {
-                            if (ex.Status != WebExceptionStatus.RequestCanceled)
+                            var errorResult = MessageBox.Show(
+                                $"The {workingComponent.Title} component failed to download.\n\n" +
+                                "Click OK to retry, or Cancel to abort the installation.",
+                                "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error
+                            );
+                        
+                            if (errorResult == DialogResult.OK)
                             {
-                                var errorResult = MessageBox.Show(
-                                    $"The {workingComponent.Title} component failed to download.\n\n" +
-                                    "Click OK to retry, or Cancel to abort the installation.",
-                                    "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error
-                                );
-
-                                if (errorResult == DialogResult.OK) continue;
+                                // Retry the download
+                                continue;
                             }
-
-                            cancelStatus = 2;
-                            CancelButton.PerformClick();
-                            return;
+                            else
+                            {
+                                cancelStatus = 2;
+                                cancellationTokenSource.Cancel();
+                                return;
+                            }
                         }
-
                         break;
                     }
                 }
 
-                await Task.Run(ExtractComponents);
+                await Task.Run(() => ExtractComponents(cancellationTokenSource.Token, progressReporter), cancellationTokenSource.Token);
 
                 byteProgress += component.Size;
             }
@@ -130,7 +156,7 @@ namespace FlashpointManager
             {
                 workingComponent = component;
 
-                await Task.Run(RemoveComponents);
+                await Task.Run(() => RemoveComponents(cancellationTokenSource.Token, progressReporter), cancellationTokenSource.Token);
 
                 byteProgress += component.Size;
             }
@@ -141,7 +167,7 @@ namespace FlashpointManager
             {
                 workingComponent = component;
 
-                await Task.Run(ApplyComponents);
+                await Task.Run(() => ApplyComponents(cancellationTokenSource.Token), cancellationTokenSource.Token);
             }
 
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
@@ -184,7 +210,7 @@ namespace FlashpointManager
             });
         }
 
-        private void ExtractComponents()
+        private void ExtractComponents(CancellationToken cancellationToken, IProgress<double> progress)
         {
             string rootPath = Path.Combine(FPM.SourcePath, "Temp");
             string infoPath = Path.Combine(rootPath, "Components");
@@ -201,67 +227,66 @@ namespace FlashpointManager
             }
 
             if (workingComponent.Size == 0) return;
-
-            using (archive = ZipArchive.Open(stream))
+            try
             {
-                using (reader = archive.ExtractAllEntries())
+                using (archive = ZipArchive.Open(stream))
                 {
-                    long extractedSize = 0;
-                    long totalSize = archive.TotalUncompressSize;
-
-                    string destPath = Path.Combine(rootPath, workingComponent.Path.Replace('/', '\\'));
-
-                    while (cancelStatus == 0 && reader.MoveToNextEntry())
+                    using (reader = archive.ExtractAllEntries())
                     {
-                        if (reader.Entry.IsDirectory) continue;
+                        long extractedSize = 0;
+                        long totalSize = archive.TotalUncompressSize;
 
-                        Directory.CreateDirectory(destPath);
+                        string destPath = Path.Combine(rootPath, workingComponent.Path.Replace('/', '\\'));
 
-                        reader.WriteEntryToDirectory(destPath, new ExtractionOptions {
-                            ExtractFullPath = true, Overwrite = true, PreserveFileTime = true 
-                        });
-
-                        using (TextWriter writer = File.AppendText(infoFile))
+                        while (reader.MoveToNextEntry())
                         {
-                            writer.WriteLine(Path.Combine(workingComponent.Path, reader.Entry.Key).Replace("/", @"\"));
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            if (reader.Entry.IsDirectory) continue;
+
+                            Directory.CreateDirectory(destPath);
+
+                            reader.WriteEntryToDirectory(destPath, new ExtractionOptions {
+                                ExtractFullPath = true, Overwrite = true, PreserveFileTime = true
+                            });
+
+                            using (TextWriter writer = File.AppendText(infoFile))
+                            {
+                                writer.WriteLine(Path.Combine(workingComponent.Path, reader.Entry.Key).Replace("/", @"\"));
+                            }
+
+                            extractedSize += reader.Entry.Size;
+
+                            double currentProgress = (double)extractedSize / totalSize;
+                            long currentSize = workingComponent.Size;
+                            double totalProgress = (byteProgress + (currentSize / 2) + (currentProgress / 2 * currentSize)) / byteTotal;
+
+                            progress.Report(totalProgress);
+
+                            ProgressLabel.Invoke((MethodInvoker)delegate
+                            {
+                                ProgressLabel.Text =
+                                    $"[{(int)((double)totalProgress * 100)}%] Extracting component \"{workingComponent.Title}\"... " +
+                                    $"{FPM.GetFormattedBytes(extractedSize)} of {FPM.GetFormattedBytes(totalSize)}";
+                            });
+
+                            FPM.Main.Invoke((MethodInvoker)delegate
+                            {
+                                TaskbarManager.Instance.SetProgressValue(
+                                    (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
+                                );
+                            });
                         }
-
-                        extractedSize += reader.Entry.Size;
-
-                        double currentProgress = (double)extractedSize / totalSize;
-                        long currentSize = workingComponent.Size;
-                        double totalProgress = (byteProgress + (currentSize / 2) + (currentProgress / 2 * currentSize)) / byteTotal;
-
-                        ProgressMeasure.Invoke((MethodInvoker)delegate
-                        {
-                            ProgressMeasure.Value = (int)((double)totalProgress * ProgressMeasure.Maximum);
-                        });
-
-                        ProgressLabel.Invoke((MethodInvoker)delegate
-                        {
-                            ProgressLabel.Text = 
-                                $"[{(int)((double)totalProgress * 100)}%] Extracting component \"{workingComponent.Title}\"... " +
-                                $"{FPM.GetFormattedBytes(extractedSize)} of {FPM.GetFormattedBytes(totalSize)}";
-                        });
-
-                        FPM.Main.Invoke((MethodInvoker)delegate
-                        {
-                            TaskbarManager.Instance.SetProgressValue(
-                                (int)((double)totalProgress * ProgressMeasure.Maximum), ProgressMeasure.Maximum, FPM.Main.Handle
-                            );
-                        });
-                    }
-
-                    if (cancelStatus != 0)
-                    {
-                        reader.Cancel();
-                        cancelStatus = 2;
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                cancelStatus = 2;
+            }
         }
 
-        private void RemoveComponents()
+        private void RemoveComponents(CancellationToken cancellationToken, IProgress<double> progress)
         {
             string[] infoText = File.ReadLines(workingComponent.InfoFile).Skip(1).ToArray();
 
@@ -277,10 +302,7 @@ namespace FlashpointManager
                 double removeProgress = (double)removedFiles / totalFiles;
                 double totalProgress = FPM.OperationMode != OperateMode.Modify ? 1 : (byteProgress + (removeProgress * totalSize)) / byteTotal;
 
-                ProgressMeasure.Invoke((MethodInvoker)delegate
-                {
-                    ProgressMeasure.Value = (int)((double)totalProgress * ProgressMeasure.Maximum);
-                });
+                progress.Report(totalProgress);
 
                 ProgressLabel.Invoke((MethodInvoker)delegate
                 {
@@ -302,7 +324,7 @@ namespace FlashpointManager
             FPM.DeleteFileAndDirectories(workingComponent.InfoFile);
         }
 
-        private void ApplyComponents()
+        private void ApplyComponents(CancellationToken cancellationToken)
         {
             void MoveDelete(string source, string dest)
             {
@@ -332,6 +354,12 @@ namespace FlashpointManager
                 Directory.CreateDirectory(Path.GetDirectoryName(destFile));
 
                 MoveDelete(tempFile, destFile);
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cancelStatus = 2;
+                    break;
+                }
             }
 
             MoveDelete(tempInfoFile, workingComponent.InfoFile);
@@ -346,6 +374,8 @@ namespace FlashpointManager
             {
                 ProgressLabel.Text = "Cancelling...";
             });
+
+            cancellationTokenSource.Cancel();
 
             await Task.Run(() =>
             {
@@ -365,7 +395,6 @@ namespace FlashpointManager
             });
 
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, FPM.Main.Handle);
-
             Close();
         }
 
@@ -374,6 +403,14 @@ namespace FlashpointManager
             if (cancelStatus != 2) e.Cancel = true;
 
             FPM.Client.DownloadProgressChanged -= OnDownloadProgressChanged;
+        }
+
+        private void ReportProgress(double value)
+        {
+            ProgressMeasure.Invoke((MethodInvoker)delegate
+            {
+                ProgressMeasure.Value = (int)(value * ProgressMeasure.Maximum);
+            });
         }
     }
 }
