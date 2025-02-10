@@ -40,7 +40,7 @@ namespace FlashpointInstaller
 
         private void Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start(new ProcessStartInfo("https://bluemaxima.org/flashpoint") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo("https://flashpointarchive.org/") { UseShellExecute = true });
         }
 
         public void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
