@@ -176,8 +176,8 @@ namespace FlashpointManager
             // Internet locations of component list XMLs
             public static class RepoXmlTemplates
             {
-                public const string Stable = "https://nexus-dev.unstable.life/repository/stable/components.xml";
-                public const string Development = "https://nexus-dev.unstable.life/repository/development/components.xml";
+                public const string Stable = "https://nexus-dev.flashpointarchive.org/repository/stable/components.xml";
+                public const string Development = "https://nexus-dev.flashpointarchive.org/repository/development/components.xml";
             }
             public static string RepoXml { get; set; } = RepoXmlTemplates.Stable;
             // Path to the local Flashpoint copy
