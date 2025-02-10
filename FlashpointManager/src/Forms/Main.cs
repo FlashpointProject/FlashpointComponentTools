@@ -17,6 +17,7 @@ namespace FlashpointManager
 
         private void Main_Load(object sender, EventArgs e)
         {
+            this.TabControl.ItemSize = new Size(this.TabControl.Width / this.TabControl.TabCount, 0) - new Size(1, 0);
             Text += $" v{Application.ProductVersion}";
 
             if (FPM.OfflineMode)
@@ -189,6 +190,11 @@ namespace FlashpointManager
             UpdateButton.Enabled = chkUncheckAll.Checked;
 
             ChangeButton.Focus();
+        }
+
+        private void OfflineIndicator_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -463,6 +463,14 @@ namespace FlashpointManager
                         Main.CustomRepo.Checked = true;
                         break;
                 }
+
+                long totalInstalledSize = ComponentTracker.Downloaded.Sum(c => c.Size);
+                Main.installSizeLabel.Text = $"Total installed size: {GetFormattedBytes(totalInstalledSize)}";
+                int numInstalled = ComponentTracker.Downloaded.Count;
+                int numMissing = componentList.Count - numInstalled;
+                Main.numInstalledLabel.Text = $"Number of installed components: {numInstalled}";
+                Main.numMissingLabel.Text = $"Number of missing components: {numMissing}";
+
                 Ready = true;
                 Main.UpdateList.EndUpdate();
             }

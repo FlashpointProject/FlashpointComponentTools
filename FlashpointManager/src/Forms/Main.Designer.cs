@@ -1,4 +1,6 @@
-﻿namespace FlashpointManager
+﻿using System.Drawing;
+
+namespace FlashpointManager
 {
     partial class Main
     {
@@ -61,13 +63,18 @@
             this.RepositoryLabel = new System.Windows.Forms.Label();
             this.CustomRepo = new System.Windows.Forms.RadioButton();
             this.UninstallButton = new System.Windows.Forms.Button();
-            this.OfflineIndicator = new System.Windows.Forms.Label();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.OfflineIndicator = new System.Windows.Forms.ToolStripStatusLabel();
+            this.installSizeLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.numInstalledLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.numMissingLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
             this.UpdateTab.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SettingsTab.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
@@ -75,10 +82,11 @@
             this.TabControl.Controls.Add(this.ManageTab);
             this.TabControl.Controls.Add(this.UpdateTab);
             this.TabControl.Controls.Add(this.SettingsTab);
-            this.TabControl.ItemSize = new System.Drawing.Size(150, 20);
+            this.TabControl.ItemSize = new System.Drawing.Size(200, 50);
             this.TabControl.Location = new System.Drawing.Point(20, 15);
             this.TabControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TabControl.Name = "TabControl";
+            this.TabControl.Padding = new System.Drawing.Point(10, 10);
             this.TabControl.SelectedIndex = 0;
             this.TabControl.Size = new System.Drawing.Size(916, 435);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
@@ -91,11 +99,11 @@
             this.ManageTab.Controls.Add(this.ChangeButton);
             this.ManageTab.Controls.Add(this.DescriptionBox);
             this.ManageTab.Controls.Add(this.ComponentList);
-            this.ManageTab.Location = new System.Drawing.Point(4, 24);
+            this.ManageTab.Location = new System.Drawing.Point(4, 54);
             this.ManageTab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ManageTab.Name = "ManageTab";
             this.ManageTab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ManageTab.Size = new System.Drawing.Size(908, 407);
+            this.ManageTab.Size = new System.Drawing.Size(908, 377);
             this.ManageTab.TabIndex = 1;
             this.ManageTab.Text = "Add/Remove Components";
             this.ManageTab.UseVisualStyleBackColor = true;
@@ -121,10 +129,10 @@
             // ChangeButton
             // 
             this.ChangeButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.ChangeButton.Location = new System.Drawing.Point(20, 337);
+            this.ChangeButton.Location = new System.Drawing.Point(14, 323);
             this.ChangeButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ChangeButton.Name = "ChangeButton";
-            this.ChangeButton.Size = new System.Drawing.Size(861, 40);
+            this.ChangeButton.Size = new System.Drawing.Size(857, 40);
             this.ChangeButton.TabIndex = 4;
             this.ChangeButton.Text = "&Apply changes";
             this.ChangeButton.UseVisualStyleBackColor = true;
@@ -158,7 +166,7 @@
             this.ComponentList.Location = new System.Drawing.Point(14, 18);
             this.ComponentList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(584, 232);
+            this.ComponentList.Size = new System.Drawing.Size(584, 295);
             this.ComponentList.TabIndex = 0;
             this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
             this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
@@ -170,11 +178,11 @@
             this.UpdateTab.Controls.Add(this.groupBox1);
             this.UpdateTab.Controls.Add(this.UpdateButton);
             this.UpdateTab.Controls.Add(this.UpdateList);
-            this.UpdateTab.Location = new System.Drawing.Point(4, 24);
+            this.UpdateTab.Location = new System.Drawing.Point(4, 54);
             this.UpdateTab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UpdateTab.Name = "UpdateTab";
             this.UpdateTab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.UpdateTab.Size = new System.Drawing.Size(908, 407);
+            this.UpdateTab.Size = new System.Drawing.Size(908, 377);
             this.UpdateTab.TabIndex = 3;
             this.UpdateTab.Text = "Update Components";
             this.UpdateTab.UseVisualStyleBackColor = true;
@@ -290,18 +298,19 @@
             this.SettingsTab.Controls.Add(this.RepositoryLabel);
             this.SettingsTab.Controls.Add(this.CustomRepo);
             this.SettingsTab.Controls.Add(this.UninstallButton);
-            this.SettingsTab.Location = new System.Drawing.Point(4, 24);
+            this.SettingsTab.Location = new System.Drawing.Point(4, 54);
             this.SettingsTab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.SettingsTab.Name = "SettingsTab";
             this.SettingsTab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.SettingsTab.Size = new System.Drawing.Size(908, 407);
+            this.SettingsTab.Size = new System.Drawing.Size(908, 377);
             this.SettingsTab.TabIndex = 2;
             this.SettingsTab.Text = "Settings";
             this.SettingsTab.UseVisualStyleBackColor = true;
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new System.Drawing.Point(74, 271);
+            this.SaveButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.SaveButton.Location = new System.Drawing.Point(82, 308);
             this.SaveButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(240, 40);
@@ -342,7 +351,7 @@
             // CheckFilesButton
             // 
             this.CheckFilesButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.CheckFilesButton.Location = new System.Drawing.Point(330, 337);
+            this.CheckFilesButton.Location = new System.Drawing.Point(330, 308);
             this.CheckFilesButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.CheckFilesButton.Name = "CheckFilesButton";
             this.CheckFilesButton.Size = new System.Drawing.Size(240, 40);
@@ -411,7 +420,7 @@
             // UninstallButton
             // 
             this.UninstallButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.UninstallButton.Location = new System.Drawing.Point(580, 337);
+            this.UninstallButton.Location = new System.Drawing.Point(580, 308);
             this.UninstallButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UninstallButton.Name = "UninstallButton";
             this.UninstallButton.Size = new System.Drawing.Size(240, 40);
@@ -420,24 +429,52 @@
             this.UninstallButton.UseVisualStyleBackColor = true;
             this.UninstallButton.Click += new System.EventHandler(this.UninstallButton_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OfflineIndicator,
+            this.installSizeLabel,
+            this.numInstalledLabel,
+            this.numMissingLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 463);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(949, 32);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
             // OfflineIndicator
             // 
-            this.OfflineIndicator.AutoSize = true;
-            this.OfflineIndicator.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OfflineIndicator.Location = new System.Drawing.Point(795, 25);
-            this.OfflineIndicator.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.OfflineIndicator.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.OfflineIndicator.Name = "OfflineIndicator";
-            this.OfflineIndicator.Size = new System.Drawing.Size(116, 20);
-            this.OfflineIndicator.TabIndex = 1;
+            this.OfflineIndicator.Size = new System.Drawing.Size(125, 25);
             this.OfflineIndicator.Text = "Offline Mode";
             this.OfflineIndicator.Visible = false;
+            // 
+            // installSizeLabel
+            // 
+            this.installSizeLabel.Name = "installSizeLabel";
+            this.installSizeLabel.Size = new System.Drawing.Size(88, 25);
+            this.installSizeLabel.Text = "installSize";
+            // 
+            // numInstalledLabel
+            // 
+            this.numInstalledLabel.Name = "numInstalledLabel";
+            this.numInstalledLabel.Size = new System.Drawing.Size(155, 25);
+            this.numInstalledLabel.Text = "numInstalledLabel";
+            // 
+            // numMissingLabel
+            // 
+            this.numMissingLabel.Name = "numMissingLabel";
+            this.numMissingLabel.Size = new System.Drawing.Size(150, 25);
+            this.numMissingLabel.Text = "numMissingLabel";
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(949, 464);
-            this.Controls.Add(this.OfflineIndicator);
+            this.ClientSize = new System.Drawing.Size(949, 495);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.TabControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -457,13 +494,14 @@
             this.groupBox1.PerformLayout();
             this.SettingsTab.ResumeLayout(false);
             this.SettingsTab.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.TabControl TabControl;
         private System.Windows.Forms.TabPage ManageTab;
         private System.Windows.Forms.TabPage SettingsTab;
         public RikTheVeggie.TriStateTreeView ComponentList;
@@ -484,17 +522,22 @@
         private System.Windows.Forms.Button BrowseButton;
         private System.Windows.Forms.Label LocationLabel;
         public System.Windows.Forms.Button CheckFilesButton;
-        private System.Windows.Forms.Button SaveButton;
         public System.Windows.Forms.TextBox RepositoryBox;
         public System.Windows.Forms.TextBox LocationBox;
         public System.Windows.Forms.RadioButton StableRepo;
         public System.Windows.Forms.RadioButton DevRepo;
         public System.Windows.Forms.RadioButton CustomRepo;
-        private System.Windows.Forms.Label OfflineIndicator;
         private System.Windows.Forms.GroupBox groupBox1;
         public System.Windows.Forms.Label lblTotalUpdates;
         public System.Windows.Forms.Label lblTotalUpdatesSize;
         private System.Windows.Forms.CheckBox chkUncheckAll;
+        public System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel OfflineIndicator;
+        public System.Windows.Forms.ToolStripStatusLabel installSizeLabel;
+        public System.Windows.Forms.ToolStripStatusLabel numInstalledLabel;
+        public System.Windows.Forms.ToolStripStatusLabel numMissingLabel;
+        private System.Windows.Forms.TabControl TabControl;
     }
 }
 
