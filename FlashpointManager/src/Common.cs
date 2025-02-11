@@ -26,7 +26,7 @@ namespace FlashpointManager
             public string[] Depends { get; set; } = new string[] { };
 
             public string InfoFile { get => System.IO.Path.Combine(FPM.SourcePath, "Components", ID); }
-            public bool Downloaded { get => File.Exists(InfoFile); }
+            public bool Downloaded { get => System.IO.File.Exists(InfoFile); }
 
             // This is used to get around edge cases where check events trigger despite the checkbox value not changing
             public bool Checked { get; set; } = false;
@@ -177,7 +177,7 @@ namespace FlashpointManager
             public static class RepoXmlTemplates
             {
                 public const string Stable = "https://nexus-dev.flashpointarchive.org/repository/stable/components.xml";
-                public const string Development = "https://nexus-dev.flashpointarchive.org/repository/development/components.xml";
+                public const string Development = "https://nexus-dev.flashpointarchive.org/repository/development/components.xml";                
             }
             public static string RepoXml { get; set; } = RepoXmlTemplates.Stable;
             // Path to the local Flashpoint copy
@@ -316,7 +316,7 @@ namespace FlashpointManager
                     }
                 });
 
-                DownloadedSize = ComponentTracker.Downloaded.Sum(c => long.Parse(File.ReadLines(c.InfoFile).First().Split(' ')[1]));
+                DownloadedSize = ComponentTracker.Downloaded.Sum(c => long.Parse(System.IO.File.ReadLines(c.InfoFile).First().Split(' ')[1]));
                 ModifiedSize = 0;
 
                 var componentList = new List<string>();
@@ -334,7 +334,7 @@ namespace FlashpointManager
 
                     if (downloaded)
                     {
-                        string localHash = File.ReadLines(component.InfoFile).First().Split(' ')[0];
+                        string localHash = System.IO.File.ReadLines(component.InfoFile).First().Split(' ')[0];
                         outdated = localHash != component.Hash && component.ID != "core-database";
                     }
                     else if (component.Required)
@@ -373,7 +373,7 @@ namespace FlashpointManager
 
                     if (componentList.Contains(id)) continue;
 
-                    string[] header = File.ReadLines(filePath).First().Split(' ');
+                    string[] header = System.IO.File.ReadLines(filePath).First().Split(' ');
 
                     long size = 0;
 
@@ -398,7 +398,7 @@ namespace FlashpointManager
                 foreach (var component in ComponentTracker.Outdated)
                 {
                     long oldSize = ComponentTracker.Downloaded.Exists(c => c.ID == component.ID)
-                        ? long.Parse(File.ReadLines(component.InfoFile).First().Split(' ')[1])
+                        ? long.Parse(System.IO.File.ReadLines(component.InfoFile).First().Split(' ')[1])
                         : 0;
 
                     long sizeChange = component.Size - oldSize;
@@ -484,7 +484,7 @@ namespace FlashpointManager
 
                 try
                 {
-                    File.Delete(file);
+                    System.IO.File.Delete(file);
                 }
                 catch (Exception e)
                 {
@@ -522,7 +522,7 @@ namespace FlashpointManager
                 {
                     if (isFlashpoint || node.Name != "component") return;
 
-                    if (File.Exists(Path.Combine(sourcePath, "Components", new Component(node).ID)))
+                    if (System.IO.File.Exists(Path.Combine(sourcePath, "Components", new Component(node).ID)))
                     {
                         isFlashpoint = true;
                     }
@@ -536,7 +536,7 @@ namespace FlashpointManager
             {
                 try
                 {
-                    File.WriteAllLines("fpm.cfg", new[] { path, source });
+                    System.IO.File.WriteAllLines("fpm.cfg", new[] { path, source });
                 }
                 catch
                 {
@@ -578,7 +578,7 @@ namespace FlashpointManager
                         var component = node.Tag as Component;
 
                         AddDependencies(ComponentTracker.Downloaded.Exists(c => c.ID == component.ID)
-                            ? File.ReadLines(component.InfoFile).First().Split(' ').Skip(2).ToArray()
+                            ? System.IO.File.ReadLines(component.InfoFile).First().Split(' ').Skip(2).ToArray()
                             : component.Depends
                         );
                     }
