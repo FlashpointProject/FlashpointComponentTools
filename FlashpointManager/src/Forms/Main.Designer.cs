@@ -229,17 +229,17 @@ namespace FlashpointManager
             // ComponentDescription
             // 
             this.ComponentDescription.Text = "Description";
-            this.ComponentDescription.Width = 450;
+            this.ComponentDescription.Width = 300;
             // 
             // ComponentDate
             // 
             this.ComponentDate.Text = "Date";
-            this.ComponentDate.Width = 150;
+            this.ComponentDate.Width = 75;
             // 
             // ComponentSize
             // 
             this.ComponentSize.Text = "Size";
-            this.ComponentSize.Width = 150;
+            this.ComponentSize.Width = 75;
             // 
             // SettingsTab
             // 
