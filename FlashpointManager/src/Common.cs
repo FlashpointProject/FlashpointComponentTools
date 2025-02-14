@@ -440,8 +440,8 @@ namespace FlashpointManager
                 if (ComponentTracker.Outdated.Count > 0 || ComponentTracker.Deprecated.Count > 0)
                 {
                     var componentCount = ComponentTracker.Outdated.Count + ComponentTracker.Deprecated.Count;
-                    Main.lblTotalUpdates.Text = $"Total updates: {componentCount}";
-                    Main.lblTotalUpdatesSize.Text = $"Total size: {GetFormattedBytes(totalSizeChange)}";
+                    Main.numToUpdateLabel.Text = $"Total updates: {componentCount}";
+                    Main.numUpdateSizeLabel.Text = $"Total update size: {GetFormattedBytes(totalSizeChange)}";
                     Main.UpdateButton.Enabled = true;
                 }
                 else
@@ -468,8 +468,8 @@ namespace FlashpointManager
                 Main.installSizeLabel.Text = $"Total installed size: {GetFormattedBytes(totalInstalledSize)}";
                 int numInstalled = ComponentTracker.Downloaded.Count;
                 int numMissing = componentList.Count - numInstalled;
-                Main.numInstalledLabel.Text = $"Number of installed components: {numInstalled}";
-                Main.numMissingLabel.Text = $"Number of missing components: {numMissing}";
+                Main.numInstalledLabel.Text = $"Installed components: {numInstalled}";
+                Main.numMissingLabel.Text = $"Missing components: {numMissing}";
 
                 Ready = true;
                 Main.UpdateList.EndUpdate();

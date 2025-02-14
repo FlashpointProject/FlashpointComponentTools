@@ -41,6 +41,7 @@ namespace FlashpointManager
             FPM.SyncManager();
             ComponentList.BeforeCheck += ComponentList_BeforeCheck;
             UpdateList.ItemChecked += UpdateList_ItemChecked;
+            TabControl.SelectedIndexChanged += tabControl_SelectedIndexChanged;
 
             if (FPM.AutoDownload.Count > 0)
             {
@@ -52,7 +53,8 @@ namespace FlashpointManager
 
                 FPM.CheckDependencies(false);
 
-                new Operate() {
+                new Operate()
+                {
                     StartPosition = FormStartPosition.CenterScreen,
                     TopMost = true
                 }.ShowDialog();
@@ -60,7 +62,14 @@ namespace FlashpointManager
                 Close();
             }
 
-            if (FPM.OpenUpdateTab) TabControl.SelectTab(1);
+            if (FPM.OpenUpdateTab)
+            {
+                TabControl.SelectTab(1);
+            }
+            else
+            {
+                tabControl_SelectedIndexChanged(this, EventArgs.Empty);
+            }
         }
 
         public void ComponentList_BeforeCheck(object sender, TreeViewCancelEventArgs e)
@@ -171,8 +180,8 @@ namespace FlashpointManager
 
                 component.Checked2 = e.Item.Checked;
 
-                lblTotalUpdates.Text = $"Total updates: {UpdateList.CheckedItems.Count}";
-                lblTotalUpdatesSize.Text = $"Total size: {FPM.GetFormattedBytes(FPM.totalSizeChange, true)}";
+                numToUpdateLabel.Text = $"Total updates: {UpdateList.CheckedItems.Count}";
+                numUpdateSizeLabel.Text = $"Total size: {FPM.GetFormattedBytes(FPM.totalSizeChange, true)}";
             }
 
             UpdateButton.Enabled = UpdateList.CheckedItems.Count > 0;
@@ -192,9 +201,47 @@ namespace FlashpointManager
             ChangeButton.Focus();
         }
 
-        private void OfflineIndicator_Click(object sender, EventArgs e)
+        private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
+            string selectedTab = TabControl.SelectedTab.Name;
 
+            SetAllStatusLabelsVisibility(false);
+
+            if (selectedTab == "ManageTab")
+            {
+                ShowStatusLabels("installSizeLabel");
+                ShowStatusLabels("numInstalledLabel");
+                ShowStatusLabels("numMissingLabel");
+                
+            }
+            else if (selectedTab == "UpdateTab")
+            {
+                ShowStatusLabels("numToUpdateLabel", "numUpdateSizeLabel");
+            }
         }
+
+        private void SetAllStatusLabelsVisibility(bool visible)
+        {
+            foreach (var item in statusStrip1.Items)
+            {
+                if (item is ToolStripStatusLabel label)
+                {
+                    label.Visible = visible;
+                }
+            }
+        }
+
+        private void ShowStatusLabels(params string[] labelNames)
+        {
+            foreach (string name in labelNames)
+            {
+                var label = statusStrip1.Items.Find(name, false).FirstOrDefault() as ToolStripStatusLabel;
+                if (label != null)
+                {
+                    label.Visible = true;
+                }
+            }
+        }
+
     }
 }

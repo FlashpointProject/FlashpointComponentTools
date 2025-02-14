@@ -39,12 +39,8 @@ namespace FlashpointManager
             this.ChangeButton = new System.Windows.Forms.Button();
             this.DescriptionBox = new System.Windows.Forms.GroupBox();
             this.Description = new System.Windows.Forms.Label();
-            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.UpdateTab = new System.Windows.Forms.TabPage();
             this.chkUncheckAll = new System.Windows.Forms.CheckBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.lblTotalUpdates = new System.Windows.Forms.Label();
-            this.lblTotalUpdatesSize = new System.Windows.Forms.Label();
             this.UpdateButton = new System.Windows.Forms.Button();
             this.UpdateList = new System.Windows.Forms.ListView();
             this.ComponentTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -68,11 +64,13 @@ namespace FlashpointManager
             this.installSizeLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.numInstalledLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.numMissingLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.numToUpdateLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.numUpdateSizeLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
             this.UpdateTab.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.SettingsTab.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -160,22 +158,9 @@ namespace FlashpointManager
             this.Description.Size = new System.Drawing.Size(226, 85);
             this.Description.TabIndex = 0;
             // 
-            // ComponentList
-            // 
-            this.ComponentList.Indent = 20;
-            this.ComponentList.Location = new System.Drawing.Point(14, 18);
-            this.ComponentList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(584, 295);
-            this.ComponentList.TabIndex = 0;
-            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
-            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
-            // 
             // UpdateTab
             // 
             this.UpdateTab.Controls.Add(this.chkUncheckAll);
-            this.UpdateTab.Controls.Add(this.groupBox1);
             this.UpdateTab.Controls.Add(this.UpdateButton);
             this.UpdateTab.Controls.Add(this.UpdateList);
             this.UpdateTab.Location = new System.Drawing.Point(4, 54);
@@ -192,7 +177,7 @@ namespace FlashpointManager
             this.chkUncheckAll.AutoSize = true;
             this.chkUncheckAll.Checked = true;
             this.chkUncheckAll.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkUncheckAll.Location = new System.Drawing.Point(8, 55);
+            this.chkUncheckAll.Location = new System.Drawing.Point(8, 39);
             this.chkUncheckAll.Name = "chkUncheckAll";
             this.chkUncheckAll.Size = new System.Drawing.Size(266, 24);
             this.chkUncheckAll.TabIndex = 3;
@@ -200,41 +185,12 @@ namespace FlashpointManager
             this.chkUncheckAll.UseVisualStyleBackColor = true;
             this.chkUncheckAll.CheckedChanged += new System.EventHandler(this.chkUncheckAll_CheckedChanged);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.lblTotalUpdates);
-            this.groupBox1.Controls.Add(this.lblTotalUpdatesSize);
-            this.groupBox1.Location = new System.Drawing.Point(649, 9);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(235, 75);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Update Info";
-            // 
-            // lblTotalUpdates
-            // 
-            this.lblTotalUpdates.AutoSize = true;
-            this.lblTotalUpdates.Location = new System.Drawing.Point(6, 50);
-            this.lblTotalUpdates.Name = "lblTotalUpdates";
-            this.lblTotalUpdates.Size = new System.Drawing.Size(120, 20);
-            this.lblTotalUpdates.TabIndex = 3;
-            this.lblTotalUpdates.Text = "lblTotalUpdates";
-            // 
-            // lblTotalUpdatesSize
-            // 
-            this.lblTotalUpdatesSize.AutoSize = true;
-            this.lblTotalUpdatesSize.Location = new System.Drawing.Point(6, 22);
-            this.lblTotalUpdatesSize.Name = "lblTotalUpdatesSize";
-            this.lblTotalUpdatesSize.Size = new System.Drawing.Size(151, 20);
-            this.lblTotalUpdatesSize.TabIndex = 0;
-            this.lblTotalUpdatesSize.Text = "lblTotalUpdatesSize";
-            // 
             // UpdateButton
             // 
             this.UpdateButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.UpdateButton.Enabled = false;
             this.UpdateButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.UpdateButton.Location = new System.Drawing.Point(405, 21);
+            this.UpdateButton.Location = new System.Drawing.Point(653, 309);
             this.UpdateButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UpdateButton.Name = "UpdateButton";
             this.UpdateButton.Size = new System.Drawing.Size(237, 58);
@@ -255,11 +211,11 @@ namespace FlashpointManager
             this.UpdateList.GridLines = true;
             this.UpdateList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.UpdateList.HideSelection = false;
-            this.UpdateList.Location = new System.Drawing.Point(8, 91);
+            this.UpdateList.Location = new System.Drawing.Point(8, 71);
             this.UpdateList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UpdateList.MultiSelect = false;
             this.UpdateList.Name = "UpdateList";
-            this.UpdateList.Size = new System.Drawing.Size(876, 296);
+            this.UpdateList.Size = new System.Drawing.Size(619, 296);
             this.UpdateList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.UpdateList.TabIndex = 0;
             this.UpdateList.UseCompatibleStateImageBehavior = false;
@@ -268,22 +224,22 @@ namespace FlashpointManager
             // ComponentTitle
             // 
             this.ComponentTitle.Text = "Title";
-            this.ComponentTitle.Width = 120;
+            this.ComponentTitle.Width = 160;
             // 
             // ComponentDescription
             // 
             this.ComponentDescription.Text = "Description";
-            this.ComponentDescription.Width = 267;
+            this.ComponentDescription.Width = 275;
             // 
             // ComponentDate
             // 
             this.ComponentDate.Text = "Date";
-            this.ComponentDate.Width = 80;
+            this.ComponentDate.Width = 74;
             // 
             // ComponentSize
             // 
             this.ComponentSize.Text = "Size";
-            this.ComponentSize.Width = 80;
+            this.ComponentSize.Width = 99;
             // 
             // SettingsTab
             // 
@@ -436,7 +392,9 @@ namespace FlashpointManager
             this.OfflineIndicator,
             this.installSizeLabel,
             this.numInstalledLabel,
-            this.numMissingLabel});
+            this.numMissingLabel,
+            this.numToUpdateLabel,
+            this.numUpdateSizeLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 463);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(949, 32);
@@ -454,20 +412,48 @@ namespace FlashpointManager
             // installSizeLabel
             // 
             this.installSizeLabel.Name = "installSizeLabel";
-            this.installSizeLabel.Size = new System.Drawing.Size(88, 25);
-            this.installSizeLabel.Text = "installSize";
+            this.installSizeLabel.Size = new System.Drawing.Size(152, 25);
+            this.installSizeLabel.Text = "Total Size: 0 bytes";
             // 
             // numInstalledLabel
             // 
             this.numInstalledLabel.Name = "numInstalledLabel";
-            this.numInstalledLabel.Size = new System.Drawing.Size(155, 25);
-            this.numInstalledLabel.Text = "numInstalledLabel";
+            this.numInstalledLabel.Size = new System.Drawing.Size(202, 25);
+            this.numInstalledLabel.Text = "Installed components: 0";
+            this.numInstalledLabel.Visible = false;
             // 
             // numMissingLabel
             // 
             this.numMissingLabel.Name = "numMissingLabel";
-            this.numMissingLabel.Size = new System.Drawing.Size(150, 25);
-            this.numMissingLabel.Text = "numMissingLabel";
+            this.numMissingLabel.Size = new System.Drawing.Size(197, 25);
+            this.numMissingLabel.Text = "Missing components: 0";
+            this.numMissingLabel.Visible = false;
+            // 
+            // numToUpdateLabel
+            // 
+            this.numToUpdateLabel.Name = "numToUpdateLabel";
+            this.numToUpdateLabel.Size = new System.Drawing.Size(137, 25);
+            this.numToUpdateLabel.Text = "Total updates: 0";
+            this.numToUpdateLabel.Visible = false;
+            // 
+            // numUpdateSizeLabel
+            // 
+            this.numUpdateSizeLabel.Name = "numUpdateSizeLabel";
+            this.numUpdateSizeLabel.Size = new System.Drawing.Size(211, 25);
+            this.numUpdateSizeLabel.Text = "Total update size: 0 bytes";
+            this.numUpdateSizeLabel.Visible = false;
+            // 
+            // ComponentList
+            // 
+            this.ComponentList.Indent = 20;
+            this.ComponentList.Location = new System.Drawing.Point(14, 18);
+            this.ComponentList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.ComponentList.Name = "ComponentList";
+            this.ComponentList.Size = new System.Drawing.Size(584, 295);
+            this.ComponentList.TabIndex = 0;
+            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
             // 
             // Main
             // 
@@ -490,8 +476,6 @@ namespace FlashpointManager
             this.DescriptionBox.ResumeLayout(false);
             this.UpdateTab.ResumeLayout(false);
             this.UpdateTab.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.SettingsTab.ResumeLayout(false);
             this.SettingsTab.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -527,9 +511,6 @@ namespace FlashpointManager
         public System.Windows.Forms.RadioButton StableRepo;
         public System.Windows.Forms.RadioButton DevRepo;
         public System.Windows.Forms.RadioButton CustomRepo;
-        private System.Windows.Forms.GroupBox groupBox1;
-        public System.Windows.Forms.Label lblTotalUpdates;
-        public System.Windows.Forms.Label lblTotalUpdatesSize;
         private System.Windows.Forms.CheckBox chkUncheckAll;
         public System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.StatusStrip statusStrip1;
@@ -538,6 +519,8 @@ namespace FlashpointManager
         public System.Windows.Forms.ToolStripStatusLabel numInstalledLabel;
         public System.Windows.Forms.ToolStripStatusLabel numMissingLabel;
         private System.Windows.Forms.TabControl TabControl;
+        public System.Windows.Forms.ToolStripStatusLabel numToUpdateLabel;
+        public System.Windows.Forms.ToolStripStatusLabel numUpdateSizeLabel;
     }
 }
 
