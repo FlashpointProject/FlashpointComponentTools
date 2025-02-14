@@ -39,6 +39,7 @@ namespace FlashpointManager
             this.ChangeButton = new System.Windows.Forms.Button();
             this.DescriptionBox = new System.Windows.Forms.GroupBox();
             this.Description = new System.Windows.Forms.Label();
+            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.UpdateTab = new System.Windows.Forms.TabPage();
             this.chkUncheckAll = new System.Windows.Forms.CheckBox();
             this.UpdateButton = new System.Windows.Forms.Button();
@@ -66,7 +67,6 @@ namespace FlashpointManager
             this.numMissingLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.numToUpdateLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.numUpdateSizeLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.ComponentList = new RikTheVeggie.TriStateTreeView();
             this.TabControl.SuspendLayout();
             this.ManageTab.SuspendLayout();
             this.DescriptionBox.SuspendLayout();
@@ -158,6 +158,18 @@ namespace FlashpointManager
             this.Description.Size = new System.Drawing.Size(226, 85);
             this.Description.TabIndex = 0;
             // 
+            // ComponentList
+            // 
+            this.ComponentList.Indent = 20;
+            this.ComponentList.Location = new System.Drawing.Point(14, 18);
+            this.ComponentList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.ComponentList.Name = "ComponentList";
+            this.ComponentList.Size = new System.Drawing.Size(584, 295);
+            this.ComponentList.TabIndex = 0;
+            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
+            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
+            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
+            // 
             // UpdateTab
             // 
             this.UpdateTab.Controls.Add(this.chkUncheckAll);
@@ -215,6 +227,7 @@ namespace FlashpointManager
             this.UpdateList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UpdateList.MultiSelect = false;
             this.UpdateList.Name = "UpdateList";
+            this.UpdateList.ShowItemToolTips = true;
             this.UpdateList.Size = new System.Drawing.Size(892, 278);
             this.UpdateList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.UpdateList.TabIndex = 0;
@@ -442,18 +455,6 @@ namespace FlashpointManager
             this.numUpdateSizeLabel.Size = new System.Drawing.Size(211, 25);
             this.numUpdateSizeLabel.Text = "Total update size: 0 bytes";
             this.numUpdateSizeLabel.Visible = false;
-            // 
-            // ComponentList
-            // 
-            this.ComponentList.Indent = 20;
-            this.ComponentList.Location = new System.Drawing.Point(14, 18);
-            this.ComponentList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ComponentList.Name = "ComponentList";
-            this.ComponentList.Size = new System.Drawing.Size(584, 295);
-            this.ComponentList.TabIndex = 0;
-            this.ComponentList.TriStateStyleProperty = RikTheVeggie.TriStateTreeView.TriStateStyles.Installer;
-            this.ComponentList.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ComponentList_AfterCheck);
-            this.ComponentList.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.ComponentList_BeforeSelect);
             // 
             // Main
             // 
