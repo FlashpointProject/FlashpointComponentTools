@@ -190,7 +190,7 @@ namespace FlashpointManager
             this.UpdateButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.UpdateButton.Enabled = false;
             this.UpdateButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.UpdateButton.Location = new System.Drawing.Point(653, 309);
+            this.UpdateButton.Location = new System.Drawing.Point(663, 21);
             this.UpdateButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UpdateButton.Name = "UpdateButton";
             this.UpdateButton.Size = new System.Drawing.Size(237, 58);
@@ -211,11 +211,12 @@ namespace FlashpointManager
             this.UpdateList.GridLines = true;
             this.UpdateList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.UpdateList.HideSelection = false;
-            this.UpdateList.Location = new System.Drawing.Point(8, 71);
+            this.UpdateList.Location = new System.Drawing.Point(8, 89);
             this.UpdateList.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.UpdateList.MultiSelect = false;
             this.UpdateList.Name = "UpdateList";
-            this.UpdateList.Size = new System.Drawing.Size(619, 296);
+            this.UpdateList.ShowItemToolTips = true;
+            this.UpdateList.Size = new System.Drawing.Size(892, 278);
             this.UpdateList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.UpdateList.TabIndex = 0;
             this.UpdateList.UseCompatibleStateImageBehavior = false;
@@ -229,17 +230,17 @@ namespace FlashpointManager
             // ComponentDescription
             // 
             this.ComponentDescription.Text = "Description";
-            this.ComponentDescription.Width = 275;
+            this.ComponentDescription.Width = 300;
             // 
             // ComponentDate
             // 
             this.ComponentDate.Text = "Date";
-            this.ComponentDate.Width = 74;
+            this.ComponentDate.Width = 90;
             // 
             // ComponentSize
             // 
             this.ComponentSize.Text = "Size";
-            this.ComponentSize.Width = 99;
+            this.ComponentSize.Width = 90;
             // 
             // SettingsTab
             // 
