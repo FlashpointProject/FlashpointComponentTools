@@ -1,7 +1,2 @@
-.vs/
-bin/
-obj/
-packages/
-*.csproj.user
-FodyWeavers.xsd
-FodyWeavers.xml
+# Go build output (scripts/build.sh)
+dist/
